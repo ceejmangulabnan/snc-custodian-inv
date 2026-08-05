@@ -1,37 +1,45 @@
 <script setup lang="ts">
-//@ts-nocheck
-const showMessage = ref(false)
+const { user, isAdmin, isCustodian } = useAuth()
+
+const roleLabel = computed(() => {
+  if (isAdmin.value) {
+    return 'Administrator'
+  }
+
+  if (isCustodian.value) {
+    return 'Custodian'
+  }
+
+  return user.value?.role?.type || ''
+})
 </script>
 
 <template>
-  <UContainer class="py-12">
-    <UCard class="mx-auto max-w-xl">
+  <UContainer class="py-8">
+    <UCard class="mx-auto max-w-2xl">
       <template #header>
         <div>
           <h1 class="text-2xl font-bold">
-            Nuxt 4 + Nuxt UI
+            Welcome, {{ user?.username }}
           </h1>
 
           <p class="mt-1 text-sm text-muted">
-            Your project was installed successfully.
+            Signed in as
+            <span class="font-semibold capitalize">{{ roleLabel }}</span>
           </p>
         </div>
       </template>
 
       <div class="space-y-4">
         <p>
-          You can now start building your application using Nuxt UI
-          components.
+          This is the SNC Custodian Inventory dashboard. Use the sidebar to
+          manage items, categories, and transactions.
         </p>
 
-        <UButton @click="showMessage = true">
-          Test Nuxt UI
-        </UButton>
-
         <UAlert
-          v-if="showMessage"
-          title="Installation successful"
-          description="Nuxt UI components are working correctly."
+          v-if="isAdmin"
+          title="Administrator access"
+          description="You can manage user accounts and roles from the Users page."
           color="success"
         />
       </div>

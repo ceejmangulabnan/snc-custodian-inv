@@ -12,7 +12,7 @@
       class="fixed inset-y-0 left-0 z-50 border-r border-white/10 bg-[#0f172a]/95 shadow-2xl backdrop-blur-2xl transition-all duration-300"
       :class="[
         sidebarCollapsed ? 'w-20' : 'w-72',
-        mobileOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0',
+        mobileOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
       ]"
     >
       <div class="flex h-full flex-col">
@@ -25,14 +25,20 @@
             <div
               class="flex size-12 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-500 via-green-500 to-teal-600 text-white shadow-[0_10px_30px_rgba(16,185,129,0.40)]"
             >
-              <UIcon name="i-lucide-id-card" class="size-6" />
+              <UIcon
+                name="i-lucide-id-card"
+                class="size-6"
+              />
             </div>
 
-            <div v-if="!sidebarCollapsed" class="min-w-0">
+            <div
+              v-if="!sidebarCollapsed"
+              class="min-w-0"
+            >
               <h1
                 class="text-wrap leading-none text-base font-semibold tracking-tight text-white"
               >
-              Custodian Inventory System
+                Custodian Inventory System
               </h1>
 
               <p class="truncate text-xs text-slate-400">
@@ -75,7 +81,7 @@
                 isActive(item.to)
                   ? 'bg-white/10 text-white shadow-lg backdrop-blur'
                   : 'text-slate-400 hover:bg-white/5 hover:text-white',
-                sidebarCollapsed ? 'justify-center' : '',
+                sidebarCollapsed ? 'justify-center' : ''
               ]"
               @click="closeMobileSidebar"
             >
@@ -94,11 +100,17 @@
                     : 'bg-white/5 text-slate-400 group-hover:bg-white/10 group-hover:text-white'
                 "
               >
-                <UIcon :name="item.icon" class="size-4" />
+                <UIcon
+                  :name="item.icon"
+                  class="size-4"
+                />
               </div>
 
               <!-- Navigation label -->
-              <span v-if="!sidebarCollapsed" class="truncate">
+              <span
+                v-if="!sidebarCollapsed"
+                class="truncate"
+              >
                 {{ item.label }}
               </span>
             </NuxtLink>
@@ -118,10 +130,16 @@
               <div
                 class="flex size-10 shrink-0 items-center justify-center rounded-2xl bg-emerald-500/20 text-emerald-300"
               >
-                <UIcon name="i-lucide-user" class="size-5" />
+                <UIcon
+                  name="i-lucide-user"
+                  class="size-5"
+                />
               </div>
 
-              <div v-if="!sidebarCollapsed" class="min-w-0 flex-1">
+              <div
+                v-if="!sidebarCollapsed"
+                class="min-w-0 flex-1"
+              >
                 <p class="truncate text-sm font-semibold">
                   {{ displayName }}
                 </p>
@@ -157,12 +175,15 @@
           <div
             class="flex size-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-500 via-green-500 to-teal-600 text-white shadow-lg shadow-emerald-500/30"
           >
-            <UIcon name="i-lucide-id-card" class="size-5" />
+            <UIcon
+              name="i-lucide-id-card"
+              class="size-5"
+            />
           </div>
 
           <div class="min-w-0">
             <p class="truncate text-sm font-bold text-slate-900">
-              School ID System
+              Custodian Inventory System
             </p>
 
             <p class="truncate text-xs text-slate-500">
@@ -207,7 +228,9 @@
               {{ pageTitle }}
             </h2>
 
-            <p class="text-xs text-slate-500">School UI Template</p>
+            <p class="text-xs text-slate-500">
+              Custodian Inventory System
+            </p>
           </div>
         </div>
       </div>
@@ -245,7 +268,10 @@
             <div
               class="mx-auto flex size-20 items-center justify-center rounded-[28px] bg-gradient-to-br from-red-500 to-rose-600 text-white shadow-[0_10px_40px_rgba(239,68,68,0.35)]"
             >
-              <UIcon name="i-lucide-log-out" class="size-10" />
+              <UIcon
+                name="i-lucide-log-out"
+                class="size-10"
+              />
             </div>
 
             <!-- CONTENT -->
@@ -257,9 +283,8 @@
               <p class="mt-2 text-sm leading-relaxed text-slate-500">
                 You are about to sign out from the
                 <span class="font-semibold text-slate-700">
-                  School ID System </span
-                >.
-                <br />
+                  Custodian Inventory System </span>.
+                <br>
                 You can login again anytime.
               </p>
             </div>
@@ -272,7 +297,10 @@
                 <div
                   class="flex size-12 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-500 to-green-600 text-white shadow-lg shadow-emerald-500/20"
                 >
-                  <UIcon name="i-lucide-user" class="size-5" />
+                  <UIcon
+                    name="i-lucide-user"
+                    class="size-5"
+                  />
                 </div>
 
                 <div class="min-w-0 flex-1 text-left">
@@ -315,25 +343,24 @@
             </div>
           </div>
         </div>
-      </template> </UModal
-    >>
+      </template>
+    </UModal>>
   </div>
 </template>
 
 <script setup lang="ts">
-//@ts-nocheck
 interface NavigationLink {
-  label: string;
-  icon: string;
-  to: string;
+  label: string
+  icon: string
+  to: string
 }
 
-const route = useRoute();
+const route = useRoute()
 
-const logoutOpen = ref(false);
-const isLoggingOut = ref(false);
-const isCollapsed = ref(false);
-const mobileOpen = ref(false);
+const logoutOpen = ref(false)
+const isLoggingOut = ref(false)
+const isCollapsed = ref(false)
+const mobileOpen = ref(false)
 
 /*
 |--------------------------------------------------------------------------
@@ -341,23 +368,40 @@ const mobileOpen = ref(false);
 |--------------------------------------------------------------------------
 */
 
-const links: NavigationLink[] = [
-  {
-    label: "Dashboard",
-    icon: "i-lucide-layout-dashboard",
-    to: "/",
-  },
-  {
-    label: "People Records",
-    icon: "i-lucide-users",
-    to: "/people",
-  },
-  {
-    label: "Courses",
-    icon: "i-lucide-graduation-cap",
-    to: "/courses",
-  },
-];
+const links = computed<NavigationLink[]>(() => {
+  const items: NavigationLink[] = [
+    {
+      label: 'Dashboard',
+      icon: 'i-lucide-layout-dashboard',
+      to: '/'
+    },
+    {
+      label: 'Items',
+      icon: 'i-lucide-package',
+      to: '/items'
+    },
+    {
+      label: 'Categories',
+      icon: 'i-lucide-folder-tree',
+      to: '/categories'
+    },
+    {
+      label: 'Transactions',
+      icon: 'i-lucide-arrow-left-right',
+      to: '/transactions'
+    }
+  ]
+
+  if (isAdmin.value) {
+    items.push({
+      label: 'Users',
+      icon: 'i-lucide-users',
+      to: '/users'
+    })
+  }
+
+  return items
+})
 
 /*
 |--------------------------------------------------------------------------
@@ -368,19 +412,19 @@ const links: NavigationLink[] = [
 const sidebarCollapsed = computed(() => {
   // Always show the full sidebar when opened on mobile.
   if (mobileOpen.value) {
-    return false;
+    return false
   }
 
-  return isCollapsed.value;
-});
+  return isCollapsed.value
+})
 
 const toggleSidebar = () => {
-  isCollapsed.value = !isCollapsed.value;
-};
+  isCollapsed.value = !isCollapsed.value
+}
 
 const closeMobileSidebar = () => {
-  mobileOpen.value = false;
-};
+  mobileOpen.value = false
+}
 
 /*
 |--------------------------------------------------------------------------
@@ -389,28 +433,36 @@ const closeMobileSidebar = () => {
 */
 
 const isActive = (path: string): boolean => {
-  if (path === "/") {
-    return route.path === "/";
+  if (path === '/') {
+    return route.path === '/'
   }
 
-  return route.path === path || route.path.startsWith(`${path}/`);
-};
+  return route.path === path || route.path.startsWith(`${path}/`)
+}
 
 const pageTitle = computed(() => {
-  if (route.path.startsWith("/people")) {
-    return "People Records";
+  if (route.path.startsWith('/items')) {
+    return 'Items'
   }
 
-  if (route.path.startsWith("/courses")) {
-    return "Courses";
+  if (route.path.startsWith('/categories')) {
+    return 'Categories'
   }
 
-  return "Dashboard";
-});
+  if (route.path.startsWith('/transactions')) {
+    return 'Transactions'
+  }
+
+  if (route.path.startsWith('/users')) {
+    return 'Users'
+  }
+
+  return 'Dashboard'
+})
 
 const hideDesktopHeader = computed(() => {
-  return route.path.includes("/designer");
-});
+  return route.path.includes('/designer')
+})
 
 /*
 |--------------------------------------------------------------------------
@@ -418,13 +470,25 @@ const hideDesktopHeader = computed(() => {
 |--------------------------------------------------------------------------
 */
 
+const { user, isAdmin, logout } = useAuth()
+
 const displayName = computed(() => {
-  return "SNC Admin";
-});
+  return user.value?.username || 'User'
+})
 
 const displayRole = computed(() => {
-  return "administrator";
-});
+  const type = user.value?.role?.type
+
+  if (type === 'administrator') {
+    return 'Administrator'
+  }
+
+  if (type === 'custodian') {
+    return 'Custodian'
+  }
+
+  return type || ''
+})
 
 /*
 |--------------------------------------------------------------------------
@@ -433,35 +497,27 @@ const displayRole = computed(() => {
 */
 
 const openLogoutModal = () => {
-  mobileOpen.value = false;
-  logoutOpen.value = true;
-};
+  mobileOpen.value = false
+  logoutOpen.value = true
+}
 
 const confirmLogout = async () => {
   if (isLoggingOut.value) {
-    return;
+    return
   }
 
-  isLoggingOut.value = true;
+  isLoggingOut.value = true
 
   try {
-    /*
-     * Replace this section with your real logout function when your
-     * authentication system is ready.
-     *
-     * Example:
-     * const { logout } = useAuth()
-     * await logout()
-     */
-
-    await navigateTo("/auth/login");
-    logoutOpen.value = false;
+    await logout()
+    await navigateTo('/auth/login')
+    logoutOpen.value = false
   } catch (error) {
-    console.error("Logout failed:", error);
+    console.error('Logout failed:', error)
   } finally {
-    isLoggingOut.value = false;
+    isLoggingOut.value = false
   }
-};
+}
 
 /*
 |--------------------------------------------------------------------------
@@ -472,7 +528,7 @@ const confirmLogout = async () => {
 watch(
   () => route.fullPath,
   () => {
-    mobileOpen.value = false;
-  },
-);
+    mobileOpen.value = false
+  }
+)
 </script>

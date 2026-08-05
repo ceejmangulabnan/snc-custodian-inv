@@ -25,7 +25,10 @@
         <div
           class="mx-auto mb-6 flex size-20 items-center justify-center rounded-[28px] bg-gradient-to-br from-emerald-500 via-green-500 to-teal-600 text-white shadow-[0_15px_50px_rgba(16,185,129,0.35)]"
         >
-          <UIcon name="i-lucide-id-card" class="size-10" />
+          <UIcon
+            name="i-lucide-id-card"
+            class="size-10"
+          />
         </div>
 
         <h1 class="text-3xl font-bold tracking-tight text-slate-900">
@@ -39,7 +42,11 @@
 
       <!-- FORM -->
       <div class="p-8">
-        <UForm :state="form" class="space-y-5" @submit="submitLogin">
+        <UForm
+          :state="form"
+          class="space-y-5"
+          @submit="submitLogin"
+        >
           <!-- General error -->
           <div
             v-if="errors.general"
@@ -139,133 +146,100 @@
 </template>
 
 <script setup lang="ts">
-//@ts-nocheck
 definePageMeta({
-  layout: false,
-});
+  layout: false
+})
 
-interface LoginForm {
-  identifier: string;
-  password: string;
-  rememberMe: boolean;
-}
+const { login } = useAuth()
 
 interface LoginErrors {
-  identifier: string;
-  password: string;
-  general: string;
+  identifier?: string
+  password?: string
+  general?: string
 }
 
 const form = reactive({
-  identifier: "",
-  password: "",
-});
+  identifier: '',
+  password: ''
+})
 
 const errors = reactive<LoginErrors>({
-   identifier: undefined,
+  identifier: undefined,
   password: undefined,
-  general: undefined,
-});
+  general: undefined
+})
 
-const toast = useToast();
-
-const showPassword = ref(false);
-const isLoading = ref(false);
+const showPassword = ref(false)
+const isLoading = ref(false)
 
 const canSubmit = computed(() => {
-  return Boolean(form.identifier.trim() && form.password && !isLoading.value);
-});
+  return Boolean(form.identifier.trim() && form.password && !isLoading.value)
+})
 
-const clearFieldError = (field: "identifier" | "password") => {
+const clearFieldError = (field: 'identifier' | 'password') => {
   errors[field] = undefined
   errors.general = undefined
-};
+}
 
 const validateIdentifier = (): boolean => {
-  const identifier = form.identifier.trim();
+  const identifier = form.identifier.trim()
 
   if (!identifier) {
-    errors.identifier = "Email address or username is required.";
-    return false;
+    errors.identifier = 'Email address or username is required.'
+    return false
   }
 
   if (identifier.length < 3) {
-    errors.identifier =
-      "Email address or username must contain at least 3 characters.";
-    return false;
+    errors.identifier
+      = 'Email address or username must contain at least 3 characters.'
+    return false
   }
 
-  errors.identifier = "";
-  return true;
-};
+  errors.identifier = ''
+  return true
+}
 
 const validatePassword = (): boolean => {
   if (!form.password) {
-    errors.password = "Password is required.";
-    return false;
+    errors.password = 'Password is required.'
+    return false
   }
 
   if (form.password.length < 6) {
-    errors.password = "Password must contain at least 6 characters.";
-    return false;
+    errors.password = 'Password must contain at least 6 characters.'
+    return false
   }
 
-  errors.password = "";
-  return true;
-};
+  errors.password = ''
+  return true
+}
 
 const validateForm = (): boolean => {
-  const identifierIsValid = validateIdentifier();
-  const passwordIsValid = validatePassword();
+  const identifierIsValid = validateIdentifier()
+  const passwordIsValid = validatePassword()
 
-  return identifierIsValid && passwordIsValid;
-};
+  return identifierIsValid && passwordIsValid
+}
 
 const submitLogin = async () => {
-  errors.general = "";
+  errors.general = undefined
 
   if (!validateForm() || isLoading.value) {
-    return;
+    return
   }
 
-  isLoading.value = true;
+  isLoading.value = true
 
   try {
-    /*
-     * DEMONSTRATION LOGIN
-     *
-     * Remove this delay and replace it with your actual authentication
-     * request when your backend Authentication is ready.
-     */
-    await new Promise<void>((resolve) => {
-      setTimeout(resolve, 1000);
-    });
-
-    /*
-     * Example Firebase login:
-     *
-     * const { signIn } = useFirebaseAuth()
-     * await signIn(form.email, form.password)
-     *
-     * Example Strapi login:
-     *
-     * await $fetch('/api/auth/local', {
-     *   method: 'POST',
-     *   body: {
-     *     identifier: form.email,
-     *     password: form.password,
-     *   },
-     * })
-     */
-
-    await navigateTo("/");
+    await login(form.identifier, form.password)
+    await navigateTo('/')
   } catch (error) {
-    console.error("Login error:", error);
+    console.error('Login error:', error)
 
-    errors.general =
-      "Unable to sign in. Please verify your email address and password.";
+    errors.general
+      = 'Unable to sign in. Please verify your email address and password.'
   } finally {
-    isLoading.value = false;
+    isLoading.value = false
   }
-};
+}
 </script>
