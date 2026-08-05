@@ -13,8 +13,11 @@ export default defineNuxtConfig({
 
   css: ['~/assets/css/main.css'],
 
-  routeRules: {
-    '/': { prerender: true }
+  runtimeConfig: {
+    strapiUrl: '',
+    session: {
+      name: 'snc_session'
+    }
   },
 
   compatibilityDate: '2026-06-30',
