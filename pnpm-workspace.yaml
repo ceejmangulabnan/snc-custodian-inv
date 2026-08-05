@@ -4,3 +4,5 @@ allowBuilds:
   esbuild: false
   unrs-resolver: false
   vue-demi: false
+minimumReleaseAgeExclude:
+  - nuxt-auth-utils@0.5.30
