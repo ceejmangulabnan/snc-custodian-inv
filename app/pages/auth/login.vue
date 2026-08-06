@@ -179,6 +179,8 @@ const errors = reactive<LoginErrors>({
 
 const toast = useToast()
 
+const { fetch: refreshSession } = useUserSession()
+
 const showPassword = ref(false)
 const isLoading = ref(false)
 
@@ -244,11 +246,12 @@ const submitLogin = async () => {
         await $fetch('/api/auth/login', {
             method: 'POST',
             body: {
-                identifier: form.email,
+                identifier: form.identifier,
                 password: form.password,
             },
         })
 
+        await refreshSession()
         await navigateTo('/')
     } catch (error) {
         console.error('Login error:', error)

@@ -335,6 +335,8 @@ const isLoggingOut = ref(false);
 const isCollapsed = ref(false);
 const mobileOpen = ref(false);
 
+const { fetch: refreshSession } = useUserSession();
+
 /*
 |--------------------------------------------------------------------------
 | Navigation links
@@ -445,16 +447,9 @@ const confirmLogout = async () => {
   isLoggingOut.value = true;
 
   try {
-    /*
-     * Replace this section with your real logout function when your
-     * authentication system is ready.
-     *
-     * Example:
-     * const { logout } = useAuth()
-     * await logout()
-     */
-
-    await navigateTo("/auth/login");
+    await $fetch('/api/auth/logout', { method: 'POST' });
+    await refreshSession();
+    await navigateTo('/auth/login');
     logoutOpen.value = false;
   } catch (error) {
     console.error("Logout failed:", error);
