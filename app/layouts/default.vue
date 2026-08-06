@@ -27,7 +27,7 @@
                         :class="sidebarCollapsed ? 'justify-center' : 'gap-3'"
                     >
                         <div
-                            class="flex size-12 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-500 via-green-500 to-teal-600 text-white shadow-[0_10px_30px_rgba(16,185,129,0.40)]"
+                            class="flex size-12 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-green-500 via-green-600 to-teal-600 text-white shadow-[0_10px_30px_rgba(0,193,106,0.40)]"
                         >
                             <UIcon name="i-lucide-id-card" class="size-6" />
                         </div>
@@ -86,7 +86,7 @@
                             <!-- Active indicator -->
                             <span
                                 v-if="isActive(item.to) && !sidebarCollapsed"
-                                class="absolute left-0 top-1/2 h-7 w-1 -translate-y-1/2 rounded-r-full bg-emerald-400"
+                                class="absolute left-0 top-1/2 h-7 w-1 -translate-y-1/2 rounded-r-full bg-green-400"
                             />
 
                             <!-- Navigation icon -->
@@ -94,7 +94,7 @@
                                 class="flex size-9 shrink-0 items-center justify-center rounded-xl transition"
                                 :class="
                                     isActive(item.to)
-                                        ? 'bg-gradient-to-br from-emerald-500 to-green-600 text-white shadow-lg shadow-emerald-500/30'
+                                        ? 'bg-gradient-to-br from-green-500 to-green-600 text-white shadow-lg shadow-green-500/30'
                                         : 'bg-white/5 text-slate-400 group-hover:bg-white/10 group-hover:text-white'
                                 "
                             >
@@ -122,7 +122,7 @@
                             "
                         >
                             <div
-                                class="flex size-10 shrink-0 items-center justify-center rounded-2xl bg-emerald-500/20 text-emerald-300"
+                                class="flex size-10 shrink-0 items-center justify-center rounded-2xl bg-green-500/20 text-green-300"
                             >
                                 <UIcon name="i-lucide-user" class="size-5" />
                             </div>
@@ -163,12 +163,12 @@
 
         <!-- Mobile header -->
         <header
-            class="sticky top-0 z-30 border-b border-emerald-100 bg-[#f4f8f6]/85 px-4 py-3 backdrop-blur-2xl lg:hidden"
+            class="sticky top-0 z-30 border-b border-green-100 bg-[#f4f8f6]/85 px-4 py-3 backdrop-blur-2xl lg:hidden"
         >
             <div class="flex items-center justify-between">
                 <div class="flex min-w-0 items-center gap-3">
                     <div
-                        class="flex size-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-500 via-green-500 to-teal-600 text-white shadow-lg shadow-emerald-500/30"
+                        class="flex size-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-green-500 via-green-600 to-teal-600 text-white shadow-lg shadow-green-500/30"
                     >
                         <UIcon name="i-lucide-id-card" class="size-5" />
                     </div>
@@ -212,7 +212,7 @@
             <!-- Desktop page header -->
             <div
                 v-if="!hideDesktopHeader"
-                class="sticky top-0 z-20 hidden border-b border-emerald-100 bg-white/75 px-8 py-5 backdrop-blur-2xl lg:block"
+                class="sticky top-0 z-20 hidden border-b border-green-100 bg-white/75 px-8 py-5 backdrop-blur-2xl lg:block"
             >
                 <div class="flex items-center justify-between">
                     <div>
@@ -242,7 +242,7 @@
                 >
                     <!-- BACKGROUND EFFECT -->
                     <div
-                        class="absolute inset-0 bg-gradient-to-br from-red-50/70 via-white to-emerald-50/40"
+                        class="absolute inset-0 bg-gradient-to-br from-red-50/70 via-white to-green-50/40"
                     />
 
                     <!-- TOP DECOR -->
@@ -250,7 +250,7 @@
                         class="absolute right-0 top-0 h-40 w-40 rounded-full bg-red-500/10 blur-3xl"
                     />
                     <div
-                        class="absolute bottom-0 left-0 h-40 w-40 rounded-full bg-emerald-500/10 blur-3xl"
+                        class="absolute bottom-0 left-0 h-40 w-40 rounded-full bg-green-500/10 blur-3xl"
                     />
 
                     <div class="relative p-7">
@@ -283,11 +283,11 @@
 
                         <!-- USER CARD -->
                         <div
-                            class="mt-6 rounded-3xl border border-emerald-100 bg-white/70 p-4 shadow-sm backdrop-blur-xl"
+                            class="mt-6 rounded-3xl border border-green-100 bg-white/70 p-4 shadow-sm backdrop-blur-xl"
                         >
                             <div class="flex items-center gap-3">
                                 <div
-                                    class="flex size-12 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-500 to-green-600 text-white shadow-lg shadow-emerald-500/20"
+                                    class="flex size-12 items-center justify-center rounded-2xl bg-gradient-to-br from-green-500 to-green-600 text-white shadow-lg shadow-green-500/20"
                                 >
                                     <UIcon
                                         name="i-lucide-user"

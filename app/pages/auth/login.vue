@@ -8,7 +8,7 @@
         />
 
         <div
-            class="absolute right-0 top-0 h-96 w-96 rounded-full bg-emerald-500/10 blur-3xl"
+            class="absolute right-0 top-0 h-96 w-96 rounded-full bg-green-500/10 blur-3xl"
         />
         <div
             class="absolute bottom-0 left-0 h-96 w-96 rounded-full bg-teal-500/10 blur-3xl"
@@ -20,10 +20,10 @@
         >
             <!-- HEADER -->
             <div
-                class="border-b border-emerald-100 bg-gradient-to-br from-white via-emerald-50/70 to-white px-8 py-10 text-center"
+                class="border-b border-green-100 bg-gradient-to-br from-white via-green-50/70 to-white px-8 py-10 text-center"
             >
                 <div
-                    class="mx-auto mb-6 flex size-20 items-center justify-center rounded-[28px] bg-gradient-to-br from-emerald-500 via-green-500 to-teal-600 text-white shadow-[0_15px_50px_rgba(16,185,129,0.35)]"
+                    class="mx-auto mb-6 flex size-20 items-center justify-center rounded-[28px] bg-gradient-to-br from-green-500 via-green-600 to-teal-600 text-white shadow-[0_15px_50px_rgba(0,193,106,0.35)]"
                 >
                     <UIcon name="i-lucide-id-card" class="size-10" />
                 </div>
@@ -129,7 +129,7 @@
                         icon="i-lucide-log-in"
                         :loading="isLoading"
                         :disabled="!canSubmit"
-                        class="rounded-2xl bg-gradient-to-r from-emerald-500 to-green-600 shadow-lg shadow-emerald-500/25"
+                        class="rounded-2xl bg-gradient-to-r from-green-500 to-green-600 shadow-lg shadow-green-500/25"
                     >
                         {{ isLoading ? 'Signing in...' : 'Sign In' }}
                     </UButton>
@@ -137,7 +137,7 @@
 
                 <!-- FOOTER -->
                 <div
-                    class="mt-8 rounded-3xl border border-emerald-100 bg-emerald-50/50 p-4 text-center"
+                    class="mt-8 rounded-3xl border border-green-100 bg-green-50/50 p-4 text-center"
                 >
                     <p class="text-xs leading-relaxed text-slate-500">
                         Secure access for administrators, staff, and encoders.
