@@ -234,9 +234,7 @@
                             {{ pageTitle }}
                         </h2>
 
-                        <p
-                            class="text-xs text-slate-500 dark:text-slate-400"
-                        >
+                        <p class="text-xs text-slate-500 dark:text-slate-400">
                             School UI Template
                         </p>
                     </div>
@@ -259,10 +257,13 @@
         </main>
 
         <!-- Logout confirmation modal -->
-        <UModal v-model:open="logoutOpen">
+        <UModal
+            v-model:open="logoutOpen"
+            :ui="{ content: 'rounded-[28px]' }"
+        >
             <template #content>
                 <div
-                    class="relative overflow-hidden rounded-[28px] border border-white/20 bg-white/90 shadow-[0_20px_80px_rgba(15,23,42,0.18)] backdrop-blur-2xl dark:border-slate-700/40 dark:bg-slate-900/90"
+                    class="relative overflow-hidden rounded-[28px] bg-white/90 shadow-[0_20px_80px_rgba(15,23,42,0.18)] backdrop-blur-2xl dark:bg-slate-900/90"
                 >
                     <!-- BACKGROUND EFFECT -->
                     <div
@@ -365,8 +366,8 @@
                         </div>
                     </div>
                 </div>
-            </template> </UModal
-        >>
+            </template>
+        </UModal>
     </div>
 </template>
 
