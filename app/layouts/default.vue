@@ -1,5 +1,7 @@
 <template>
-    <div class="min-h-screen bg-[#f4f8f6] text-slate-900">
+    <div
+        class="min-h-screen bg-[#f4f8f6] text-slate-900 dark:bg-slate-950 dark:text-white"
+    >
         <!-- Mobile sidebar overlay -->
         <div
             v-if="mobileOpen"
@@ -163,7 +165,7 @@
 
         <!-- Mobile header -->
         <header
-            class="sticky top-0 z-30 border-b border-green-100 bg-[#f4f8f6]/85 px-4 py-3 backdrop-blur-2xl lg:hidden"
+            class="sticky top-0 z-30 border-b border-green-100 bg-[#f4f8f6]/85 px-4 py-3 backdrop-blur-2xl lg:hidden dark:border-slate-700 dark:bg-slate-950/85"
         >
             <div class="flex items-center justify-between">
                 <div class="flex min-w-0 items-center gap-3">
@@ -174,17 +176,27 @@
                     </div>
 
                     <div class="min-w-0">
-                        <p class="truncate text-sm font-bold text-slate-900">
+                        <p
+                            class="truncate text-sm font-bold text-slate-900 dark:text-white"
+                        >
                             School ID System
                         </p>
 
-                        <p class="truncate text-xs text-slate-500">
+                        <p
+                            class="truncate text-xs text-slate-500 dark:text-slate-400"
+                        >
                             {{ pageTitle }}
                         </p>
                     </div>
                 </div>
 
                 <div class="flex shrink-0 items-center gap-2">
+                    <UColorModeButton
+                        color="neutral"
+                        variant="ghost"
+                        aria-label="Toggle theme"
+                    />
+
                     <UButton
                         color="error"
                         variant="ghost"
@@ -212,16 +224,28 @@
             <!-- Desktop page header -->
             <div
                 v-if="!hideDesktopHeader"
-                class="sticky top-0 z-20 hidden border-b border-green-100 bg-white/75 px-8 py-5 backdrop-blur-2xl lg:block"
+                class="sticky top-0 z-20 hidden border-b border-green-100 bg-white/75 px-8 py-5 backdrop-blur-2xl lg:block dark:border-slate-700 dark:bg-slate-900/75"
             >
                 <div class="flex items-center justify-between">
                     <div>
-                        <h2 class="text-lg font-bold text-slate-900">
+                        <h2
+                            class="text-lg font-bold text-slate-900 dark:text-white"
+                        >
                             {{ pageTitle }}
                         </h2>
 
-                        <p class="text-xs text-slate-500">School UI Template</p>
+                        <p
+                            class="text-xs text-slate-500 dark:text-slate-400"
+                        >
+                            School UI Template
+                        </p>
                     </div>
+
+                    <UColorModeButton
+                        color="neutral"
+                        variant="ghost"
+                        aria-label="Toggle theme"
+                    />
                 </div>
             </div>
 
@@ -238,11 +262,11 @@
         <UModal v-model:open="logoutOpen">
             <template #content>
                 <div
-                    class="relative overflow-hidden rounded-[28px] border border-white/20 bg-white/90 shadow-[0_20px_80px_rgba(15,23,42,0.18)] backdrop-blur-2xl"
+                    class="relative overflow-hidden rounded-[28px] border border-white/20 bg-white/90 shadow-[0_20px_80px_rgba(15,23,42,0.18)] backdrop-blur-2xl dark:border-slate-700/40 dark:bg-slate-900/90"
                 >
                     <!-- BACKGROUND EFFECT -->
                     <div
-                        class="absolute inset-0 bg-gradient-to-br from-red-50/70 via-white to-green-50/40"
+                        class="absolute inset-0 bg-gradient-to-br from-red-50/70 via-white to-green-50/40 dark:from-red-950/30 dark:via-slate-900 dark:to-green-950/30"
                     />
 
                     <!-- TOP DECOR -->
@@ -264,16 +288,18 @@
                         <!-- CONTENT -->
                         <div class="mt-5 text-center">
                             <h2
-                                class="text-2xl font-bold tracking-tight text-slate-900"
+                                class="text-2xl font-bold tracking-tight text-slate-900 dark:text-white"
                             >
                                 Logout Session?
                             </h2>
 
                             <p
-                                class="mt-2 text-sm leading-relaxed text-slate-500"
+                                class="mt-2 text-sm leading-relaxed text-slate-500 dark:text-slate-400"
                             >
                                 You are about to sign out from the
-                                <span class="font-semibold text-slate-700">
+                                <span
+                                    class="font-semibold text-slate-700 dark:text-slate-200"
+                                >
                                     School ID System </span
                                 >.
                                 <br />
@@ -283,7 +309,7 @@
 
                         <!-- USER CARD -->
                         <div
-                            class="mt-6 rounded-3xl border border-green-100 bg-white/70 p-4 shadow-sm backdrop-blur-xl"
+                            class="mt-6 rounded-3xl border border-green-100 bg-white/70 p-4 shadow-sm backdrop-blur-xl dark:border-slate-700 dark:bg-slate-800/70"
                         >
                             <div class="flex items-center gap-3">
                                 <div
@@ -297,13 +323,13 @@
 
                                 <div class="min-w-0 flex-1 text-left">
                                     <p
-                                        class="truncate text-sm font-semibold text-slate-900"
+                                        class="truncate text-sm font-semibold text-slate-900 dark:text-white"
                                     >
                                         {{ displayName }}
                                     </p>
 
                                     <p
-                                        class="truncate text-xs capitalize text-slate-500"
+                                        class="truncate text-xs capitalize text-slate-500 dark:text-slate-400"
                                     >
                                         {{ displayRole }}
                                     </p>

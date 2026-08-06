@@ -1,26 +1,34 @@
 <template>
     <div
-        class="relative flex min-h-screen items-center justify-center overflow-hidden bg-[#f4f8f6] px-4 py-10"
+        class="relative flex min-h-screen items-center justify-center overflow-hidden bg-[#f4f8f6] px-4 py-10 dark:bg-slate-950"
     >
+        <!-- Theme toggle -->
+        <div class="absolute right-4 top-4 z-10">
+            <UColorModeButton
+                size="lg"
+                class="rounded-full bg-white/80 backdrop-blur-xl dark:bg-slate-900/80"
+            />
+        </div>
+
         <!-- BACKGROUND -->
         <div
-            class="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(16,185,129,0.18),transparent_35%),radial-gradient(circle_at_bottom_right,rgba(20,184,166,0.18),transparent_35%)]"
+            class="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(16,185,129,0.18),transparent_35%),radial-gradient(circle_at_bottom_right,rgba(20,184,166,0.18),transparent_35%)] dark:bg-[radial-gradient(circle_at_top_left,rgba(0,193,106,0.12),transparent_35%),radial-gradient(circle_at_bottom_right,rgba(20,184,166,0.12),transparent_35%)]"
         />
 
         <div
-            class="absolute right-0 top-0 h-96 w-96 rounded-full bg-green-500/10 blur-3xl"
+            class="absolute right-0 top-0 h-96 w-96 rounded-full bg-green-500/10 blur-3xl dark:bg-green-500/5"
         />
         <div
-            class="absolute bottom-0 left-0 h-96 w-96 rounded-full bg-teal-500/10 blur-3xl"
+            class="absolute bottom-0 left-0 h-96 w-96 rounded-full bg-teal-500/10 blur-3xl dark:bg-teal-500/5"
         />
 
         <!-- LOGIN CARD -->
         <div
-            class="relative w-full max-w-md overflow-hidden rounded-[36px] border border-white/70 bg-white/80 shadow-[0_25px_90px_rgba(15,23,42,0.16)] backdrop-blur-2xl"
+            class="relative w-full max-w-md overflow-hidden rounded-[36px] border border-white/70 bg-white/80 shadow-[0_25px_90px_rgba(15,23,42,0.16)] backdrop-blur-2xl dark:border-slate-700/70 dark:bg-slate-900/80"
         >
             <!-- HEADER -->
             <div
-                class="border-b border-green-100 bg-gradient-to-br from-white via-green-50/70 to-white px-8 py-10 text-center"
+                class="border-b border-green-100 bg-gradient-to-br from-white via-green-50/70 to-white px-8 py-10 text-center dark:border-slate-700 dark:from-slate-900 dark:via-green-950/60 dark:to-slate-900"
             >
                 <div
                     class="mx-auto mb-6 flex size-20 items-center justify-center rounded-[28px] bg-gradient-to-br from-green-500 via-green-600 to-teal-600 text-white shadow-[0_15px_50px_rgba(0,193,106,0.35)]"
@@ -28,11 +36,15 @@
                     <UIcon name="i-lucide-id-card" class="size-10" />
                 </div>
 
-                <h1 class="text-3xl font-bold tracking-tight text-slate-900">
+                <h1
+                    class="text-3xl font-bold tracking-tight text-slate-900 dark:text-white"
+                >
                     School UI Template
                 </h1>
 
-                <p class="mt-2 text-sm leading-relaxed text-slate-500">
+                <p
+                    class="mt-2 text-sm leading-relaxed text-slate-500 dark:text-slate-400"
+                >
                     Sign in to access the UI Template dashboard.
                 </p>
             </div>
@@ -137,9 +149,11 @@
 
                 <!-- FOOTER -->
                 <div
-                    class="mt-8 rounded-3xl border border-green-100 bg-green-50/50 p-4 text-center"
+                    class="mt-8 rounded-3xl border border-green-100 bg-green-50/50 p-4 text-center dark:border-slate-700 dark:bg-slate-800/50"
                 >
-                    <p class="text-xs leading-relaxed text-slate-500">
+                    <p
+                        class="text-xs leading-relaxed text-slate-500 dark:text-slate-400"
+                    >
                         Secure access for administrators, staff, and encoders.
                     </p>
                 </div>

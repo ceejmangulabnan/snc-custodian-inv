@@ -2,6 +2,11 @@
 export default defineNuxtConfig({
     modules: ['@nuxt/eslint', '@nuxt/ui', '@nuxt/fonts', 'nuxt-auth-utils'],
 
+    colorMode: {
+        preference: 'light',
+        fallback: 'light',
+    },
+
     runtimeConfig: {
         strapiUrl: 'http://localhost:1337',
     },
