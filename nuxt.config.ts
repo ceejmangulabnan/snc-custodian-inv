@@ -1,30 +1,30 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-  modules: [
-    '@nuxt/eslint',
-    '@nuxt/ui',
-    '@nuxt/fonts',
-    'nuxt-auth-utils'
-  ],
+    modules: ['@nuxt/eslint', '@nuxt/ui', '@nuxt/fonts', 'nuxt-auth-utils'],
 
-  devtools: {
-    enabled: true
-  },
+    runtimeConfig: {
+        strapiUrl: 'http://localhost:1337',
+    },
 
-  css: ['~/assets/css/main.css'],
+    devtools: {
+        enabled: true,
+    },
 
-  routeRules: {
-    '/': { prerender: true }
-  },
+    css: ['~/assets/css/main.css'],
 
-  compatibilityDate: '2026-06-30',
+    routeRules: {
+        '/': { prerender: true },
+    },
 
-  eslint: {
-    config: {
-      stylistic: {
-        commaDangle: 'never',
-        braceStyle: '1tbs'
-      }
-    }
-  }
+    compatibilityDate: '2026-06-30',
+
+    eslint: {
+        config: {
+            stylistic: {
+                commaDangle: 'never',
+                braceStyle: '1tbs',
+            },
+        },
+    },
 })
+
