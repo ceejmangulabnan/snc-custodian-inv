@@ -250,7 +250,7 @@
             <!-- Page content -->
             <div
                 class="mx-auto px-4 sm:px-6 lg:px-8"
-                :class="hideDesktopHeader ? 'py-2' : 'py-4 sm:py-6 lg:py-4'"
+                :class="hideDesktopHeader ? 'py-2' : 'py-4 sm:py-6 lg:py-8'"
             >
                 <slot />
             </div>
@@ -395,7 +395,27 @@ const links: NavigationLink[] = [
     {
         label: 'Dashboard',
         icon: 'i-lucide-layout-dashboard',
-        to: '/',
+        to: '/admin',
+    },
+    {
+        label: 'Inventory',
+        icon: 'i-lucide-boxes',
+        to: '/admin/inventory',
+    },
+    {
+        label: 'User Management',
+        icon: 'i-lucide-users',
+        to: '/admin/users',
+    },
+    {
+        label: 'Transactions',
+        icon: 'i-lucide-clipboard-list',
+        to: '/admin/transactions',
+    },
+    {
+        label: 'Audit Logs',
+        icon: 'i-lucide-history',
+        to: '/admin/logs',
     },
 ]
 
@@ -429,8 +449,8 @@ const closeMobileSidebar = () => {
 */
 
 const isActive = (path: string): boolean => {
-    if (path === '/') {
-        return route.path === '/'
+    if (path === '/admin') {
+        return route.path === '/admin'
     }
 
     return route.path === path || route.path.startsWith(`${path}/`)
