@@ -2,7 +2,7 @@
     <div class="space-y-6">
         <div class="flex items-start gap-4">
             <div
-                class="flex size-14 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-green-500 via-green-600 to-teal-600 text-white shadow-[0_10px_30px_rgba(16,185,129,0.35)]"
+                class="flex size-14 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-amber-500 to-orange-600 text-white shadow-[0_10px_30px_rgba(245,158,11,0.35)]"
             >
                 <UIcon name="i-lucide-clipboard-list" class="size-7" />
             </div>
