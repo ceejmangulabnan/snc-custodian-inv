@@ -1,23 +1,38 @@
 <template>
     <div class="space-y-6">
-        <div class="flex items-start gap-4">
-            <div
-                class="flex size-14 shrink-0 items-center justify-center rounded-2xl bg-linear-to-br from-blue-500 to-indigo-600 text-white shadow-[0_10px_30px_rgba(59,130,246,0.35)]"
-            >
-                <UIcon name="i-lucide-users" class="size-7" />
-            </div>
-
-            <div>
-                <h1
-                    class="text-2xl font-bold tracking-tight text-slate-900 dark:text-white"
+        <!-- Page header -->
+        <div
+            class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"
+        >
+            <div class="flex items-start gap-4">
+                <div
+                    class="flex size-14 shrink-0 items-center justify-center rounded-2xl bg-linear-to-br from-blue-500 to-indigo-600 text-white shadow-[0_10px_30px_rgba(59,130,246,0.35)]"
                 >
-                    Manage Users
-                </h1>
+                    <UIcon name="i-lucide-users" class="size-7" />
+                </div>
 
-                <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">
-                    Create, update, and manage user accounts.
-                </p>
+                <div>
+                    <h1
+                        class="text-2xl font-bold tracking-tight text-slate-900 dark:text-white"
+                    >
+                        Manage Users
+                    </h1>
+
+                    <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">
+                        Create, update, and manage user accounts.
+                    </p>
+                </div>
             </div>
+
+            <UButton
+                color="primary"
+                size="lg"
+                icon="i-lucide-plus"
+                class="rounded-2xl shadow-lg shadow-blue-500/20"
+                @click="openCreate"
+            >
+                Add User
+            </UButton>
         </div>
 
         <div
@@ -42,7 +57,12 @@
             v-else
             class="overflow-hidden rounded-3xl border border-green-100 bg-white shadow-sm dark:border-slate-700 dark:bg-slate-900"
         >
-            <UTable :data="users ?? []" :columns="userColumns" class="flex-1">
+            <UTable
+                :data="users ?? []"
+                :columns="userColumns"
+                :empty="'No users found.'"
+                class="flex-1"
+            >
                 <template #role-cell="{ row }">
                     <UBadge
                         :color="
@@ -74,7 +94,8 @@
             </UTable>
         </div>
 
-        <UModal v-model:open="editOpen" :ui="{ content: 'rounded-[28px]' }">
+        <!-- Create / Edit user modal -->
+        <UModal v-model:open="formOpen" :ui="{ content: 'rounded-[28px]' }">
             <template #content>
                 <div
                     class="relative overflow-hidden rounded-[28px] border border-green-100 bg-white/90 p-6 shadow-xl backdrop-blur-xl dark:border-slate-700 dark:bg-slate-900/90"
@@ -83,33 +104,50 @@
                         <div
                             class="flex size-11 shrink-0 items-center justify-center rounded-xl bg-linear-to-br from-green-500 via-green-600 to-teal-600 text-white shadow-[0_10px_30px_rgba(16,185,129,0.35)]"
                         >
-                            <UIcon name="i-lucide-pen" class="size-5" />
+                            <UIcon
+                                :name="isEditing ? 'i-lucide-pen' : 'i-lucide-user-plus'"
+                                class="size-5"
+                            />
                         </div>
 
                         <div>
                             <h2
                                 class="text-lg font-bold tracking-tight text-slate-900 dark:text-white"
                             >
-                                Edit User
+                                {{ isEditing ? 'Edit User' : 'Add User' }}
                             </h2>
 
                             <p
                                 class="mt-0.5 text-sm text-slate-500 dark:text-slate-400"
                             >
-                                Editing
-                                <span
-                                    class="font-medium text-slate-700 dark:text-slate-300"
-                                >
-                                    {{ selectedUser?.username }}
-                                </span>
+                                <template v-if="isEditing">
+                                    Editing
+                                    <span
+                                        class="font-medium text-slate-700 dark:text-slate-300"
+                                    >
+                                        {{ selectedUser?.username }}
+                                    </span>
+                                </template>
+                                <template v-else>
+                                    Create a new user account.
+                                </template>
                             </p>
                         </div>
                     </div>
 
-                    <UForm class="mt-6 space-y-4" :state="editForm">
+                    <UAlert
+                        v-if="formError"
+                        color="error"
+                        variant="soft"
+                        icon="i-lucide-alert-circle"
+                        :title="formError"
+                        class="mt-5"
+                    />
+
+                    <UForm class="mt-6 space-y-4" :state="form">
                         <UFormField label="Username">
                             <UInput
-                                v-model="editForm.username"
+                                v-model="form.username"
                                 icon="i-lucide-user"
                                 placeholder="Enter username"
                                 class="w-full"
@@ -118,16 +156,28 @@
 
                         <UFormField label="Email">
                             <UInput
-                                v-model="editForm.email"
+                                v-model="form.email"
                                 icon="i-lucide-mail"
                                 placeholder="user@example.com"
                                 class="w-full"
                             />
                         </UFormField>
 
+                        <UFormField
+                            :label="isEditing ? 'New Password (optional)' : 'Password'"
+                        >
+                            <UInput
+                                v-model="form.password"
+                                type="password"
+                                icon="i-lucide-lock"
+                                placeholder="Min. 6 characters"
+                                class="w-full"
+                            />
+                        </UFormField>
+
                         <UFormField label="Role">
                             <USelect
-                                v-model="editForm.roleName"
+                                v-model="form.roleId"
                                 :items="roleOptions"
                                 icon="i-lucide-shield"
                                 class="w-full"
@@ -140,15 +190,16 @@
                                 orientation="horizontal"
                                 class="flex items-center"
                             >
-                                <USwitch v-model="editForm.confirmed" />
+                                <USwitch v-model="form.confirmed" />
                             </UFormField>
 
                             <UFormField
+                                v-if="isEditing"
                                 label="Blocked"
                                 orientation="horizontal"
                                 class="flex items-center"
                             >
-                                <USwitch v-model="editForm.blocked" />
+                                <USwitch v-model="form.blocked" />
                             </UFormField>
                         </div>
                     </UForm>
@@ -157,7 +208,7 @@
                         <UButton
                             color="neutral"
                             variant="outline"
-                            @click="editOpen = false"
+                            @click="formOpen = false"
                         >
                             Cancel
                         </UButton>
@@ -165,15 +216,17 @@
                         <UButton
                             color="success"
                             icon="i-lucide-check"
+                            :loading="saving"
                             @click="saveUser"
                         >
-                            Save
+                            {{ isEditing ? 'Save' : 'Create User' }}
                         </UButton>
                     </div>
                 </div>
             </template>
         </UModal>
 
+        <!-- Delete user modal -->
         <UModal v-model:open="deleteOpen" :ui="{ content: 'rounded-[28px]' }">
             <template #content>
                 <div
@@ -206,6 +259,15 @@
                             </p>
                         </div>
                     </div>
+
+                    <UAlert
+                        v-if="deleteError"
+                        color="error"
+                        variant="soft"
+                        icon="i-lucide-alert-circle"
+                        :title="deleteError"
+                        class="mt-5"
+                    />
 
                     <div
                         v-if="userToDelete"
@@ -244,6 +306,7 @@
                         <UButton
                             color="error"
                             icon="i-lucide-trash"
+                            :loading="deleting"
                             @click="confirmDelete"
                         >
                             Delete
@@ -265,6 +328,7 @@ definePageMeta({
 
 const strapi = useStrapi()
 const toast = useToast()
+const { session } = useUserSession()
 
 interface StrapiRole {
     id: number
@@ -281,21 +345,46 @@ interface StrapiUser {
     role?: StrapiRole
 }
 
-interface UserEditForm {
+interface UserForm {
     username: string
     email: string
-    roleName: string
+    password: string
+    roleId: number | undefined
     confirmed: boolean
     blocked: boolean
 }
+
+/*
+|--------------------------------------------------------------------------
+| Strapi data
+|--------------------------------------------------------------------------
+*/
 
 const {
     data: users,
     pending,
     error,
+    refresh: refreshUsers,
 } = await useAsyncData('users', () =>
     strapi.get<StrapiUser[]>('/users', { populate: 'role' })
 )
+
+const { data: roles } = await useAsyncData('user-roles', () =>
+    strapi.get<{ roles: StrapiRole[] }>('/users-permissions/roles')
+)
+
+const roleOptions = computed(() =>
+    (roles.value?.roles ?? []).map((role) => ({
+        label: role.name,
+        value: role.id,
+    }))
+)
+
+/*
+|--------------------------------------------------------------------------
+| Table
+|--------------------------------------------------------------------------
+*/
 
 const userColumns: TableColumn<StrapiUser>[] = [
     { accessorKey: 'id', header: 'ID', enableSorting: false },
@@ -314,80 +403,188 @@ const userColumns: TableColumn<StrapiUser>[] = [
     },
 ]
 
+const isCurrentUser = (user: StrapiUser) => {
+    return user.id === session.value?.user?.id
+}
+
 function getActionItems(user: StrapiUser): DropdownMenuItem[] {
-    return [
+    const items: DropdownMenuItem[] = [
         {
             label: 'Edit',
             icon: 'i-lucide-pen',
             class: 'flex gap-2 items-center',
             onSelect: () => openEdit(user),
         },
-        {
+    ]
+
+    if (!isCurrentUser(user)) {
+        items.push({
             label: 'Delete',
             icon: 'i-lucide-trash',
             color: 'error',
             class: 'flex gap-2 items-center',
             onSelect: () => openDelete(user),
-        },
-    ]
+        })
+    }
+
+    return items
 }
 
-const deleteOpen = ref(false)
-const userToDelete = ref<StrapiUser | null>(null)
+/*
+|--------------------------------------------------------------------------
+| Create / Edit
+|--------------------------------------------------------------------------
+*/
 
-const editOpen = ref(false)
+const formOpen = ref(false)
 const selectedUser = ref<StrapiUser | null>(null)
+const saving = ref(false)
+const formError = ref('')
 
-const editForm = ref<UserEditForm>({
+const isEditing = computed(() => !!selectedUser.value)
+
+const form = ref<UserForm>({
     username: '',
     email: '',
-    roleName: '',
+    password: '',
+    roleId: undefined,
     confirmed: false,
     blocked: false,
 })
 
-const roleOptions = computed(() => {
-    const roles = new Map<string, string>()
-    for (const user of users.value ?? []) {
-        if (user.role?.name) {
-            roles.set(user.role.name, user.role.name)
-        }
+function resetForm() {
+    form.value = {
+        username: '',
+        email: '',
+        password: '',
+        roleId: undefined,
+        confirmed: false,
+        blocked: false,
     }
-    return Array.from(roles, ([value, label]) => ({ label, value }))
-})
+    formError.value = ''
+}
+
+function openCreate() {
+    selectedUser.value = null
+    resetForm()
+    formOpen.value = true
+}
 
 function openEdit(user: StrapiUser) {
     selectedUser.value = user
-    editForm.value = {
+    form.value = {
         username: user.username ?? '',
         email: user.email ?? '',
-        roleName: user.role?.name ?? '',
+        password: '',
+        roleId: user.role?.id ?? undefined,
         confirmed: user.confirmed ?? false,
         blocked: user.blocked ?? false,
     }
-    editOpen.value = true
+    formError.value = ''
+    formOpen.value = true
 }
 
-function saveUser() {
-    console.log('Save User', selectedUser.value?.id, editForm.value)
-    editOpen.value = false
-    toast.add({
-        title: 'User saved successfully',
-        description: `Changes saved for user: ${selectedUser.value?.username}`,
-    })
+async function saveUser() {
+    if (saving.value) return
+
+    formError.value = ''
+
+    if (!form.value.username.trim() || !form.value.email.trim()) {
+        formError.value = 'Username and email are required.'
+        return
+    }
+
+    if (!isEditing.value && form.value.password.length < 6) {
+        formError.value = 'Password must be at least 6 characters.'
+        return
+    }
+
+    if (!form.value.roleId) {
+        formError.value = 'Please select a role.'
+        return
+    }
+
+    saving.value = true
+
+    try {
+        if (isEditing.value) {
+            const body: Record<string, unknown> = {
+                username: form.value.username.trim(),
+                email: form.value.email.trim(),
+                role: form.value.roleId,
+                confirmed: form.value.confirmed,
+                blocked: form.value.blocked,
+            }
+
+            if (form.value.password) {
+                body.password = form.value.password
+            }
+
+            await strapi.put(`/users/${selectedUser.value?.id}`, body)
+            toast.add({
+                title: 'User saved successfully',
+                description: `Changes saved for user: ${form.value.username.trim()}`,
+            })
+        } else {
+            await strapi.post('/users', {
+                username: form.value.username.trim(),
+                email: form.value.email.trim(),
+                password: form.value.password,
+                role: form.value.roleId,
+                confirmed: form.value.confirmed,
+            })
+            toast.add({
+                title: 'User created successfully',
+                description: `User ${form.value.username.trim()} was created`,
+            })
+        }
+
+        formOpen.value = false
+        await refreshUsers()
+    } catch (err) {
+        formError.value =
+            (err as Error).message ?? 'Failed to save user. Please try again.'
+    } finally {
+        saving.value = false
+    }
 }
+
+/*
+|--------------------------------------------------------------------------
+| Delete
+|--------------------------------------------------------------------------
+*/
+
+const deleteOpen = ref(false)
+const userToDelete = ref<StrapiUser | null>(null)
+const deleting = ref(false)
+const deleteError = ref('')
 
 function openDelete(user: StrapiUser) {
     userToDelete.value = user
+    deleteError.value = ''
     deleteOpen.value = true
 }
 
-function confirmDelete() {
-    console.log('Delete User', userToDelete.value?.id)
-    deleteOpen.value = false
-    toast.add({
-        title: 'User Deleted Successfully',
-        description: `User ${userToDelete.value?.username} was deleted successfully`,
-    })
+async function confirmDelete() {
+    if (deleting.value || !userToDelete.value) return
+
+    deleting.value = true
+    deleteError.value = ''
+
+    try {
+        await strapi.delete(`/users/${userToDelete.value.id}`)
+        toast.add({
+            title: 'User Deleted Successfully',
+            description: `User ${userToDelete.value.username} was deleted successfully`,
+        })
+        deleteOpen.value = false
+        await refreshUsers()
+    } catch (err) {
+        deleteError.value =
+            (err as Error).message ?? 'Failed to delete user. Please try again.'
+    } finally {
+        deleting.value = false
+    }
 }
 </script>

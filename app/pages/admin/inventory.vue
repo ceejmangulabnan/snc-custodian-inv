@@ -24,14 +24,28 @@
                 </div>
             </div>
 
-            <UButton
-                color="primary"
-                size="lg"
-                icon="i-lucide-plus"
-                class="rounded-2xl shadow-lg shadow-green-500/20"
-            >
-                Add Item
-            </UButton>
+            <div class="flex flex-col gap-3 sm:flex-row">
+                <UButton
+                    color="neutral"
+                    size="lg"
+                    variant="soft"
+                    icon="i-lucide-tags"
+                    class="rounded-2xl"
+                    @click="categoriesOpen = true"
+                >
+                    Manage Categories
+                </UButton>
+
+                <UButton
+                    color="primary"
+                    size="lg"
+                    icon="i-lucide-plus"
+                    class="rounded-2xl shadow-lg shadow-green-500/20"
+                    @click="openItemCreate"
+                >
+                    Add Item
+                </UButton>
+            </div>
         </div>
 
         <!-- Stats -->
@@ -175,6 +189,22 @@
                         }}
                     </UBadge>
                 </template>
+
+                <template #actions-cell="{ row }">
+                    <UDropdownMenu
+                        :items="getItemActions(row.original)"
+                        :ui="{
+                            content: 'w-48',
+                            itemLeadingIcon: 'size-4',
+                        }"
+                    >
+                        <UButton
+                            icon="i-lucide-ellipsis-vertical"
+                            color="neutral"
+                            variant="ghost"
+                        />
+                    </UDropdownMenu>
+                </template>
             </UTable>
 
             <!-- Table footer -->
@@ -186,10 +216,425 @@
                 <p>Updated just now</p>
             </div>
         </div>
+
+        <!-- Create / Edit item modal -->
+        <UModal v-model:open="itemFormOpen" :ui="{ content: 'rounded-[28px]' }">
+            <template #content>
+                <div
+                    class="relative overflow-hidden rounded-[28px] border border-green-100 bg-white/90 p-6 shadow-xl backdrop-blur-xl dark:border-slate-700 dark:bg-slate-900/90"
+                >
+                    <div class="flex items-start gap-4">
+                        <div
+                            class="flex size-11 shrink-0 items-center justify-center rounded-xl bg-linear-to-br from-green-500 via-green-600 to-teal-600 text-white shadow-[0_10px_30px_rgba(16,185,129,0.35)]"
+                        >
+                            <UIcon
+                                :name="isEditingItem ? 'i-lucide-pen' : 'i-lucide-package-plus'"
+                                class="size-5"
+                            />
+                        </div>
+
+                        <div>
+                            <h2
+                                class="text-lg font-bold tracking-tight text-slate-900 dark:text-white"
+                            >
+                                {{ isEditingItem ? 'Edit Item' : 'Add Item' }}
+                            </h2>
+
+                            <p
+                                class="mt-0.5 text-sm text-slate-500 dark:text-slate-400"
+                            >
+                                <template v-if="isEditingItem">
+                                    Editing
+                                    <span
+                                        class="font-medium text-slate-700 dark:text-slate-300"
+                                    >
+                                        {{ selectedItem?.name }}
+                                    </span>
+                                </template>
+                                <template v-else>
+                                    Add a new inventory item.
+                                </template>
+                            </p>
+                        </div>
+                    </div>
+
+                    <UAlert
+                        v-if="itemFormError"
+                        color="error"
+                        variant="soft"
+                        icon="i-lucide-alert-circle"
+                        :title="itemFormError"
+                        class="mt-5"
+                    />
+
+                    <UForm class="mt-6 space-y-4" :state="itemForm">
+                        <UFormField label="Item Name">
+                            <UInput
+                                v-model="itemForm.name"
+                                icon="i-lucide-package"
+                                placeholder="e.g. Bond Paper - Letter"
+                                class="w-full"
+                            />
+                        </UFormField>
+
+                        <div class="grid grid-cols-2 gap-4">
+                            <UFormField label="SKU">
+                                <UInput
+                                    v-model="itemForm.sku"
+                                    icon="i-lucide-barcode"
+                                    placeholder="e.g. PAP-101"
+                                    class="w-full"
+                                />
+                            </UFormField>
+
+                            <UFormField label="Unit">
+                                <UInput
+                                    v-model="itemForm.unit"
+                                    icon="i-lucide-ruler"
+                                    placeholder="e.g. Rim, Box, Each"
+                                    class="w-full"
+                                />
+                            </UFormField>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-4">
+                            <UFormField label="Stock Quantity">
+                                <UInput
+                                    v-model.number="itemForm.stockQty"
+                                    type="number"
+                                    min="0"
+                                    icon="i-lucide-boxes"
+                                    class="w-full"
+                                />
+                            </UFormField>
+
+                            <UFormField label="Min. Threshold">
+                                <UInput
+                                    v-model.number="itemForm.minThreshold"
+                                    type="number"
+                                    min="0"
+                                    icon="i-lucide-triangle-alert"
+                                    class="w-full"
+                                />
+                            </UFormField>
+                        </div>
+
+                        <UFormField label="Category">
+                            <USelect
+                                v-model.number="itemForm.categoryId"
+                                :items="itemCategoryOptions"
+                                icon="i-lucide-tags"
+                                class="w-full"
+                            />
+                        </UFormField>
+                    </UForm>
+
+                    <div class="mt-6 flex justify-end gap-3">
+                        <UButton
+                            color="neutral"
+                            variant="outline"
+                            @click="itemFormOpen = false"
+                        >
+                            Cancel
+                        </UButton>
+
+                        <UButton
+                            color="success"
+                            icon="i-lucide-check"
+                            :loading="savingItem"
+                            @click="saveItem"
+                        >
+                            {{ isEditingItem ? 'Save' : 'Add Item' }}
+                        </UButton>
+                    </div>
+                </div>
+            </template>
+        </UModal>
+
+        <!-- Delete item modal -->
+        <UModal v-model:open="itemDeleteOpen" :ui="{ content: 'rounded-[28px]' }">
+            <template #content>
+                <div
+                    class="relative overflow-hidden rounded-[28px] border border-red-100 bg-white/90 p-6 shadow-xl backdrop-blur-xl dark:border-red-900/50 dark:bg-slate-900/90"
+                >
+                    <div class="flex items-start gap-4">
+                        <div
+                            class="flex size-11 shrink-0 items-center justify-center rounded-xl bg-linear-to-br from-red-500 via-red-600 to-rose-600 text-white shadow-[0_10px_30px_rgba(239,68,68,0.35)]"
+                        >
+                            <UIcon name="i-lucide-trash" class="size-5" />
+                        </div>
+
+                        <div>
+                            <h2
+                                class="text-lg font-bold tracking-tight text-slate-900 dark:text-white"
+                            >
+                                Delete Item
+                            </h2>
+
+                            <p
+                                class="mt-0.5 text-sm text-slate-500 dark:text-slate-400"
+                            >
+                                Are you sure you want to delete
+                                <span
+                                    class="font-medium text-slate-700 dark:text-slate-300"
+                                >
+                                    {{ itemToDelete?.name }}
+                                </span>
+                                ? This action cannot be undone.
+                            </p>
+                        </div>
+                    </div>
+
+                    <UAlert
+                        v-if="itemDeleteError"
+                        color="error"
+                        variant="soft"
+                        icon="i-lucide-alert-circle"
+                        :title="itemDeleteError"
+                        class="mt-5"
+                    />
+
+                    <div class="mt-6 flex justify-end gap-3">
+                        <UButton
+                            color="neutral"
+                            variant="outline"
+                            @click="itemDeleteOpen = false"
+                        >
+                            Cancel
+                        </UButton>
+
+                        <UButton
+                            color="error"
+                            icon="i-lucide-trash"
+                            :loading="deletingItem"
+                            @click="confirmItemDelete"
+                        >
+                            Delete
+                        </UButton>
+                    </div>
+                </div>
+            </template>
+        </UModal>
+
+        <!-- Manage categories modal -->
+        <UModal
+            v-model:open="categoriesOpen"
+            :ui="{ content: 'rounded-[28px]' }"
+        >
+            <template #content>
+                <div
+                    class="relative overflow-hidden rounded-[28px] border border-green-100 bg-white/90 p-6 shadow-xl backdrop-blur-xl dark:border-slate-700 dark:bg-slate-900/90"
+                >
+                    <div class="flex items-start gap-4">
+                        <div
+                            class="flex size-11 shrink-0 items-center justify-center rounded-xl bg-linear-to-br from-amber-500 to-orange-600 text-white shadow-[0_10px_30px_rgba(245,158,11,0.35)]"
+                        >
+                            <UIcon name="i-lucide-tags" class="size-5" />
+                        </div>
+
+                        <div>
+                            <h2
+                                class="text-lg font-bold tracking-tight text-slate-900 dark:text-white"
+                            >
+                                Manage Categories
+                            </h2>
+
+                            <p
+                                class="mt-0.5 text-sm text-slate-500 dark:text-slate-400"
+                            >
+                                Add, rename, or remove item categories.
+                            </p>
+                        </div>
+                    </div>
+
+                    <UAlert
+                        v-if="categoryError"
+                        color="error"
+                        variant="soft"
+                        icon="i-lucide-alert-circle"
+                        :title="categoryError"
+                        class="mt-5"
+                    />
+
+                    <!-- Add category -->
+                    <div class="mt-6 flex gap-2">
+                        <UInput
+                            v-model="newCategoryName"
+                            icon="i-lucide-plus"
+                            placeholder="New category name..."
+                            class="flex-1"
+                            @keydown.enter="addCategory"
+                        />
+
+                        <UButton
+                            color="success"
+                            icon="i-lucide-plus"
+                            :loading="savingCategory"
+                            @click="addCategory"
+                        >
+                            Add
+                        </UButton>
+                    </div>
+
+                    <!-- Category list -->
+                    <ul
+                        v-if="apiCategories.length"
+                        class="mt-4 divide-y divide-green-100 overflow-hidden rounded-2xl border border-green-100 dark:divide-slate-700 dark:border-slate-700"
+                    >
+                        <li
+                            v-for="cat in apiCategories"
+                            :key="cat.id"
+                            class="flex items-center gap-3 px-4 py-3"
+                        >
+                            <UIcon
+                                name="i-lucide-tag"
+                                class="size-4 shrink-0 text-amber-500"
+                            />
+
+                            <template v-if="categoryEditingId === cat.id">
+                                <UInput
+                                    v-model="categoryEditingName"
+                                    size="sm"
+                                    class="flex-1"
+                                    @keydown.enter="saveCategoryRename(cat)"
+                                    @keydown.esc="cancelCategoryEdit"
+                                />
+
+                                <UButton
+                                    size="sm"
+                                    color="success"
+                                    variant="soft"
+                                    icon="i-lucide-check"
+                                    :loading="savingCategory"
+                                    @click="saveCategoryRename(cat)"
+                                />
+                            </template>
+
+                            <template v-else>
+                                <span
+                                    class="min-w-0 flex-1 truncate text-sm font-medium text-slate-800 dark:text-slate-200"
+                                >
+                                    {{ cat.name }}
+                                </span>
+
+                                <span
+                                    class="shrink-0 text-xs text-slate-500 dark:text-slate-400"
+                                >
+                                    {{ itemCountFor(cat.name) }} items
+                                </span>
+
+                                <UButton
+                                    size="sm"
+                                    color="neutral"
+                                    variant="ghost"
+                                    icon="i-lucide-pen"
+                                    aria-label="Rename category"
+                                    @click="startCategoryEdit(cat)"
+                                />
+
+                                <UButton
+                                    size="sm"
+                                    color="error"
+                                    variant="ghost"
+                                    icon="i-lucide-trash"
+                                    aria-label="Delete category"
+                                    @click="openCategoryDelete(cat)"
+                                />
+                            </template>
+                        </li>
+                    </ul>
+
+                    <div
+                        v-else
+                        class="mt-4 rounded-2xl border border-dashed border-green-200 p-8 text-center text-sm text-slate-500 dark:border-slate-700 dark:text-slate-400"
+                    >
+                        No categories yet. Add one above.
+                    </div>
+                </div>
+            </template>
+        </UModal>
+
+        <!-- Delete category modal -->
+        <UModal
+            v-model:open="categoryDeleteOpen"
+            :ui="{ content: 'rounded-[28px]' }"
+        >
+            <template #content>
+                <div
+                    class="relative overflow-hidden rounded-[28px] border border-red-100 bg-white/90 p-6 shadow-xl backdrop-blur-xl dark:border-red-900/50 dark:bg-slate-900/90"
+                >
+                    <div class="flex items-start gap-4">
+                        <div
+                            class="flex size-11 shrink-0 items-center justify-center rounded-xl bg-linear-to-br from-red-500 via-red-600 to-rose-600 text-white shadow-[0_10px_30px_rgba(239,68,68,0.35)]"
+                        >
+                            <UIcon name="i-lucide-trash" class="size-5" />
+                        </div>
+
+                        <div>
+                            <h2
+                                class="text-lg font-bold tracking-tight text-slate-900 dark:text-white"
+                            >
+                                Delete Category
+                            </h2>
+
+                            <p
+                                class="mt-0.5 text-sm text-slate-500 dark:text-slate-400"
+                            >
+                                Delete
+                                <span
+                                    class="font-medium text-slate-700 dark:text-slate-300"
+                                >
+                                    {{ categoryToDelete?.name }}
+                                </span>
+                                ?
+                            </p>
+                        </div>
+                    </div>
+
+                    <div
+                        v-if="categoryToDelete"
+                        class="mt-6 rounded-2xl border border-red-100 bg-red-50/60 p-4 text-sm text-slate-600 dark:border-red-900/50 dark:bg-red-950/30 dark:text-slate-300"
+                    >
+                        {{ itemCountFor(categoryToDelete.name) }} item(s) in
+                        this category will become
+                        <span class="font-semibold">Uncategorized</span>.
+                    </div>
+
+                    <UAlert
+                        v-if="categoryDeleteError"
+                        color="error"
+                        variant="soft"
+                        icon="i-lucide-alert-circle"
+                        :title="categoryDeleteError"
+                        class="mt-5"
+                    />
+
+                    <div class="mt-6 flex justify-end gap-3">
+                        <UButton
+                            color="neutral"
+                            variant="outline"
+                            @click="categoryDeleteOpen = false"
+                        >
+                            Cancel
+                        </UButton>
+
+                        <UButton
+                            color="error"
+                            icon="i-lucide-trash"
+                            :loading="deletingCategory"
+                            @click="confirmCategoryDelete"
+                        >
+                            Delete
+                        </UButton>
+                    </div>
+                </div>
+            </template>
+        </UModal>
     </div>
 </template>
 <script setup lang="ts">
 import type { TableColumn } from '@nuxt/ui'
+import type { DropdownMenuItem } from '#ui/types'
 import type { SortingState } from '@tanstack/vue-table'
 import type { InventoryItem } from '#shared/types/inventory'
 
@@ -217,7 +662,13 @@ interface StrapiItem {
     } | null
 }
 
+interface Category {
+    id: number
+    name: string
+}
+
 const strapi = useStrapi()
+const toast = useToast()
 
 const {
     data: itemsResponse,
@@ -230,6 +681,15 @@ const {
         sort: 'id',
     })
 )
+
+const { data: categoriesResponse, refresh: refreshCategories } =
+    await useAsyncData('fetchCategories', () =>
+        strapi.get<{ data: Category[] }>('/categories', { sort: 'name' })
+    )
+
+const apiCategories = computed<Category[]>(() => {
+    return categoriesResponse.value?.data ?? []
+})
 
 const inventoryItems = computed<InventoryItem[]>(() => {
     return (itemsResponse.value?.data ?? []).map((item) => ({
@@ -315,7 +775,7 @@ const stats = computed(() => [
     },
     {
         label: 'Categories',
-        value: categories.value.length,
+        value: apiCategories.value.length,
         icon: 'i-lucide-tags',
         tint: 'from-amber-500 to-orange-600',
     },
@@ -323,7 +783,7 @@ const stats = computed(() => [
 
 /*
 |--------------------------------------------------------------------------
-| Table
+| Item table
 |--------------------------------------------------------------------------
 */
 
@@ -362,5 +822,308 @@ const columns: TableColumn<InventoryItem>[] = [
         header: 'Status',
         enableSorting: false,
     },
+    {
+        id: 'actions',
+        header: 'Actions',
+        enableSorting: false,
+        meta: {
+            class: {
+                td: 'text-right pr-4',
+                th: 'text-right pr-4',
+            },
+        },
+    },
 ]
+
+/*
+|--------------------------------------------------------------------------
+| Create / Edit item
+|--------------------------------------------------------------------------
+*/
+
+const itemFormOpen = ref(false)
+const selectedItem = ref<InventoryItem | null>(null)
+const savingItem = ref(false)
+const itemFormError = ref('')
+
+const isEditingItem = computed(() => !!selectedItem.value)
+
+const itemForm = ref({
+    name: '',
+    sku: '',
+    unit: '',
+    stockQty: 0,
+    minThreshold: 0,
+    categoryId: 0,
+})
+
+const itemCategoryOptions = computed(() => [
+    { label: 'Uncategorized', value: 0 },
+    ...apiCategories.value.map((cat) => ({ label: cat.name, value: cat.id })),
+])
+
+function resetItemForm() {
+    itemForm.value = {
+        name: '',
+        sku: '',
+        unit: '',
+        stockQty: 0,
+        minThreshold: 0,
+        categoryId: 0,
+    }
+    itemFormError.value = ''
+}
+
+function openItemCreate() {
+    selectedItem.value = null
+    resetItemForm()
+    itemFormOpen.value = true
+}
+
+function openItemEdit(item: InventoryItem) {
+    const raw = (itemsResponse.value?.data ?? []).find((i) => i.id === item.id)
+    selectedItem.value = item
+    itemForm.value = {
+        name: item.name,
+        sku: item.sku,
+        unit: item.unit,
+        stockQty: item.stockQty,
+        minThreshold: item.minThreshold,
+        categoryId: raw?.category?.id ?? 0,
+    }
+    itemFormError.value = ''
+    itemFormOpen.value = true
+}
+
+async function saveItem() {
+    if (savingItem.value) return
+
+    itemFormError.value = ''
+
+    if (!itemForm.value.name.trim() || !itemForm.value.sku.trim()) {
+        itemFormError.value = 'Item name and SKU are required.'
+        return
+    }
+
+    if (!itemForm.value.unit.trim()) {
+        itemFormError.value = 'Unit is required.'
+        return
+    }
+
+    const body = {
+        name: itemForm.value.name.trim(),
+        sku: itemForm.value.sku.trim(),
+        unit: itemForm.value.unit.trim(),
+        stockQty: itemForm.value.stockQty || 0,
+        minThreshold: itemForm.value.minThreshold || 0,
+        category: itemForm.value.categoryId || null,
+    }
+
+    savingItem.value = true
+
+    try {
+        if (isEditingItem.value) {
+            await strapi.put(`/items/${selectedItem.value?.id}`, body)
+            toast.add({
+                title: 'Item saved successfully',
+                description: `Changes saved for item: ${itemForm.value.name.trim()}`,
+            })
+        } else {
+            await strapi.post('/items', body)
+            toast.add({
+                title: 'Item added successfully',
+                description: `${itemForm.value.name.trim()} was added to inventory`,
+            })
+        }
+
+        itemFormOpen.value = false
+        await refresh()
+    } catch (err) {
+        itemFormError.value =
+            (err as Error).message ?? 'Failed to save item. Please try again.'
+    } finally {
+        savingItem.value = false
+    }
+}
+
+/*
+|--------------------------------------------------------------------------
+| Delete item
+|--------------------------------------------------------------------------
+*/
+
+const itemDeleteOpen = ref(false)
+const itemToDelete = ref<InventoryItem | null>(null)
+const deletingItem = ref(false)
+const itemDeleteError = ref('')
+
+function openItemDelete(item: InventoryItem) {
+    itemToDelete.value = item
+    itemDeleteError.value = ''
+    itemDeleteOpen.value = true
+}
+
+async function confirmItemDelete() {
+    if (deletingItem.value || !itemToDelete.value) return
+
+    deletingItem.value = true
+    itemDeleteError.value = ''
+
+    try {
+        await strapi.delete(`/items/${itemToDelete.value.id}`)
+        toast.add({
+            title: 'Item deleted successfully',
+            description: `${itemToDelete.value.name} was removed from inventory`,
+        })
+        itemDeleteOpen.value = false
+        await refresh()
+    } catch (err) {
+        itemDeleteError.value =
+            (err as Error).message ?? 'Failed to delete item. Please try again.'
+    } finally {
+        deletingItem.value = false
+    }
+}
+
+function getItemActions(item: InventoryItem): DropdownMenuItem[] {
+    return [
+        {
+            label: 'Edit',
+            icon: 'i-lucide-pen',
+            class: 'flex gap-2 items-center',
+            onSelect: () => openItemEdit(item),
+        },
+        {
+            label: 'Delete',
+            icon: 'i-lucide-trash',
+            color: 'error',
+            class: 'flex gap-2 items-center',
+            onSelect: () => openItemDelete(item),
+        },
+    ]
+}
+
+/*
+|--------------------------------------------------------------------------
+| Categories
+|--------------------------------------------------------------------------
+*/
+
+const categoriesOpen = ref(false)
+const newCategoryName = ref('')
+const savingCategory = ref(false)
+const categoryError = ref('')
+
+const categoryEditingId = ref<number | null>(null)
+const categoryEditingName = ref('')
+
+const categoryDeleteOpen = ref(false)
+const categoryToDelete = ref<Category | null>(null)
+const deletingCategory = ref(false)
+const categoryDeleteError = ref('')
+
+const itemCountFor = (name: string) => {
+    return inventoryItems.value.filter((item) => item.category === name).length
+}
+
+async function addCategory() {
+    if (savingCategory.value) return
+
+    categoryError.value = ''
+
+    const name = newCategoryName.value.trim()
+    if (!name) {
+        categoryError.value = 'Category name is required.'
+        return
+    }
+
+    savingCategory.value = true
+
+    try {
+        await strapi.post('/categories', { name })
+        newCategoryName.value = ''
+        await refreshCategories()
+        toast.add({
+            title: 'Category added',
+            description: `${name} was added`,
+        })
+    } catch (err) {
+        categoryError.value =
+            (err as Error).message ?? 'Failed to add category. Please try again.'
+    } finally {
+        savingCategory.value = false
+    }
+}
+
+function startCategoryEdit(cat: Category) {
+    categoryEditingId.value = cat.id
+    categoryEditingName.value = cat.name
+    categoryError.value = ''
+}
+
+function cancelCategoryEdit() {
+    categoryEditingId.value = null
+    categoryEditingName.value = ''
+}
+
+async function saveCategoryRename(cat: Category) {
+    if (savingCategory.value) return
+
+    categoryError.value = ''
+
+    const name = categoryEditingName.value.trim()
+    if (!name) {
+        categoryError.value = 'Category name is required.'
+        return
+    }
+
+    savingCategory.value = true
+
+    try {
+        await strapi.put(`/categories/${cat.id}`, { name })
+        cancelCategoryEdit()
+        await refreshCategories()
+        await refresh()
+        toast.add({
+            title: 'Category renamed',
+            description: `${cat.name} was renamed to ${name}`,
+        })
+    } catch (err) {
+        categoryError.value =
+            (err as Error).message ??
+            'Failed to rename category. Please try again.'
+    } finally {
+        savingCategory.value = false
+    }
+}
+
+function openCategoryDelete(cat: Category) {
+    categoryToDelete.value = cat
+    categoryDeleteError.value = ''
+    categoryDeleteOpen.value = true
+}
+
+async function confirmCategoryDelete() {
+    if (deletingCategory.value || !categoryToDelete.value) return
+
+    deletingCategory.value = true
+    categoryDeleteError.value = ''
+
+    try {
+        await strapi.delete(`/categories/${categoryToDelete.value.id}`)
+        toast.add({
+            title: 'Category deleted',
+            description: `${categoryToDelete.value.name} was deleted`,
+        })
+        categoryDeleteOpen.value = false
+        await refreshCategories()
+        await refresh()
+    } catch (err) {
+        categoryDeleteError.value =
+            (err as Error).message ??
+            'Failed to delete category. Please try again.'
+    } finally {
+        deletingCategory.value = false
+    }
+}
 </script>

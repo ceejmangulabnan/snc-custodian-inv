@@ -295,6 +295,23 @@ const recentOrders = computed<RecentOrder[]>(() =>
     }))
 )
 
+const { data: transactionCount } = await useAsyncData(
+    'dashboard-transaction-count',
+    () =>
+        strapi.get<{ meta: { pagination: { total: number } } }>(
+            '/transactions',
+            { pagination: { limit: 1 } }
+        )
+)
+
+const { data: auditLogCount } = await useAsyncData(
+    'dashboard-audit-log-count',
+    () =>
+        strapi.get<{ meta: { pagination: { total: number } } }>('/audit-logs', {
+            pagination: { limit: 1 },
+        })
+)
+
 const lowStockItems = computed(() =>
     sampleInventory.value
         .filter((item) => item.stockQty <= item.minThreshold)
@@ -338,20 +355,18 @@ const stats = computed(() => [
         footer: 'Manage Users',
     },
     {
-        // TODO: Should be fetched from backend
         label: 'Transactions',
         description: 'Transaction history',
-        value: 0,
+        value: transactionCount.value?.meta?.pagination?.total ?? 0,
         icon: 'i-lucide-clipboard-list',
         tint: 'from-amber-500 to-orange-600',
         to: '/admin/transactions',
         footer: 'View Transactions',
     },
     {
-        // TODO: Should be fetched from backend
         label: 'Audit Logs',
         description: 'Stock movement and user actions',
-        value: 0,
+        value: auditLogCount.value?.meta?.pagination?.total ?? 0,
         icon: 'i-lucide-history',
         tint: 'from-red-500 to-rose-600',
         to: '/admin/logs',
