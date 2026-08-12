@@ -71,8 +71,166 @@
                     />
                 </div>
             </NuxtLink>
+        </div>
 
-            <!-- TODO: Add two cards for recent orders and low stock items. -->
+        <!-- Recent activity -->
+        <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
+            <!-- Recent orders -->
+            <div
+                class="overflow-hidden rounded-3xl border border-green-100 bg-white shadow-sm dark:border-slate-700 dark:bg-slate-900"
+            >
+                <div
+                    class="flex items-center justify-between gap-3 border-b border-green-100 p-5 dark:border-slate-700"
+                >
+                    <div class="flex items-center gap-3">
+                        <div
+                            class="flex size-10 shrink-0 items-center justify-center rounded-xl bg-amber-500/10 text-amber-600 dark:text-amber-400"
+                        >
+                            <UIcon name="i-lucide-clipboard-list" class="size-5" />
+                        </div>
+
+                        <div>
+                            <h2
+                                class="text-base font-semibold text-slate-900 dark:text-white"
+                            >
+                                Recent Orders
+                            </h2>
+
+                            <p class="text-xs text-slate-500 dark:text-slate-400">
+                                Latest inventory transactions
+                            </p>
+                        </div>
+                    </div>
+
+                    <NuxtLink
+                        to="/admin/transactions"
+                        class="flex shrink-0 items-center gap-1 text-sm font-medium text-green-600 hover:text-green-700 dark:text-green-400"
+                    >
+                        View all
+                        <UIcon name="i-lucide-arrow-right" class="size-4" />
+                    </NuxtLink>
+                </div>
+
+                <ul
+                    v-if="recentOrders.length"
+                    class="divide-y divide-green-100 dark:divide-slate-700"
+                >
+                    <li
+                        v-for="order in recentOrders"
+                        :key="order.id"
+                        class="flex items-center gap-3 px-5 py-3"
+                    >
+                        <div
+                            class="flex size-9 shrink-0 items-center justify-center rounded-xl bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400"
+                        >
+                            <UIcon name="i-lucide-receipt-text" class="size-4" />
+                        </div>
+
+                        <div class="min-w-0 flex-1">
+                            <p
+                                class="truncate text-sm font-medium text-slate-800 dark:text-slate-200"
+                            >
+                                #{{ order.id }} · {{ order.custodian }}
+                            </p>
+
+                            <p class="text-xs text-slate-500 dark:text-slate-400">
+                                {{ order.date }}
+                            </p>
+                        </div>
+
+                        <UBadge
+                            :color="orderColor(order.status)"
+                            variant="subtle"
+                        >
+                            {{ order.status }}
+                        </UBadge>
+                    </li>
+                </ul>
+
+                <div
+                    v-else
+                    class="p-8 text-center text-sm text-slate-500 dark:text-slate-400"
+                >
+                    No recent transactions yet.
+                </div>
+            </div>
+
+            <!-- Low stock -->
+            <div
+                class="overflow-hidden rounded-3xl border border-green-100 bg-white shadow-sm dark:border-slate-700 dark:bg-slate-900"
+            >
+                <div
+                    class="flex items-center justify-between gap-3 border-b border-green-100 p-5 dark:border-slate-700"
+                >
+                    <div class="flex items-center gap-3">
+                        <div
+                            class="flex size-10 shrink-0 items-center justify-center rounded-xl bg-red-500/10 text-red-600 dark:text-red-400"
+                        >
+                            <UIcon name="i-lucide-alert-triangle" class="size-5" />
+                        </div>
+
+                        <div>
+                            <h2
+                                class="text-base font-semibold text-slate-900 dark:text-white"
+                            >
+                                Low Stock Items
+                            </h2>
+
+                            <p class="text-xs text-slate-500 dark:text-slate-400">
+                                Items at or below minimum threshold
+                            </p>
+                        </div>
+                    </div>
+
+                    <NuxtLink
+                        to="/admin/inventory"
+                        class="flex shrink-0 items-center gap-1 text-sm font-medium text-green-600 hover:text-green-700 dark:text-green-400"
+                    >
+                        View all
+                        <UIcon name="i-lucide-arrow-right" class="size-4" />
+                    </NuxtLink>
+                </div>
+
+                <ul
+                    v-if="lowStockItems.length"
+                    class="divide-y divide-green-100 dark:divide-slate-700"
+                >
+                    <li
+                        v-for="item in lowStockItems"
+                        :key="item.id"
+                        class="flex items-center gap-3 px-5 py-3"
+                    >
+                        <div
+                            class="flex size-9 shrink-0 items-center justify-center rounded-xl bg-red-500/10 text-red-600 dark:bg-red-500/10 dark:text-red-400"
+                        >
+                            <UIcon name="i-lucide-box" class="size-4" />
+                        </div>
+
+                        <div class="min-w-0 flex-1">
+                            <p
+                                class="truncate text-sm font-medium text-slate-800 dark:text-slate-200"
+                            >
+                                {{ item.name }}
+                            </p>
+
+                            <p class="text-xs text-slate-500 dark:text-slate-400">
+                                {{ item.category }}
+                            </p>
+                        </div>
+
+                        <UBadge color="error" variant="subtle">
+                            {{ item.stockQty }} / {{ item.minThreshold }}
+                        </UBadge>
+                    </li>
+                </ul>
+
+                <div
+                    v-else
+                    class="p-8 text-center text-sm text-slate-500 dark:text-slate-400"
+                >
+                    All items are sufficiently stocked.
+                </div>
+            </div>
         </div>
     </div>
 </template>
@@ -94,6 +252,71 @@ const { data: users } = await useAsyncData('dashboard-users', () =>
 )
 
 const usersCount = computed(() => users.value?.length ?? 0)
+
+/*
+|--------------------------------------------------------------------------
+| Recent activity
+|--------------------------------------------------------------------------
+*/
+
+interface StrapiRecentTransaction {
+    id: number
+    createdAt: string
+    orderStatus: 'Pending' | 'Completed' | 'Voided'
+    custodian: {
+        id: number
+        username: string
+    } | null
+}
+
+interface RecentOrder {
+    id: number
+    date: string
+    custodian: string
+    status: 'Pending' | 'Completed' | 'Voided'
+}
+
+const { data: recentTransactions } = await useAsyncData(
+    'dashboard-recent-transactions',
+    () =>
+        strapi.get<{ data: StrapiRecentTransaction[] }>('/transactions', {
+            populate: 'custodian',
+            sort: 'createdAt:desc',
+            pagination: { limit: 5 },
+        })
+)
+
+const recentOrders = computed<RecentOrder[]>(() =>
+    (recentTransactions.value?.data ?? []).map((transaction) => ({
+        id: transaction.id,
+        date: formatDate(transaction.createdAt),
+        custodian: transaction.custodian?.username ?? '—',
+        status: transaction.orderStatus,
+    }))
+)
+
+const lowStockItems = computed(() =>
+    sampleInventory.value
+        .filter((item) => item.stockQty <= item.minThreshold)
+        .slice(0, 4)
+)
+
+function formatDate(iso: string): string {
+    return new Intl.DateTimeFormat('en-US', {
+        month: 'short',
+        day: 'numeric',
+        hour: 'numeric',
+        minute: '2-digit',
+    }).format(new Date(iso))
+}
+
+const orderColor = (
+    status: RecentOrder['status']
+): 'neutral' | 'success' | 'error' => {
+    if (status === 'Completed') return 'success'
+    if (status === 'Voided') return 'error'
+    return 'neutral'
+}
 
 const stats = computed(() => [
     {
