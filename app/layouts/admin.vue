@@ -38,11 +38,11 @@
                             <h1
                                 class="text-wrap leading-none text-base font-semibold tracking-tight text-white"
                             >
-                                Custodian Inventory System
+                                SNC Custodian System
                             </h1>
 
                             <p class="truncate text-xs text-slate-400">
-                                Dynamic ID Management
+                                School Property &amp; Inventory
                             </p>
                         </div>
                     </div>
@@ -63,6 +63,27 @@
                     >
                         <span v-if="!isCollapsed"> Collapse Sidebar </span>
                     </UButton>
+                </div>
+
+                <!-- App link -->
+                <div class="px-4 pb-3 pt-3 lg:pt-0">
+                    <UTooltip
+                        text="Custodian Dashboard"
+                        :disabled="!sidebarCollapsed"
+                        :delay-duration="0"
+                    >
+                        <UButton
+                            block
+                            icon="i-lucide-id-card"
+                            to="/"
+                            class="bg-gradient-to-br from-green-500 via-green-600 to-teal-600 text-white shadow-lg shadow-green-500/30 hover:from-green-600 hover:via-green-700 hover:to-teal-700"
+                            @click="closeMobileSidebar"
+                        >
+                            <span v-if="!sidebarCollapsed">
+                                View Custodian Dashboard
+                            </span>
+                        </UButton>
+                    </UTooltip>
                 </div>
 
                 <!-- Navigation links -->
@@ -179,7 +200,7 @@
                         <p
                             class="truncate text-sm font-bold text-slate-900 dark:text-white"
                         >
-                            School ID System
+                            SNC Custodian System
                         </p>
 
                         <p
@@ -235,7 +256,7 @@
                         </h2>
 
                         <p class="text-xs text-slate-500 dark:text-slate-400">
-                            School UI Template
+                            School Property &amp; Inventory
                         </p>
                     </div>
 
@@ -298,7 +319,7 @@
                                 <span
                                     class="font-semibold text-slate-700 dark:text-slate-200"
                                 >
-                                    School ID System </span
+                                    SNC Custodian </span
                                 >.
                                 <br />
                                 You can login again anytime.
@@ -383,7 +404,7 @@ const isLoggingOut = ref(false)
 const isCollapsed = ref(false)
 const mobileOpen = ref(false)
 
-const { fetch: refreshSession } = useUserSession()
+const { fetch: refreshSession, session } = useUserSession()
 
 /*
 |--------------------------------------------------------------------------
@@ -457,15 +478,9 @@ const isActive = (path: string): boolean => {
 }
 
 const pageTitle = computed(() => {
-    if (route.path.startsWith('/people')) {
-        return 'People Records'
-    }
+    const active = links.find((link) => isActive(link.to))
 
-    if (route.path.startsWith('/courses')) {
-        return 'Courses'
-    }
-
-    return 'Dashboard'
+    return active?.label ?? 'Dashboard'
 })
 
 const hideDesktopHeader = computed(() => {
@@ -479,11 +494,11 @@ const hideDesktopHeader = computed(() => {
 */
 
 const displayName = computed(() => {
-    return 'SNC Admin'
+    return session.value.user?.username
 })
 
 const displayRole = computed(() => {
-    return 'administrator'
+    return session.value.user?.role.name
 })
 
 /*
