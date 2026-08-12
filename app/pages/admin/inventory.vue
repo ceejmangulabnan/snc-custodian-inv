@@ -66,6 +66,25 @@
             </div>
         </div>
 
+        <!-- Fetch error -->
+        <UAlert
+            v-if="fetchError"
+            color="error"
+            variant="soft"
+            icon="i-lucide-triangle-alert"
+            :title="errorMessage"
+            description="Check that the backend is running and try again."
+            :actions="[
+                {
+                    label: 'Retry',
+                    icon: 'i-lucide-refresh-cw',
+                    color: 'error',
+                    variant: 'outline',
+                    onClick: () => refresh(),
+                },
+            ]"
+        />
+
         <!-- Inventory table -->
         <div
             class="overflow-hidden rounded-3xl border border-green-100 bg-white shadow-sm dark:border-slate-700 dark:bg-slate-900"
@@ -90,7 +109,7 @@
 
                         <p class="text-xs text-slate-500 dark:text-slate-400">
                             {{ filteredByCategory.length }} of
-                            {{ sampleInventory.length }} items shown
+                            {{ inventoryItems.length }} items shown
                         </p>
                     </div>
                 </div>
@@ -117,6 +136,7 @@
             <UTable
                 :data="filteredByCategory"
                 :columns="columns"
+                :loading="pending"
                 v-model:global-filter="search"
                 v-model:sorting="sorting"
                 :empty="'No items match your filters.'"
@@ -172,14 +192,62 @@
 import type { TableColumn } from '@nuxt/ui'
 import type { SortingState } from '@tanstack/vue-table'
 import type { InventoryItem } from '#shared/types/inventory'
-import { sampleInventory as sampleInventoryData } from '#shared/data/inventory'
 
 definePageMeta({
     layout: 'admin',
     middleware: 'admin',
 })
 
-const sampleInventory = ref<InventoryItem[]>(sampleInventoryData)
+/*
+|--------------------------------------------------------------------------
+| Strapi data
+|--------------------------------------------------------------------------
+*/
+
+interface StrapiItem {
+    id: number
+    name: string
+    sku: string
+    stockQty: number
+    minThreshold: number
+    unit: string
+    category: {
+        id: number
+        name: string
+    } | null
+}
+
+const strapi = useStrapi()
+
+const {
+    data: itemsResponse,
+    error: fetchError,
+    pending,
+    refresh,
+} = await useAsyncData('fetchInventoryItems', () =>
+    strapi.get<{ data: StrapiItem[] }>('/items', {
+        populate: 'category',
+        sort: 'id',
+    })
+)
+
+const inventoryItems = computed<InventoryItem[]>(() => {
+    return (itemsResponse.value?.data ?? []).map((item) => ({
+        id: item.id,
+        sku: item.sku,
+        name: item.name,
+        category: item.category?.name ?? 'Uncategorized',
+        stockQty: item.stockQty,
+        minThreshold: item.minThreshold,
+        unit: item.unit,
+        status: item.stockQty <= item.minThreshold ? 'low' : 'healthy',
+    }))
+})
+
+const errorMessage = computed(() => {
+    const err = fetchError.value as { data?: { statusMessage?: string } } | null
+    return err?.data?.statusMessage ?? 'Failed to load inventory'
+})
 
 /*
 |--------------------------------------------------------------------------
@@ -193,11 +261,9 @@ const sorting = ref<SortingState>([])
 
 const categories = computed(() => {
     return [
-        ...new Set(sampleInventory.value.map((item) => item.category)),
+        ...new Set(inventoryItems.value.map((item) => item.category)),
     ].sort()
 })
-
-console.log('Categories: ', categories.value)
 
 const categoryOptions = computed(() => [
     { label: 'All Categories', value: 'all' },
@@ -206,10 +272,10 @@ const categoryOptions = computed(() => [
 
 const filteredByCategory = computed(() => {
     if (category.value === 'all') {
-        return sampleInventory.value
+        return inventoryItems.value
     }
 
-    return sampleInventory.value.filter(
+    return inventoryItems.value.filter(
         (item) => item.category === category.value
     )
 })
@@ -220,19 +286,18 @@ const filteredByCategory = computed(() => {
 |--------------------------------------------------------------------------
 */
 
-// TODO: Should be fetched from backend
 const totalUnits = computed(() =>
-    sampleInventory.value.reduce((sum, item) => sum + item.stockQty, 0)
+    inventoryItems.value.reduce((sum, item) => sum + item.stockQty, 0)
 )
 
 const lowStockItems = computed(() =>
-    sampleInventory.value.filter((item) => item.stockQty <= item.minThreshold)
+    inventoryItems.value.filter((item) => item.stockQty <= item.minThreshold)
 )
 
 const stats = computed(() => [
     {
         label: 'Total Items',
-        value: sampleInventory.value.length,
+        value: inventoryItems.value.length,
         icon: 'i-lucide-boxes',
         tint: 'from-green-500 via-green-600 to-teal-600',
     },

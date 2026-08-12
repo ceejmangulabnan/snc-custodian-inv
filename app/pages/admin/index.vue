@@ -71,6 +71,8 @@
                     />
                 </div>
             </NuxtLink>
+
+            <!-- TODO: Add two cards for recent orders and low stock items. -->
         </div>
     </div>
 </template>
