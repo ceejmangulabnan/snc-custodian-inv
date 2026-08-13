@@ -771,15 +771,21 @@ const pagination = ref({ pageIndex: 0, pageSize: 10 })
 const page = computed({
     get: () => pagination.value.pageIndex + 1,
     set: (value: number) => {
-        pagination.value.pageIndex = value - 1
+        pagination.value = {
+            ...pagination.value,
+            pageIndex: value - 1,
+        }
     },
 })
 
 const pageSize = computed({
     get: () => pagination.value.pageSize,
     set: (value: number) => {
-        pagination.value.pageSize = value
-        pagination.value.pageIndex = 0
+        pagination.value = {
+            ...pagination.value,
+            pageSize: value,
+            pageIndex: 0,
+        }
     },
 })
 
@@ -827,7 +833,10 @@ const filteredItems = computed(() => {
 })
 
 watch([search, category], () => {
-    pagination.value.pageIndex = 0
+    pagination.value = {
+        ...pagination.value,
+        pageIndex: 0,
+    }
 })
 
 /*
