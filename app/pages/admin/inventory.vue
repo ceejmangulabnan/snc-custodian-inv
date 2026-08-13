@@ -320,12 +320,24 @@
                         </div>
 
                         <UFormField label="Category">
-                            <USelect
+                            <USelectMenu
                                 v-model.number="itemForm.categoryId"
-                                :items="itemCategoryOptions"
+                                v-model:search-term="categorySearch"
+                                :open="categoryMenuOpen"
+                                :items="categoryMenuItems"
+                                :create-item="{ position: 'top' }"
+                                value-key="id"
                                 icon="i-lucide-tags"
+                                placeholder="Select a category..."
+                                :loading="creatingCategory"
                                 class="w-full"
-                            />
+                                @update:open="categoryMenuOpen = $event"
+                                @create="createCategoryFromMenu"
+                            >
+                                <template #create-item-label="{ item }">
+                                    Create category "{{ item }}"
+                                </template>
+                            </USelectMenu>
                         </UFormField>
                     </UForm>
 
@@ -862,9 +874,13 @@ const itemForm = ref({
     categoryId: 0,
 })
 
-const itemCategoryOptions = computed(() => [
-    { label: 'Uncategorized', value: 0 },
-    ...apiCategories.value.map((cat) => ({ label: cat.name, value: cat.id })),
+const categorySearch = ref('')
+const categoryMenuOpen = ref(false)
+const creatingCategory = ref(false)
+
+const categoryMenuItems = computed(() => [
+    { id: 0, label: 'Uncategorized' },
+    ...apiCategories.value.map((cat) => ({ id: cat.id, label: cat.name })),
 ])
 
 function resetItemForm() {
@@ -876,6 +892,8 @@ function resetItemForm() {
         minThreshold: 0,
         categoryId: 0,
     }
+    categorySearch.value = ''
+    categoryMenuOpen.value = false
     itemFormError.value = ''
 }
 
@@ -1072,6 +1090,37 @@ async function addCategory() {
             (err as Error).message ?? 'Failed to add category. Please try again.'
     } finally {
         savingCategory.value = false
+    }
+}
+
+async function createCategoryFromMenu(label: string) {
+    if (creatingCategory.value) return
+
+    const name = label.trim()
+    if (!name) {
+        return
+    }
+
+    creatingCategory.value = true
+    itemFormError.value = ''
+
+    try {
+        const response = await strapi.post<{ data: Category }>(
+            '/categories',
+            { data: { name } }
+        )
+        await refreshCategories()
+        itemForm.value.categoryId = response.data?.id ?? 0
+        categoryMenuOpen.value = false
+        toast.add({
+            title: 'Category added',
+            description: name + ' was added',
+        })
+    } catch (err) {
+        itemFormError.value =
+            (err as Error).message ?? 'Failed to add category. Please try again.'
+    } finally {
+        creatingCategory.value = false
     }
 }
 
