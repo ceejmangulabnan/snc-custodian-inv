@@ -871,7 +871,9 @@ const errorMessage = computed(() => {
 })
 
 const filteredTotal = computed(
-    () => itemsResponse.value?.meta.pagination.total ?? inventoryItems.value.length
+    () =>
+        itemsResponse.value?.meta.pagination.total ??
+        inventoryItems.value.length
 )
 
 const categoryOptions = computed(() => [
@@ -893,15 +895,18 @@ watch([searchQuery, category, sorting], () => {
 |--------------------------------------------------------------------------
 */
 
-const totalUnits = computed(() =>
-    statsResponse.value?.totalUnits ??
-    inventoryItems.value.reduce((sum, item) => sum + item.stockQty, 0)
+const totalUnits = computed(
+    () =>
+        statsResponse.value?.totalUnits ??
+        inventoryItems.value.reduce((sum, item) => sum + item.stockQty, 0)
 )
 
-const lowStockItems = computed(() =>
-    statsResponse.value?.lowStockItems ??
-    inventoryItems.value.filter((item) => item.stockQty <= item.minThreshold)
-        .length
+const lowStockItems = computed(
+    () =>
+        statsResponse.value?.lowStockItems ??
+        inventoryItems.value.filter(
+            (item) => item.stockQty <= item.minThreshold
+        ).length
 )
 
 const totalItems = computed(
