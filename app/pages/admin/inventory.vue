@@ -122,7 +122,7 @@
                         </h2>
 
                         <p class="text-xs text-slate-500 dark:text-slate-400">
-                            {{ filteredByCategory.length }} of
+                            {{ filteredItems.length }} of
                             {{ inventoryItems.length }} items shown
                         </p>
                     </div>
@@ -148,11 +148,14 @@
 
             <!-- Table -->
             <UTable
-                :data="filteredByCategory"
+                :data="filteredItems"
                 :columns="columns"
                 :loading="pending"
-                v-model:global-filter="search"
+                :pagination-options="{
+                    getPaginationRowModel: getPaginationRowModel(),
+                }"
                 v-model:sorting="sorting"
+                v-model:pagination="pagination"
                 :empty="'No items match your filters.'"
                 class="flex-1"
             >
@@ -209,11 +212,32 @@
 
             <!-- Table footer -->
             <div
-                class="flex items-center justify-between border-t border-green-100 px-5 py-4 text-xs text-slate-500 dark:border-slate-700 dark:text-slate-400"
+                class="flex flex-col gap-4 border-t border-green-100 px-5 py-4 lg:flex-row lg:items-center lg:justify-between dark:border-slate-700"
             >
-                <p>{{ lowStockItems.length }} items need restocking</p>
+                <p class="text-xs text-slate-500 dark:text-slate-400">
+                    {{ filteredItems.length }} items
+                    <span class="text-slate-400 dark:text-slate-500">
+                        · {{ lowStockItems.length }} need restocking
+                    </span>
+                </p>
 
-                <p>Updated just now</p>
+                <div class="flex items-center justify-between gap-4">
+                    <USelect
+                        v-model="pageSize"
+                        :items="pageSizeOptions"
+                        size="sm"
+                        class="w-32"
+                    />
+
+                    <UPagination
+                        v-model:page="page"
+                        :total="filteredItems.length"
+                        :items-per-page="pagination.pageSize"
+                        :show-edges="true"
+                        :show-controls="true"
+                        size="sm"
+                    />
+                </div>
             </div>
         </div>
 
@@ -228,7 +252,11 @@
                             class="flex size-11 shrink-0 items-center justify-center rounded-xl bg-linear-to-br from-green-500 via-green-600 to-teal-600 text-white shadow-[0_10px_30px_rgba(16,185,129,0.35)]"
                         >
                             <UIcon
-                                :name="isEditingItem ? 'i-lucide-pen' : 'i-lucide-package-plus'"
+                                :name="
+                                    isEditingItem
+                                        ? 'i-lucide-pen'
+                                        : 'i-lucide-package-plus'
+                                "
                                 class="size-5"
                             />
                         </div>
@@ -364,7 +392,10 @@
         </UModal>
 
         <!-- Delete item modal -->
-        <UModal v-model:open="itemDeleteOpen" :ui="{ content: 'rounded-[28px]' }">
+        <UModal
+            v-model:open="itemDeleteOpen"
+            :ui="{ content: 'rounded-[28px]' }"
+        >
             <template #content>
                 <div
                     class="relative overflow-hidden rounded-[28px] border border-red-100 bg-white/90 p-6 shadow-xl backdrop-blur-xl dark:border-red-900/50 dark:bg-slate-900/90"
@@ -647,7 +678,7 @@
 <script setup lang="ts">
 import type { TableColumn } from '@nuxt/ui'
 import type { DropdownMenuItem } from '#ui/types'
-import type { SortingState } from '@tanstack/vue-table'
+import { getPaginationRowModel, type SortingState } from '@tanstack/vue-table'
 import type { InventoryItem } from '#shared/types/inventory'
 
 definePageMeta({
@@ -696,6 +727,8 @@ const {
     })
 )
 
+console.log(itemsResponse.value)
+
 const { data: categoriesResponse, refresh: refreshCategories } =
     await useAsyncData('fetchCategories', () =>
         strapi.get<{ data: Category[] }>('/categories', { sort: 'name' })
@@ -733,6 +766,30 @@ const search = ref('')
 const category = ref('all')
 const sorting = ref<SortingState>([])
 
+const pagination = ref({ pageIndex: 0, pageSize: 10 })
+
+const page = computed({
+    get: () => pagination.value.pageIndex + 1,
+    set: (value: number) => {
+        pagination.value.pageIndex = value - 1
+    },
+})
+
+const pageSize = computed({
+    get: () => pagination.value.pageSize,
+    set: (value: number) => {
+        pagination.value.pageSize = value
+        pagination.value.pageIndex = 0
+    },
+})
+
+const pageSizeOptions = [
+    { label: '5 per page', value: 5 },
+    { label: '10 per page', value: 10 },
+    { label: '20 per page', value: 20 },
+    { label: '50 per page', value: 50 },
+]
+
 const categories = computed(() => {
     return [
         ...new Set(inventoryItems.value.map((item) => item.category)),
@@ -752,6 +809,25 @@ const filteredByCategory = computed(() => {
     return inventoryItems.value.filter(
         (item) => item.category === category.value
     )
+})
+
+const filteredItems = computed(() => {
+    const query = search.value.trim().toLowerCase()
+
+    if (!query) {
+        return filteredByCategory.value
+    }
+
+    return filteredByCategory.value.filter(
+        (item) =>
+            item.name.toLowerCase().includes(query) ||
+            item.sku.toLowerCase().includes(query) ||
+            item.category.toLowerCase().includes(query)
+    )
+})
+
+watch([search, category], () => {
+    pagination.value.pageIndex = 0
 })
 
 /*
@@ -946,8 +1022,9 @@ async function saveItem() {
 
     try {
         if (isEditingItem.value) {
-            const documentId = findStrapiItemById(selectedItem.value?.id ?? 0)
-                ?.documentId
+            const documentId = findStrapiItemById(
+                selectedItem.value?.id ?? 0
+            )?.documentId
 
             if (!documentId) {
                 throw new Error('Could not locate the item to update.')
@@ -1087,7 +1164,8 @@ async function addCategory() {
         })
     } catch (err) {
         categoryError.value =
-            (err as Error).message ?? 'Failed to add category. Please try again.'
+            (err as Error).message ??
+            'Failed to add category. Please try again.'
     } finally {
         savingCategory.value = false
     }
@@ -1105,10 +1183,9 @@ async function createCategoryFromMenu(label: string) {
     itemFormError.value = ''
 
     try {
-        const response = await strapi.post<{ data: Category }>(
-            '/categories',
-            { data: { name } }
-        )
+        const response = await strapi.post<{ data: Category }>('/categories', {
+            data: { name },
+        })
         await refreshCategories()
         itemForm.value.categoryId = response.data?.id ?? 0
         categoryMenuOpen.value = false
@@ -1118,7 +1195,8 @@ async function createCategoryFromMenu(label: string) {
         })
     } catch (err) {
         itemFormError.value =
-            (err as Error).message ?? 'Failed to add category. Please try again.'
+            (err as Error).message ??
+            'Failed to add category. Please try again.'
     } finally {
         creatingCategory.value = false
     }
