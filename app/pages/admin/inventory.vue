@@ -651,6 +651,7 @@ definePageMeta({
 
 interface StrapiItem {
     id: number
+    documentId: string
     name: string
     sku: string
     stockQty: number
@@ -664,6 +665,7 @@ interface StrapiItem {
 
 interface Category {
     id: number
+    documentId: string
     name: string
 }
 
@@ -848,6 +850,9 @@ const itemFormError = ref('')
 
 const isEditingItem = computed(() => !!selectedItem.value)
 
+const findStrapiItemById = (id: number): StrapiItem | undefined =>
+    (itemsResponse.value?.data ?? []).find((item) => item.id === id)
+
 const itemForm = ref({
     name: '',
     sku: '',
@@ -923,13 +928,22 @@ async function saveItem() {
 
     try {
         if (isEditingItem.value) {
-            await strapi.put(`/items/${selectedItem.value?.id}`, body)
+            const documentId = findStrapiItemById(selectedItem.value?.id ?? 0)
+                ?.documentId
+
+            if (!documentId) {
+                throw new Error('Could not locate the item to update.')
+            }
+
+            await strapi.put(`/items/${documentId}`, {
+                data: body,
+            })
             toast.add({
                 title: 'Item saved successfully',
                 description: `Changes saved for item: ${itemForm.value.name.trim()}`,
             })
         } else {
-            await strapi.post('/items', body)
+            await strapi.post('/items', { data: body })
             toast.add({
                 title: 'Item added successfully',
                 description: `${itemForm.value.name.trim()} was added to inventory`,
@@ -970,7 +984,13 @@ async function confirmItemDelete() {
     itemDeleteError.value = ''
 
     try {
-        await strapi.delete(`/items/${itemToDelete.value.id}`)
+        const documentId = findStrapiItemById(itemToDelete.value.id)?.documentId
+
+        if (!documentId) {
+            throw new Error('Could not locate the item to delete.')
+        }
+
+        await strapi.delete(`/items/${documentId}`)
         toast.add({
             title: 'Item deleted successfully',
             description: `${itemToDelete.value.name} was removed from inventory`,
@@ -1040,7 +1060,7 @@ async function addCategory() {
     savingCategory.value = true
 
     try {
-        await strapi.post('/categories', { name })
+        await strapi.post('/categories', { data: { name } })
         newCategoryName.value = ''
         await refreshCategories()
         toast.add({
@@ -1080,7 +1100,9 @@ async function saveCategoryRename(cat: Category) {
     savingCategory.value = true
 
     try {
-        await strapi.put(`/categories/${cat.id}`, { name })
+        await strapi.put(`/categories/${cat.documentId}`, {
+            data: { name },
+        })
         cancelCategoryEdit()
         await refreshCategories()
         await refresh()
@@ -1110,7 +1132,7 @@ async function confirmCategoryDelete() {
     categoryDeleteError.value = ''
 
     try {
-        await strapi.delete(`/categories/${categoryToDelete.value.id}`)
+        await strapi.delete(`/categories/${categoryToDelete.value.documentId}`)
         toast.add({
             title: 'Category deleted',
             description: `${categoryToDelete.value.name} was deleted`,
