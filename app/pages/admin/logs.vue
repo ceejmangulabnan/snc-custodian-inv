@@ -276,6 +276,7 @@ const {
     strapi.get<{ data: StrapiAuditLog[] }>('/audit-logs', {
         populate: 'user',
         sort: 'createdAt:desc',
+        'pagination[pageSize]': 100,
     })
 )
 

@@ -239,6 +239,7 @@ const {
     strapi.get<{ data: StrapiTransaction[] }>('/transactions', {
         populate: 'custodian,items.item',
         sort: 'createdAt:desc',
+        'pagination[pageSize]': 100,
     })
 )
 

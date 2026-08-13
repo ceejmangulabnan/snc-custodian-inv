@@ -724,14 +724,16 @@ const {
     strapi.get<{ data: StrapiItem[] }>('/items', {
         populate: 'category',
         sort: 'id',
+        'pagination[pageSize]': 100,
     })
 )
 
-console.log(itemsResponse.value)
-
 const { data: categoriesResponse, refresh: refreshCategories } =
     await useAsyncData('fetchCategories', () =>
-        strapi.get<{ data: Category[] }>('/categories', { sort: 'name' })
+        strapi.get<{ data: Category[] }>('/categories', {
+            sort: 'name',
+            'pagination[pageSize]': 100,
+        })
     )
 
 const apiCategories = computed<Category[]>(() => {
