@@ -122,8 +122,8 @@
                         </h2>
 
                         <p class="text-xs text-slate-500 dark:text-slate-400">
-                            {{ filteredItems.length }} of
-                            {{ inventoryItems.length }} items shown
+                            {{ inventoryItems.length }} of
+                            {{ filteredTotal }} items shown
                         </p>
                     </div>
                 </div>
@@ -148,12 +148,10 @@
 
             <!-- Table -->
             <UTable
-                :data="filteredItems"
+                :data="inventoryItems"
                 :columns="columns"
                 :loading="pending"
-                :pagination-options="{
-                    getPaginationRowModel: getPaginationRowModel(),
-                }"
+                :pagination-options="{ manualPagination: true }"
                 v-model:sorting="sorting"
                 v-model:pagination="pagination"
                 :empty="'No items match your filters.'"
@@ -215,9 +213,9 @@
                 class="flex flex-col gap-4 border-t border-green-100 px-5 py-4 lg:flex-row lg:items-center lg:justify-between dark:border-slate-700"
             >
                 <p class="text-xs text-slate-500 dark:text-slate-400">
-                    {{ filteredItems.length }} items
+                    {{ filteredTotal }} items
                     <span class="text-slate-400 dark:text-slate-500">
-                        · {{ lowStockItems.length }} need restocking
+                        · {{ lowStockItems }} need restocking
                     </span>
                 </p>
 
@@ -231,7 +229,7 @@
 
                     <UPagination
                         v-model:page="page"
-                        :total="filteredItems.length"
+                        :total="filteredTotal"
                         :items-per-page="pagination.pageSize"
                         :show-edges="true"
                         :show-controls="true"
@@ -678,7 +676,7 @@
 <script setup lang="ts">
 import type { TableColumn } from '@nuxt/ui'
 import type { DropdownMenuItem } from '#ui/types'
-import { getPaginationRowModel, type SortingState } from '@tanstack/vue-table'
+import type { SortingState } from '@tanstack/vue-table'
 import type { InventoryItem } from '#shared/types/inventory'
 
 definePageMeta({
@@ -712,51 +710,15 @@ interface Category {
     name: string
 }
 
+interface InventoryStats {
+    totalItems: number
+    totalUnits: number
+    lowStockItems: number
+    itemsPerCategory: Record<string, number>
+}
+
 const strapi = useStrapi()
 const toast = useToast()
-
-const {
-    data: itemsResponse,
-    error: fetchError,
-    pending,
-    refresh,
-} = await useAsyncData('fetchInventoryItems', () =>
-    strapi.get<{ data: StrapiItem[] }>('/items', {
-        populate: 'category',
-        sort: 'id',
-        'pagination[pageSize]': 100,
-    })
-)
-
-const { data: categoriesResponse, refresh: refreshCategories } =
-    await useAsyncData('fetchCategories', () =>
-        strapi.get<{ data: Category[] }>('/categories', {
-            sort: 'name',
-            'pagination[pageSize]': 100,
-        })
-    )
-
-const apiCategories = computed<Category[]>(() => {
-    return categoriesResponse.value?.data ?? []
-})
-
-const inventoryItems = computed<InventoryItem[]>(() => {
-    return (itemsResponse.value?.data ?? []).map((item) => ({
-        id: item.id,
-        sku: item.sku,
-        name: item.name,
-        category: item.category?.name ?? 'Uncategorized',
-        stockQty: item.stockQty,
-        minThreshold: item.minThreshold,
-        unit: item.unit,
-        status: item.stockQty <= item.minThreshold ? 'low' : 'healthy',
-    }))
-})
-
-const errorMessage = computed(() => {
-    const err = fetchError.value as { data?: { statusMessage?: string } } | null
-    return err?.data?.statusMessage ?? 'Failed to load inventory'
-})
 
 /*
 |--------------------------------------------------------------------------
@@ -765,6 +727,24 @@ const errorMessage = computed(() => {
 */
 
 const search = ref('')
+const searchQuery = ref('')
+let searchTimer: ReturnType<typeof setTimeout> | null = null
+
+watch(search, () => {
+    if (searchTimer) {
+        clearTimeout(searchTimer)
+    }
+    searchTimer = setTimeout(() => {
+        searchQuery.value = search.value.trim()
+    }, 300)
+})
+
+onUnmounted(() => {
+    if (searchTimer) {
+        clearTimeout(searchTimer)
+    }
+})
+
 const category = ref('all')
 const sorting = ref<SortingState>([])
 
@@ -798,43 +778,109 @@ const pageSizeOptions = [
     { label: '50 per page', value: 50 },
 ]
 
-const categories = computed(() => {
-    return [
-        ...new Set(inventoryItems.value.map((item) => item.category)),
-    ].sort()
+interface ItemListResponse {
+    data: StrapiItem[]
+    meta: {
+        pagination: {
+            page: number
+            pageSize: number
+            pageCount: number
+            total: number
+        }
+    }
+}
+
+function buildItemQuery(): Record<string, unknown> {
+    const params: Record<string, unknown> = {
+        populate: 'category',
+        'pagination[page]': pagination.value.pageIndex + 1,
+        'pagination[pageSize]': pagination.value.pageSize,
+    }
+
+    const query = searchQuery.value
+    if (query) {
+        params['filters[$or][0][name][$containsi]'] = query
+        params['filters[$or][1][sku][$containsi]'] = query
+        params['filters[$or][2][category][name][$containsi]'] = query
+    }
+
+    if (category.value === 'uncategorized') {
+        params['filters[category][$null]'] = true
+    } else if (category.value !== 'all') {
+        params['filters[category][name][$eq]'] = category.value
+    }
+
+    if (sorting.value.length) {
+        params.sort = sorting.value
+            .map((s) => {
+                const field = s.id === 'category' ? 'category.name' : s.id
+                return `${field}${s.desc ? ':desc' : ''}`
+            })
+            .join(',')
+    }
+
+    return params
+}
+
+const {
+    data: itemsResponse,
+    error: fetchError,
+    pending,
+    refresh,
+} = await useAsyncData(
+    'fetchInventoryItems',
+    () => strapi.get<ItemListResponse>('/items', buildItemQuery()),
+    {
+        watch: [searchQuery, category, sorting, pagination],
+    }
+)
+
+const { data: statsResponse, refresh: refreshStats } = await useAsyncData(
+    'fetchInventoryStats',
+    () => strapi.get<InventoryStats>('/inventory-stats')
+)
+
+const { data: categoriesResponse, refresh: refreshCategories } =
+    await useAsyncData('fetchCategories', () =>
+        strapi.get<{ data: Category[] }>('/categories', {
+            sort: 'name',
+            'pagination[pageSize]': 100,
+        })
+    )
+
+const apiCategories = computed<Category[]>(() => {
+    return categoriesResponse.value?.data ?? []
 })
+
+const inventoryItems = computed<InventoryItem[]>(() => {
+    return (itemsResponse.value?.data ?? []).map((item) => ({
+        id: item.id,
+        sku: item.sku,
+        name: item.name,
+        category: item.category?.name ?? 'Uncategorized',
+        stockQty: item.stockQty,
+        minThreshold: item.minThreshold,
+        unit: item.unit,
+        status: item.stockQty <= item.minThreshold ? 'low' : 'healthy',
+    }))
+})
+
+const errorMessage = computed(() => {
+    const err = fetchError.value as { data?: { statusMessage?: string } } | null
+    return err?.data?.statusMessage ?? 'Failed to load inventory'
+})
+
+const filteredTotal = computed(
+    () => itemsResponse.value?.meta.pagination.total ?? inventoryItems.value.length
+)
 
 const categoryOptions = computed(() => [
     { label: 'All Categories', value: 'all' },
-    ...categories.value.map((item) => ({ label: item, value: item })),
+    ...apiCategories.value.map((cat) => ({ label: cat.name, value: cat.name })),
+    { label: 'Uncategorized', value: 'uncategorized' },
 ])
 
-const filteredByCategory = computed(() => {
-    if (category.value === 'all') {
-        return inventoryItems.value
-    }
-
-    return inventoryItems.value.filter(
-        (item) => item.category === category.value
-    )
-})
-
-const filteredItems = computed(() => {
-    const query = search.value.trim().toLowerCase()
-
-    if (!query) {
-        return filteredByCategory.value
-    }
-
-    return filteredByCategory.value.filter(
-        (item) =>
-            item.name.toLowerCase().includes(query) ||
-            item.sku.toLowerCase().includes(query) ||
-            item.category.toLowerCase().includes(query)
-    )
-})
-
-watch([search, category], () => {
+watch([searchQuery, category, sorting], () => {
     pagination.value = {
         ...pagination.value,
         pageIndex: 0,
@@ -848,17 +894,24 @@ watch([search, category], () => {
 */
 
 const totalUnits = computed(() =>
+    statsResponse.value?.totalUnits ??
     inventoryItems.value.reduce((sum, item) => sum + item.stockQty, 0)
 )
 
 const lowStockItems = computed(() =>
+    statsResponse.value?.lowStockItems ??
     inventoryItems.value.filter((item) => item.stockQty <= item.minThreshold)
+        .length
+)
+
+const totalItems = computed(
+    () => statsResponse.value?.totalItems ?? inventoryItems.value.length
 )
 
 const stats = computed(() => [
     {
         label: 'Total Items',
-        value: inventoryItems.value.length,
+        value: totalItems.value,
         icon: 'i-lucide-boxes',
         tint: 'from-green-500 via-green-600 to-teal-600',
     },
@@ -870,7 +923,7 @@ const stats = computed(() => [
     },
     {
         label: 'Low Stock Items',
-        value: lowStockItems.value.length,
+        value: lowStockItems.value,
         icon: 'i-lucide-alert-triangle',
         tint: 'from-red-500 to-rose-600',
     },
@@ -1057,7 +1110,7 @@ async function saveItem() {
         }
 
         itemFormOpen.value = false
-        await refresh()
+        await Promise.all([refresh(), refreshStats()])
     } catch (err) {
         itemFormError.value =
             (err as Error).message ?? 'Failed to save item. Please try again.'
@@ -1102,7 +1155,7 @@ async function confirmItemDelete() {
             description: `${itemToDelete.value.name} was removed from inventory`,
         })
         itemDeleteOpen.value = false
-        await refresh()
+        await Promise.all([refresh(), refreshStats()])
     } catch (err) {
         itemDeleteError.value =
             (err as Error).message ?? 'Failed to delete item. Please try again.'
@@ -1149,7 +1202,7 @@ const deletingCategory = ref(false)
 const categoryDeleteError = ref('')
 
 const itemCountFor = (name: string) => {
-    return inventoryItems.value.filter((item) => item.category === name).length
+    return statsResponse.value?.itemsPerCategory?.[name] ?? 0
 }
 
 async function addCategory() {
@@ -1242,8 +1295,7 @@ async function saveCategoryRename(cat: Category) {
             data: { name },
         })
         cancelCategoryEdit()
-        await refreshCategories()
-        await refresh()
+        await Promise.all([refreshCategories(), refresh(), refreshStats()])
         toast.add({
             title: 'Category renamed',
             description: `${cat.name} was renamed to ${name}`,
@@ -1276,8 +1328,7 @@ async function confirmCategoryDelete() {
             description: `${categoryToDelete.value.name} was deleted`,
         })
         categoryDeleteOpen.value = false
-        await refreshCategories()
-        await refresh()
+        await Promise.all([refreshCategories(), refresh(), refreshStats()])
     } catch (err) {
         categoryDeleteError.value =
             (err as Error).message ??
