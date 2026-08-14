@@ -65,22 +65,22 @@
                     </UButton>
                 </div>
 
-                <!-- Admin link -->
-                <div v-if="isAdmin" class="px-4 pb-3 pt-3 lg:pt-0">
+                <!-- App link -->
+                <div class="px-4 pb-3 pt-3 lg:pt-0">
                     <UTooltip
-                        text="Admin Dashboard"
+                        text="Custodian Dashboard"
                         :disabled="!sidebarCollapsed"
                         :delay-duration="0"
                     >
                         <UButton
                             block
-                            icon="i-lucide-shield-check"
-                            to="/admin"
+                            icon="i-lucide-id-card"
+                            to="/"
                             class="bg-gradient-to-br from-green-500 via-green-600 to-teal-600 text-white shadow-lg shadow-green-500/30 hover:from-green-600 hover:via-green-700 hover:to-teal-700"
                             @click="closeMobileSidebar"
                         >
                             <span v-if="!sidebarCollapsed">
-                                View Admin Dashboard
+                                View Custodian Dashboard
                             </span>
                         </UButton>
                     </UTooltip>
@@ -200,7 +200,7 @@
                         <p
                             class="truncate text-sm font-bold text-slate-900 dark:text-white"
                         >
-                            SNC Custodian
+                            SNC Custodian System
                         </p>
 
                         <p
@@ -271,7 +271,7 @@
             <!-- Page content -->
             <div
                 class="mx-auto px-4 sm:px-6 lg:px-8"
-                :class="hideDesktopHeader ? 'py-2' : 'py-4 sm:py-6 lg:py-4'"
+                :class="hideDesktopHeader ? 'py-2' : 'py-4 sm:py-6 lg:py-8'"
             >
                 <slot />
             </div>
@@ -319,7 +319,7 @@
                                 <span
                                     class="font-semibold text-slate-700 dark:text-slate-200"
                                 >
-                                    SNC Custodian System </span
+                                    SNC Custodian </span
                                 >.
                                 <br />
                                 You can login again anytime.
@@ -416,7 +416,27 @@ const links: NavigationLink[] = [
     {
         label: 'Dashboard',
         icon: 'i-lucide-layout-dashboard',
-        to: '/',
+        to: '/admin',
+    },
+    {
+        label: 'Inventory',
+        icon: 'i-lucide-boxes',
+        to: '/admin/inventory',
+    },
+    {
+        label: 'User Management',
+        icon: 'i-lucide-users',
+        to: '/admin/users',
+    },
+    {
+        label: 'Transactions',
+        icon: 'i-lucide-clipboard-list',
+        to: '/admin/transactions',
+    },
+    {
+        label: 'Audit Logs',
+        icon: 'i-lucide-history',
+        to: '/admin/logs',
     },
 ]
 
@@ -450,19 +470,17 @@ const closeMobileSidebar = () => {
 */
 
 const isActive = (path: string): boolean => {
-    if (path === '/') {
-        return route.path === '/'
+    if (path === '/admin') {
+        return route.path === '/admin'
     }
 
     return route.path === path || route.path.startsWith(`${path}/`)
 }
 
 const pageTitle = computed(() => {
-    if (route.path.startsWith('/admin')) {
-        return 'Admin'
-    }
+    const active = links.find((link) => isActive(link.to))
 
-    return 'Custodian Dashboard'
+    return active?.label ?? 'Dashboard'
 })
 
 const hideDesktopHeader = computed(() => {
@@ -481,10 +499,6 @@ const displayName = computed(() => {
 
 const displayRole = computed(() => {
     return session.value.user?.role.name
-})
-
-const isAdmin = computed(() => {
-    return session.value.user?.role?.name === 'Administrator'
 })
 
 /*

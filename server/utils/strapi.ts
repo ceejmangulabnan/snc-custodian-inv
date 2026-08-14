@@ -59,6 +59,10 @@ async function fetchStrapi<T = unknown>(
             ...(options.body ? { 'Content-Type': 'application/json' } : {}),
         },
         retry: false,
+        // Return the response (even 4xx/5xx) so `strapiRequest` can inspect
+        // the status and run its 401 refresh-retry. Without this, `$fetch.raw`
+        // throws on non-2xx and the retry logic is never reached.
+        ignoreResponseError: true,
         parseResponse: (text) => (text ? JSON.parse(text) : null),
     })
 
@@ -82,6 +86,7 @@ export async function refreshStrapiSession(
             headers: { 'Content-Type': 'application/json' },
             body: { refreshToken },
             retry: false,
+            ignoreResponseError: true,
             parseResponse: (text) => (text ? JSON.parse(text) : null),
         }
     )

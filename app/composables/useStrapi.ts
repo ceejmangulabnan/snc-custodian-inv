@@ -22,13 +22,16 @@ function extractErrorMessage(error: unknown): string {
 // This handles auto session clearing for 401
 export function useStrapi() {
     const { clear } = useUserSession()
+    // Use the request-scoped fetch so SSR requests forward the session
+    // cookie (plain $fetch drops it, causing the proxy to 401).
+    const fetchFn = useRequestFetch()
 
     async function request<T = unknown>(
         path: string,
         options: StrapiRequestOptions = {}
     ): Promise<T> {
         try {
-            return (await $fetch<T>(`/api/strapi${path}`, {
+            return (await fetchFn<T>(`/api/strapi${path}`, {
                 method: options.method,
                 query: options.query,
                 body: options.body as Record<string, unknown> | undefined,

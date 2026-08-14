@@ -193,7 +193,7 @@ const errors = reactive<LoginErrors>({
 
 const toast = useToast()
 
-const { fetch: refreshSession } = useUserSession()
+const { fetch: refreshSession, user } = useUserSession()
 
 const showPassword = ref(false)
 const isLoading = ref(false)
@@ -266,7 +266,11 @@ const submitLogin = async () => {
         })
 
         await refreshSession()
-        await navigateTo('/')
+        await navigateTo(
+            user.value?.role?.name === 'Administrator'
+                ? '/admin/inventory'
+                : '/'
+        )
     } catch (error) {
         console.error('Login error:', error)
 
