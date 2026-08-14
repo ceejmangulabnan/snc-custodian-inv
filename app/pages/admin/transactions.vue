@@ -171,9 +171,7 @@
             <div
                 class="flex items-center justify-between border-t border-green-100 px-5 py-4 text-xs text-slate-500 dark:border-slate-700 dark:text-slate-400"
             >
-                <p>
-                    {{ pendingTransactions.length }} pending transactions
-                </p>
+                <p>{{ pendingTransactions.length }} pending transactions</p>
 
                 <p>Updated just now</p>
             </div>
@@ -350,9 +348,7 @@ const statusColor = (
     return 'neutral'
 }
 
-const statusIcon = (
-    value: TransactionRow['status']
-): string => {
+const statusIcon = (value: TransactionRow['status']): string => {
     if (value === 'Completed') return 'i-lucide-circle-check'
     if (value === 'Voided') return 'i-lucide-ban'
     return 'i-lucide-hourglass'

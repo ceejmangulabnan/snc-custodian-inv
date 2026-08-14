@@ -86,7 +86,10 @@
                         <div
                             class="flex size-10 shrink-0 items-center justify-center rounded-xl bg-amber-500/10 text-amber-600 dark:text-amber-400"
                         >
-                            <UIcon name="i-lucide-clipboard-list" class="size-5" />
+                            <UIcon
+                                name="i-lucide-clipboard-list"
+                                class="size-5"
+                            />
                         </div>
 
                         <div>
@@ -96,7 +99,9 @@
                                 Recent Orders
                             </h2>
 
-                            <p class="text-xs text-slate-500 dark:text-slate-400">
+                            <p
+                                class="text-xs text-slate-500 dark:text-slate-400"
+                            >
                                 Latest inventory transactions
                             </p>
                         </div>
@@ -123,7 +128,10 @@
                         <div
                             class="flex size-9 shrink-0 items-center justify-center rounded-xl bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400"
                         >
-                            <UIcon name="i-lucide-receipt-text" class="size-4" />
+                            <UIcon
+                                name="i-lucide-receipt-text"
+                                class="size-4"
+                            />
                         </div>
 
                         <div class="min-w-0 flex-1">
@@ -133,7 +141,9 @@
                                 #{{ order.id }} · {{ order.custodian }}
                             </p>
 
-                            <p class="text-xs text-slate-500 dark:text-slate-400">
+                            <p
+                                class="text-xs text-slate-500 dark:text-slate-400"
+                            >
                                 {{ order.date }}
                             </p>
                         </div>
@@ -166,7 +176,10 @@
                         <div
                             class="flex size-10 shrink-0 items-center justify-center rounded-xl bg-red-500/10 text-red-600 dark:text-red-400"
                         >
-                            <UIcon name="i-lucide-alert-triangle" class="size-5" />
+                            <UIcon
+                                name="i-lucide-alert-triangle"
+                                class="size-5"
+                            />
                         </div>
 
                         <div>
@@ -176,7 +189,9 @@
                                 Low Stock Items
                             </h2>
 
-                            <p class="text-xs text-slate-500 dark:text-slate-400">
+                            <p
+                                class="text-xs text-slate-500 dark:text-slate-400"
+                            >
                                 Items at or below minimum threshold
                             </p>
                         </div>
@@ -213,7 +228,9 @@
                                 {{ item.name }}
                             </p>
 
-                            <p class="text-xs text-slate-500 dark:text-slate-400">
+                            <p
+                                class="text-xs text-slate-500 dark:text-slate-400"
+                            >
                                 {{ item.category }}
                             </p>
                         </div>

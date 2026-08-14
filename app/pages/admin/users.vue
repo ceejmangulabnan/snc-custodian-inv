@@ -105,7 +105,11 @@
                             class="flex size-11 shrink-0 items-center justify-center rounded-xl bg-linear-to-br from-green-500 via-green-600 to-teal-600 text-white shadow-[0_10px_30px_rgba(16,185,129,0.35)]"
                         >
                             <UIcon
-                                :name="isEditing ? 'i-lucide-pen' : 'i-lucide-user-plus'"
+                                :name="
+                                    isEditing
+                                        ? 'i-lucide-pen'
+                                        : 'i-lucide-user-plus'
+                                "
                                 class="size-5"
                             />
                         </div>
@@ -164,7 +168,11 @@
                         </UFormField>
 
                         <UFormField
-                            :label="isEditing ? 'New Password (optional)' : 'Password'"
+                            :label="
+                                isEditing
+                                    ? 'New Password (optional)'
+                                    : 'Password'
+                            "
                         >
                             <UInput
                                 v-model="form.password"

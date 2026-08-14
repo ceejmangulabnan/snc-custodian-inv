@@ -1,4 +1,5 @@
-export type AuditLogCategory = 'Auth' | 'Inventory' | 'Transaction' | 'User' | 'System'
+export type AuditLogCategory =
+    'Auth' | 'Inventory' | 'Transaction' | 'User' | 'System'
 
 export type AuditLogAction =
     | 'Login'
