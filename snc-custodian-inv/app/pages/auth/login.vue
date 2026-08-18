@@ -39,13 +39,13 @@
                 <h1
                     class="text-3xl font-bold tracking-tight text-slate-900 dark:text-white"
                 >
-                    School UI Template
+                    SNC Custodian System
                 </h1>
 
                 <p
                     class="mt-2 text-sm leading-relaxed text-slate-500 dark:text-slate-400"
                 >
-                    Sign in to access the UI Template dashboard.
+                    Please sign in to access the system.
                 </p>
             </div>
 

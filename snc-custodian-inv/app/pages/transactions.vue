@@ -126,7 +126,7 @@
                     <UInput
                         v-model="search"
                         icon="i-lucide-search"
-                        placeholder="Search item, notes..."
+                        placeholder="Search by ID, item, notes..."
                         size="lg"
                         class="w-full sm:w-72"
                     />
@@ -570,6 +570,11 @@ function buildTransactionQuery(): Record<string, unknown> {
     if (query) {
         params['filters[$or][0][items][item][name][$containsi]'] = query
         params['filters[$or][1][notes][$containsi]'] = query
+
+        const maybeId = Number(query)
+        if (Number.isInteger(maybeId) && maybeId > 0) {
+            params['filters[$or][2][id][$eq]'] = maybeId
+        }
     }
 
     if (status.value !== 'all') {
@@ -579,7 +584,11 @@ function buildTransactionQuery(): Record<string, unknown> {
     if (sorting.value.length) {
         params.sort = sorting.value
             .map((s) => {
-                const field = s.id === 'status' ? 'orderStatus' : s.id
+                const fieldMap: Record<string, string> = {
+                    status: 'orderStatus',
+                    custodian: 'custodian.username',
+                }
+                const field = fieldMap[s.id] ?? s.id
                 return `${field}${s.desc ? ':desc' : ''}`
             })
             .join(',')
@@ -739,7 +748,6 @@ const columns: TableColumn<TransactionRow>[] = [
     {
         accessorKey: 'id',
         header: 'ID',
-        enableSorting: false,
     },
     {
         accessorKey: 'date',
@@ -748,7 +756,6 @@ const columns: TableColumn<TransactionRow>[] = [
     {
         accessorKey: 'custodian',
         header: 'Custodian',
-        enableSorting: false,
     },
     {
         accessorKey: 'itemCount',
