@@ -221,7 +221,7 @@ const validateIdentifier = (): boolean => {
         return false
     }
 
-    errors.identifier = ''
+    errors.identifier = undefined
     return true
 }
 
@@ -236,7 +236,7 @@ const validatePassword = (): boolean => {
         return false
     }
 
-    errors.password = ''
+    errors.password = undefined
     return true
 }
 
@@ -248,7 +248,7 @@ const validateForm = (): boolean => {
 }
 
 const submitLogin = async () => {
-    errors.general = ''
+    errors.general = undefined
 
     if (!validateForm() || isLoading.value) {
         return
