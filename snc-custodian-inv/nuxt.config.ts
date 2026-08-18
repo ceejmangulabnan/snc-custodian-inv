@@ -18,7 +18,7 @@ export default defineNuxtConfig({
     css: ['~/assets/css/main.css'],
 
     routeRules: {
-        '/': { prerender: true },
+        '/auth/login': { prerender: true },
     },
 
     compatibilityDate: '2026-06-30',
