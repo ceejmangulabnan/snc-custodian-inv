@@ -138,6 +138,7 @@
                 :columns="columns"
                 :loading="pending"
                 :pagination-options="{ manualPagination: true }"
+                :sorting-options="{ manualSorting: false }"
                 v-model:sorting="sorting"
                 v-model:pagination="pagination"
                 v-model:expanded="expandedRows"
