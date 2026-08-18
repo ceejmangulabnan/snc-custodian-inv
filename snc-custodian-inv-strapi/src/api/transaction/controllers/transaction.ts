@@ -4,6 +4,7 @@
 
 import { factories } from '@strapi/strapi';
 import type { Context } from 'koa';
+import type { Knex } from 'knex';
 
 interface RequestedLine {
   item: number;
@@ -140,7 +141,10 @@ function assertSufficientStock(
   }
 }
 
-async function decrementStock(items: TransactionLine[]): Promise<MovedStock[]> {
+async function decrementStock(
+  items: TransactionLine[],
+  inTransaction?: (trx: Knex.Transaction) => Promise<void>,
+): Promise<MovedStock[]> {
   const moved: MovedStock[] = [];
 
   await strapi.db.transaction(async ({ trx }) => {
@@ -172,6 +176,10 @@ async function decrementStock(items: TransactionLine[]): Promise<MovedStock[]> {
         stockQty: row.stock_qty - line.qtyPulled,
         minThreshold: row.min_threshold,
       });
+    }
+
+    if (inTransaction) {
+      await inTransaction(trx);
     }
   });
 
@@ -356,12 +364,12 @@ export default factories.createCoreController('api::transaction.transaction', ()
       }
     }
 
-    const moved = await decrementStock(items);
-
     const admin = ctx.state.user as { id: number; username: string } | undefined;
 
-    await strapi.entityService.update('api::transaction.transaction', transaction.id, {
-      data: { orderStatus: 'Completed' },
+    const moved = await decrementStock(items, async (trx) => {
+      await trx('transactions')
+        .where({ id: transaction.id })
+        .update({ order_status: 'Completed' });
     });
 
     if (admin?.id) {
