@@ -17,6 +17,13 @@ export default defineNuxtConfig({
 
     css: ['~/assets/css/main.css'],
 
+    icon: {
+        clientBundle: {
+            scan: true,
+            sizeLimitKb: 256,
+        },
+    },
+
     routeRules: {
         '/auth/login': { prerender: true },
     },
