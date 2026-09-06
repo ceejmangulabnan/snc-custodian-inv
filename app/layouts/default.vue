@@ -419,6 +419,11 @@ const links: NavigationLink[] = [
         to: '/',
     },
     {
+        label: 'Inventory',
+        icon: 'i-lucide-boxes',
+        to: '/inventory',
+    },
+    {
         label: 'Transactions',
         icon: 'i-lucide-clipboard-list',
         to: '/transactions',
@@ -465,6 +470,10 @@ const isActive = (path: string): boolean => {
 const pageTitle = computed(() => {
     if (route.path.startsWith('/admin')) {
         return 'Admin'
+    }
+
+    if (route.path === '/inventory') {
+        return 'Inventory'
     }
 
     if (route.path === '/transactions') {

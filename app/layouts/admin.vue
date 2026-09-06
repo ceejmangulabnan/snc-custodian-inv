@@ -424,14 +424,14 @@ const links: NavigationLink[] = [
         to: '/admin/inventory',
     },
     {
-        label: 'User Management',
-        icon: 'i-lucide-users',
-        to: '/admin/users',
-    },
-    {
         label: 'Transactions',
         icon: 'i-lucide-clipboard-list',
         to: '/admin/transactions',
+    },
+    {
+        label: 'User Management',
+        icon: 'i-lucide-users',
+        to: '/admin/users',
     },
     {
         label: 'Audit Logs',
