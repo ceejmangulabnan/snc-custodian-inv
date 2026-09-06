@@ -685,6 +685,13 @@
                 </div>
             </template>
         </UModal>
+
+        <!-- Stock movement modal -->
+        <StockMovementModal
+            v-model:open="stockMovementOpen"
+            :item="stockMovementItem"
+            @submitted="onStockMovementSubmitted"
+        />
     </div>
 </template>
 <script setup lang="ts">
@@ -1185,6 +1192,12 @@ async function confirmItemDelete() {
 function getItemActions(item: InventoryItem): DropdownMenuItem[] {
     return [
         {
+            label: 'Stock Movement',
+            icon: 'i-lucide-arrow-left-right',
+            class: 'flex gap-2 items-center',
+            onSelect: () => openStockMovement(item),
+        },
+        {
             label: 'Edit',
             icon: 'i-lucide-pen',
             class: 'flex gap-2 items-center',
@@ -1198,6 +1211,25 @@ function getItemActions(item: InventoryItem): DropdownMenuItem[] {
             onSelect: () => openItemDelete(item),
         },
     ]
+}
+
+/*
+|--------------------------------------------------------------------------
+| Stock movement
+|--------------------------------------------------------------------------
+*/
+
+const stockMovementOpen = ref(false)
+const stockMovementItem = ref<InventoryItem | null>(null)
+
+function openStockMovement(item: InventoryItem) {
+    stockMovementItem.value = item
+    stockMovementOpen.value = true
+}
+
+async function onStockMovementSubmitted() {
+    stockMovementOpen.value = false
+    await Promise.all([refresh(), refreshStats()])
 }
 
 /*
