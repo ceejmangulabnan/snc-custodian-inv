@@ -183,6 +183,34 @@
                     </span>
                 </template>
 
+                <template #price-cell="{ row }">
+                    <span
+                        class="font-medium tabular-nums text-slate-700 dark:text-slate-200"
+                    >
+                        {{
+                            row.original.price != null
+                                ? '₱' + row.original.price.toFixed(2)
+                                : '—'
+                        }}
+                    </span>
+                </template>
+
+                <template #isForSale-cell="{ row }">
+                    <UBadge
+                        :color="row.original.isForSale ? 'success' : 'neutral'"
+                        variant="subtle"
+                        :icon="
+                            row.original.isForSale
+                                ? 'i-lucide-tag'
+                                : 'i-lucide-ban'
+                        "
+                    >
+                        {{
+                            row.original.isForSale ? 'For Sale' : 'Not for Sale'
+                        }}
+                    </UBadge>
+                </template>
+
                 <template #status-cell="{ row }">
                     <UBadge
                         :color="
@@ -379,6 +407,50 @@
                                 </template>
                             </USelectMenu>
                         </UFormField>
+
+                        <div
+                            class="mt-4 rounded-2xl border border-green-100 bg-green-50/50 p-4 dark:border-slate-700 dark:bg-slate-800/50"
+                        >
+                            <div
+                                class="flex items-center justify-between gap-3"
+                            >
+                                <div>
+                                    <p
+                                        class="text-sm font-medium text-slate-800 dark:text-slate-200"
+                                    >
+                                        Available for sale
+                                    </p>
+
+                                    <p
+                                        class="text-xs text-slate-500 dark:text-slate-400"
+                                    >
+                                        Enable selling this item through the
+                                        cashier.
+                                    </p>
+                                </div>
+
+                                <USwitch
+                                    v-model="itemForm.isForSale"
+                                    color="success"
+                                />
+                            </div>
+
+                            <UFormField
+                                v-if="itemForm.isForSale"
+                                label="Price (₱)"
+                                class="mt-4"
+                            >
+                                <UInput
+                                    v-model.number="itemForm.price"
+                                    type="number"
+                                    min="0"
+                                    step="0.01"
+                                    icon="i-lucide-tag"
+                                    placeholder="e.g. 25.00"
+                                    class="w-full"
+                                />
+                            </UFormField>
+                        </div>
                     </UForm>
 
                     <div class="mt-6 flex justify-end gap-3">
@@ -718,6 +790,8 @@ interface StrapiItem {
     stockQty: number
     minThreshold: number
     unit: string
+    isForSale: boolean
+    price: string | null
     category: {
         id: number
         name: string
@@ -881,6 +955,8 @@ const inventoryItems = computed<InventoryItem[]>(() => {
         stockQty: item.stockQty,
         minThreshold: item.minThreshold,
         unit: item.unit,
+        isForSale: item.isForSale,
+        price: item.price ? Number(item.price) : null,
         status: item.stockQty <= item.minThreshold ? 'low' : 'healthy',
     }))
 })
@@ -997,6 +1073,15 @@ const columns: TableColumn<InventoryItem>[] = [
         header: 'Unit',
     },
     {
+        accessorKey: 'price',
+        header: 'Price',
+    },
+    {
+        accessorKey: 'isForSale',
+        header: 'For Sale',
+        enableSorting: false,
+    },
+    {
         id: 'status',
         header: 'Status',
         enableSorting: false,
@@ -1037,6 +1122,8 @@ const itemForm = ref({
     stockQty: 0,
     minThreshold: 0,
     categoryId: 0,
+    isForSale: false,
+    price: null as number | null,
 })
 
 const categorySearch = ref('')
@@ -1056,6 +1143,8 @@ function resetItemForm() {
         stockQty: 0,
         minThreshold: 0,
         categoryId: 0,
+        isForSale: false,
+        price: null,
     }
     categorySearch.value = ''
     categoryMenuOpen.value = false
@@ -1078,6 +1167,8 @@ function openItemEdit(item: InventoryItem) {
         stockQty: item.stockQty,
         minThreshold: item.minThreshold,
         categoryId: raw?.category?.id ?? 0,
+        isForSale: raw?.isForSale ?? false,
+        price: raw?.price != null ? Number(raw.price) : null,
     }
     itemFormError.value = ''
     itemFormOpen.value = true
@@ -1105,6 +1196,8 @@ async function saveItem() {
         stockQty: itemForm.value.stockQty || 0,
         minThreshold: itemForm.value.minThreshold || 0,
         category: itemForm.value.categoryId || null,
+        isForSale: itemForm.value.isForSale,
+        price: itemForm.value.isForSale ? itemForm.value.price ?? null : null,
     }
 
     savingItem.value = true

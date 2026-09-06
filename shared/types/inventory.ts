@@ -7,4 +7,6 @@ export interface InventoryItem {
     minThreshold: number
     unit: string
     status: string
+    isForSale: boolean
+    price: number | null
 }

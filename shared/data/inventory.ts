@@ -11,6 +11,8 @@ export const sampleInventory: InventoryItem[] = [
         minThreshold: 20,
         unit: 'Rim',
         status: 'Healthy',
+        isForSale: false,
+        price: null,
     },
     {
         id: 2,
@@ -21,6 +23,8 @@ export const sampleInventory: InventoryItem[] = [
         minThreshold: 15,
         unit: 'Rim',
         status: 'Low Stock',
+        isForSale: false,
+        price: null,
     },
     {
         id: 3,
@@ -31,6 +35,8 @@ export const sampleInventory: InventoryItem[] = [
         minThreshold: 50,
         unit: 'Each',
         status: 'Healthy',
+        isForSale: false,
+        price: null,
     },
     {
         id: 4,
@@ -41,6 +47,8 @@ export const sampleInventory: InventoryItem[] = [
         minThreshold: 100,
         unit: 'Each',
         status: 'Healthy',
+        isForSale: false,
+        price: null,
     },
 
     // Classroom & Office Supplies
@@ -53,6 +61,8 @@ export const sampleInventory: InventoryItem[] = [
         minThreshold: 30,
         unit: 'Box',
         status: 'Healthy',
+        isForSale: false,
+        price: null,
     },
     {
         id: 6,
@@ -63,6 +73,8 @@ export const sampleInventory: InventoryItem[] = [
         minThreshold: 10,
         unit: 'Each',
         status: 'Low Stock',
+        isForSale: false,
+        price: null,
     },
     {
         id: 7,
@@ -73,6 +85,8 @@ export const sampleInventory: InventoryItem[] = [
         minThreshold: 10,
         unit: 'Box',
         status: 'Healthy',
+        isForSale: false,
+        price: null,
     },
     {
         id: 8,
@@ -83,6 +97,8 @@ export const sampleInventory: InventoryItem[] = [
         minThreshold: 20,
         unit: 'Box',
         status: 'Healthy',
+        isForSale: false,
+        price: null,
     },
     {
         id: 9,
@@ -93,6 +109,8 @@ export const sampleInventory: InventoryItem[] = [
         minThreshold: 15,
         unit: 'Box',
         status: 'Low Stock',
+        isForSale: false,
+        price: null,
     },
 
     // Maintenance & General Utility
@@ -105,6 +123,8 @@ export const sampleInventory: InventoryItem[] = [
         minThreshold: 10,
         unit: 'Roll',
         status: 'Healthy',
+        isForSale: false,
+        price: null,
     },
     {
         id: 11,
@@ -115,6 +135,8 @@ export const sampleInventory: InventoryItem[] = [
         minThreshold: 20,
         unit: 'Roll',
         status: 'Healthy',
+        isForSale: false,
+        price: null,
     },
     {
         id: 12,
@@ -125,6 +147,8 @@ export const sampleInventory: InventoryItem[] = [
         minThreshold: 15,
         unit: 'Roll',
         status: 'Healthy',
+        isForSale: false,
+        price: null,
     },
     {
         id: 13,
@@ -135,6 +159,8 @@ export const sampleInventory: InventoryItem[] = [
         minThreshold: 40,
         unit: 'Pack',
         status: 'Healthy',
+        isForSale: false,
+        price: null,
     },
     {
         id: 14,
@@ -145,6 +171,8 @@ export const sampleInventory: InventoryItem[] = [
         minThreshold: 10,
         unit: 'Each',
         status: 'Low Stock',
+        isForSale: false,
+        price: null,
     },
 
     // Uniforms & Apparel
@@ -157,6 +185,8 @@ export const sampleInventory: InventoryItem[] = [
         minThreshold: 30,
         unit: 'Piece',
         status: 'Healthy',
+        isForSale: false,
+        price: null,
     },
     {
         id: 16,
@@ -167,6 +197,8 @@ export const sampleInventory: InventoryItem[] = [
         minThreshold: 30,
         unit: 'Piece',
         status: 'Healthy',
+        isForSale: false,
+        price: null,
     },
     {
         id: 17,
@@ -177,6 +209,8 @@ export const sampleInventory: InventoryItem[] = [
         minThreshold: 30,
         unit: 'Piece',
         status: 'Healthy',
+        isForSale: false,
+        price: null,
     },
     {
         id: 18,
@@ -187,6 +221,8 @@ export const sampleInventory: InventoryItem[] = [
         minThreshold: 50,
         unit: 'Set',
         status: 'Low Stock',
+        isForSale: false,
+        price: null,
     },
     {
         id: 19,
@@ -197,6 +233,8 @@ export const sampleInventory: InventoryItem[] = [
         minThreshold: 50,
         unit: 'Piece',
         status: 'Healthy',
+        isForSale: false,
+        price: null,
     },
     {
         id: 20,
@@ -207,5 +245,7 @@ export const sampleInventory: InventoryItem[] = [
         minThreshold: 100,
         unit: 'Each',
         status: 'Low Stock',
+        isForSale: false,
+        price: null,
     },
 ]
