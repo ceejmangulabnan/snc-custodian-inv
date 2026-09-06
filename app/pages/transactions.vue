@@ -38,6 +38,18 @@
                 >
                     Issue Stock
                 </UButton>
+                <UButton
+                    icon="i-lucide-rotate-cw"
+                    color="neutral"
+                    variant="subtle"
+                    :loading="pending"
+                    @click="
+                        (e) => {
+                            e.preventDefault()
+                            refresh()
+                        }
+                    "
+                />
             </div>
         </div>
 

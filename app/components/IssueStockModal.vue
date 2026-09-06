@@ -12,10 +12,7 @@
                     <div
                         class="flex size-11 shrink-0 items-center justify-center rounded-xl bg-linear-to-br from-green-500 via-emerald-600 to-teal-600 text-white shadow-[0_10px_30px_rgba(16,185,129,0.35)]"
                     >
-                        <UIcon
-                            name="i-lucide-shopping-cart"
-                            class="size-5"
-                        />
+                        <UIcon name="i-lucide-shopping-cart" class="size-5" />
                     </div>
 
                     <div>
@@ -39,16 +36,17 @@
                 >
                     <!-- Left column: search + catalog -->
                     <div
-                        class="flex min-h-0 min-w-0 flex-1 flex-col lg:min-h-0"
+                        class="flex min-h-0 min-w-0 flex-1 flex-col lg:min-h-0 px-2"
                     >
                         <UInput
                             v-model="issueSearch"
                             icon="i-lucide-search"
                             placeholder="Search items..."
+                            class="mb-2"
                         />
 
                         <div
-                            class="mt-3 min-h-0 flex-1 space-y-2 overflow-y-auto pr-1"
+                            class="my-3 min-h-0 flex-1 space-y-2 overflow-y-auto pr-1"
                         >
                             <p
                                 v-if="loadingCatalog"
@@ -119,7 +117,7 @@
 
                     <!-- Right column: cart + notes -->
                     <div
-                        class="flex shrink-0 flex-col gap-4 border-t border-green-100 pt-4 lg:min-h-0 lg:w-[28rem] lg:flex-1 lg:border-l lg:border-t-0 lg:pl-6 lg:pt-0 dark:border-slate-700"
+                        class="flex shrink flex-col gap-4 overflow-y-auto border-t border-green-100 py-4 px-2 lg:min-h-0 lg:w-md lg:flex-1 lg:border-l lg:border-t-0 lg:pl-6 lg:pt-0 dark:border-slate-700"
                     >
                         <div
                             v-if="cartLines.length"
@@ -192,7 +190,10 @@
                             </ul>
                         </div>
 
-                        <div v-else class="py-6 text-center">
+                        <div
+                            v-else
+                            class="py-6 text-center border-dashed border-muted border-2 rounded-xl"
+                        >
                             <p
                                 class="text-sm text-slate-400 dark:text-slate-500"
                             >
@@ -212,6 +213,7 @@
                                 v-model="issueNotes"
                                 placeholder="Who is this for, or what is it for?"
                                 :rows="2"
+                                :maxrows="4"
                             />
                         </div>
 
@@ -240,7 +242,9 @@
                     </div>
                 </div>
 
-                <div class="mt-6 flex shrink-0 justify-end gap-3">
+                <div
+                    class="flex shrink-0 justify-end gap-3 border-t border-green-100 pt-4 dark:border-slate-700"
+                >
                     <UButton
                         color="neutral"
                         variant="outline"

@@ -21,7 +21,7 @@
                 </p>
             </div>
 
-            <div class="ml-auto">
+            <div class="ml-auto gap-2 flex">
                 <UButton
                     color="success"
                     icon="i-lucide-shopping-cart"
@@ -30,6 +30,18 @@
                 >
                     Issue Stock
                 </UButton>
+                <UButton
+                    icon="i-lucide-rotate-cw"
+                    color="neutral"
+                    variant="subtle"
+                    :loading="pending"
+                    @click="
+                        (e) => {
+                            e.preventDefault()
+                            refresh()
+                        }
+                    "
+                />
             </div>
         </div>
 
