@@ -269,7 +269,9 @@ const submitLogin = async () => {
         await navigateTo(
             user.value?.role?.name === 'Administrator'
                 ? '/admin/inventory'
-                : '/'
+                : user.value?.role?.name === 'Cashier'
+                  ? '/cashier'
+                  : '/'
         )
     } catch (error) {
         console.error('Login error:', error)
