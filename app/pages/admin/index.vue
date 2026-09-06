@@ -1,23 +1,42 @@
 <template>
     <div class="space-y-6">
-        <div class="flex items-start gap-4">
-            <div
-                class="flex size-14 shrink-0 items-center justify-center rounded-2xl bg-linear-to-br from-green-500 via-green-600 to-teal-600 text-white shadow-[0_10px_30px_rgba(16,185,129,0.35)]"
-            >
-                <UIcon name="i-lucide-layout-dashboard" class="size-7" />
+        <div class="flex w-full gap-4 items-start justify-between">
+            <div class="flex items-start gap-4">
+                <div
+                    class="flex size-14 shrink-0 items-center justify-center rounded-2xl bg-linear-to-br from-green-500 via-green-600 to-teal-600 text-white shadow-[0_10px_30px_rgba(16,185,129,0.35)]"
+                >
+                    <UIcon name="i-lucide-layout-dashboard" class="size-7" />
+                </div>
+
+                <div>
+                    <h1
+                        class="text-2xl font-bold tracking-tight text-slate-900 dark:text-white"
+                    >
+                        Admin Dashboard
+                    </h1>
+
+                    <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">
+                        Overview of recent activity, inventory movement, and
+                        transaction history.
+                    </p>
+                </div>
             </div>
 
-            <div>
-                <h1
-                    class="text-2xl font-bold tracking-tight text-slate-900 dark:text-white"
-                >
-                    Admin Dashboard
-                </h1>
-
-                <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">
-                    Overview of recent activity, inventory movement, and
-                    transaction history.
-                </p>
+            <div class="flex items-center justify-end gap-3">
+                <UButton
+                    icon="i-lucide-rotate-cw"
+                    color="neutral"
+                    variant="subtle"
+                    size="lg"
+                    :loading="refreshingDashboard"
+                    class="rounded-2xl px-2.5 sm:px-3"
+                    @click="
+                        (e) => {
+                            e.preventDefault()
+                            refreshDashboard()
+                        }
+                    "
+                />
             </div>
         </div>
 
@@ -262,10 +281,28 @@ definePageMeta({
 
 const strapi = useStrapi()
 
+const refreshingDashboard = ref(false)
+
+async function refreshDashboard() {
+    if (refreshingDashboard.value) return
+    refreshingDashboard.value = true
+    try {
+        await Promise.all([
+            refreshUsers(),
+            refreshRecentTransactions(),
+            refreshTransactionCount(),
+            refreshAuditLogCount(),
+        ])
+    } finally {
+        refreshingDashboard.value = false
+    }
+}
+
 const sampleInventory = ref<InventoryItem[]>(sampleInventoryData)
 
-const { data: users } = await useAsyncData('dashboard-users', () =>
-    strapi.get<{ id: number }[]>('/users')
+const { data: users, refresh: refreshUsers } = await useAsyncData(
+    'dashboard-users',
+    () => strapi.get<{ id: number }[]>('/users')
 )
 
 const usersCount = computed(() => users.value?.length ?? 0)
@@ -293,15 +330,14 @@ interface RecentOrder {
     status: 'Pending' | 'Completed' | 'Voided'
 }
 
-const { data: recentTransactions } = await useAsyncData(
-    'dashboard-recent-transactions',
-    () =>
+const { data: recentTransactions, refresh: refreshRecentTransactions } =
+    await useAsyncData('dashboard-recent-transactions', () =>
         strapi.get<{ data: StrapiRecentTransaction[] }>('/transactions', {
             populate: 'custodian',
             sort: 'createdAt:desc',
             pagination: { limit: 5 },
         })
-)
+    )
 
 const recentOrders = computed<RecentOrder[]>(() =>
     (recentTransactions.value?.data ?? []).map((transaction) => ({
@@ -312,22 +348,20 @@ const recentOrders = computed<RecentOrder[]>(() =>
     }))
 )
 
-const { data: transactionCount } = await useAsyncData(
-    'dashboard-transaction-count',
-    () =>
+const { data: transactionCount, refresh: refreshTransactionCount } =
+    await useAsyncData('dashboard-transaction-count', () =>
         strapi.get<{ meta: { pagination: { total: number } } }>(
             '/transactions',
             { pagination: { limit: 1 } }
         )
-)
+    )
 
-const { data: auditLogCount } = await useAsyncData(
-    'dashboard-audit-log-count',
-    () =>
+const { data: auditLogCount, refresh: refreshAuditLogCount } =
+    await useAsyncData('dashboard-audit-log-count', () =>
         strapi.get<{ meta: { pagination: { total: number } } }>('/audit-logs', {
             pagination: { limit: 1 },
         })
-)
+    )
 
 const lowStockItems = computed(() =>
     sampleInventory.value

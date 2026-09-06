@@ -1,9 +1,7 @@
 <template>
     <div class="space-y-6">
         <!-- Page header -->
-        <div
-            class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"
-        >
+        <div class="flex w-full gap-4 items-start justify-between">
             <div class="flex items-start gap-4">
                 <div
                     class="flex size-14 shrink-0 items-center justify-center rounded-2xl bg-linear-to-br from-blue-500 to-indigo-600 text-white shadow-[0_10px_30px_rgba(59,130,246,0.35)]"
@@ -24,15 +22,17 @@
                 </div>
             </div>
 
-            <UButton
-                color="primary"
-                size="lg"
-                icon="i-lucide-plus"
-                class="rounded-2xl shadow-lg shadow-blue-500/20"
-                @click="openCreate"
-            >
-                Add User
-            </UButton>
+            <div class="flex items-center justify-end gap-3">
+                <UButton
+                    color="primary"
+                    size="lg"
+                    icon="i-lucide-plus"
+                    class="rounded-2xl px-2.5! shadow-lg shadow-blue-500/20 sm:px-3!"
+                    @click="openCreate"
+                >
+                    <span class="hidden lg:inline">Add User</span>
+                </UButton>
+            </div>
         </div>
 
         <div
@@ -377,9 +377,14 @@ const {
     strapi.get<StrapiUser[]>('/users', { populate: 'role' })
 )
 
-const { data: roles } = await useAsyncData('user-roles', () =>
-    strapi.get<{ roles: StrapiRole[] }>('/users-permissions/roles')
+const { data: roles, refresh: refreshRoles } = await useAsyncData(
+    'user-roles',
+    () => strapi.get<{ roles: StrapiRole[] }>('/users-permissions/roles')
 )
+
+async function refreshAllData() {
+    await Promise.all([refreshUsers(), refreshRoles()])
+}
 
 const roleOptions = computed(() =>
     (roles.value?.roles ?? []).map((role) => ({

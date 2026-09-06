@@ -1,23 +1,42 @@
 <template>
     <div class="space-y-6">
         <!-- Page header -->
-        <div class="flex items-start gap-4">
-            <div
-                class="flex size-14 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-red-500 to-rose-600 text-white shadow-[0_10px_30px_rgba(239,68,68,0.35)]"
-            >
-                <UIcon name="i-lucide-history" class="size-7" />
+        <div class="flex w-full gap-4 items-start justify-between">
+            <div class="flex items-start gap-4">
+                <div
+                    class="flex size-14 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-red-500 to-rose-600 text-white shadow-[0_10px_30px_rgba(239,68,68,0.35)]"
+                >
+                    <UIcon name="i-lucide-history" class="size-7" />
+                </div>
+
+                <div>
+                    <h1
+                        class="text-2xl font-bold tracking-tight text-slate-900 dark:text-white"
+                    >
+                        Audit Logs
+                    </h1>
+
+                    <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">
+                        Track stock movement and user actions.
+                    </p>
+                </div>
             </div>
 
-            <div>
-                <h1
-                    class="text-2xl font-bold tracking-tight text-slate-900 dark:text-white"
-                >
-                    Audit Logs
-                </h1>
-
-                <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">
-                    Track stock movement and user actions.
-                </p>
+            <div class="flex items-center justify-end gap-3">
+                <UButton
+                    icon="i-lucide-rotate-cw"
+                    color="neutral"
+                    variant="subtle"
+                    size="lg"
+                    :loading="pending"
+                    class="rounded-2xl px-2.5 sm:px-3"
+                    @click="
+                        (e) => {
+                            e.preventDefault()
+                            refresh()
+                        }
+                    "
+                />
             </div>
         </div>
 

@@ -1,9 +1,7 @@
 <template>
     <div class="space-y-6">
         <!-- Page header -->
-        <div
-            class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"
-        >
+        <div class="flex w-full gap-4 items-start justify-between">
             <div class="flex items-start gap-4">
                 <div
                     class="flex size-14 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-green-500 via-green-600 to-teal-600 text-white shadow-[0_10px_30px_rgba(16,185,129,0.35)]"
@@ -24,27 +22,43 @@
                 </div>
             </div>
 
-            <div class="flex flex-col gap-3 sm:flex-row">
+            <div class="flex items-center justify-end gap-3">
                 <UButton
                     color="neutral"
                     size="lg"
                     variant="soft"
                     icon="i-lucide-tags"
-                    class="rounded-2xl"
+                    class="bg-linear-to-br from-amber-500 to-orange-600 rounded-2xl px-2.5! sm:px-3! text-white"
                     @click="categoriesOpen = true"
                 >
-                    Manage Categories
+                    <span class="hidden lg:inline">Manage Categories</span>
                 </UButton>
 
                 <UButton
                     color="primary"
                     size="lg"
                     icon="i-lucide-plus"
-                    class="rounded-2xl shadow-lg shadow-green-500/20"
+                    class="rounded-2xl px-2.5! shadow-lg shadow-green-500/20 sm:px-3!"
                     @click="openItemCreate"
                 >
-                    Add Item
+                    <span class="hidden lg:inline">Add Item</span>
                 </UButton>
+
+                <UButton
+                    icon="i-lucide-rotate-cw"
+                    color="neutral"
+                    variant="subtle"
+                    size="lg"
+                    :loading="pending"
+                    class="rounded-2xl px-2.5 sm:px-3"
+                    @click="
+                        (e) => {
+                            e.preventDefault()
+                            refresh()
+                            refreshStats()
+                        }
+                    "
+                />
             </div>
         </div>
 

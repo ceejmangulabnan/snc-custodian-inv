@@ -1,40 +1,46 @@
 <template>
     <div class="space-y-6">
         <!-- Page header -->
-        <div class="flex items-start gap-4">
-            <div
-                class="flex size-14 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-amber-500 to-orange-600 text-white shadow-[0_10px_30px_rgba(245,158,11,0.35)]"
-            >
-                <UIcon name="i-lucide-clipboard-list" class="size-7" />
-            </div>
-
-            <div>
-                <h1
-                    class="text-2xl font-bold tracking-tight text-slate-900 dark:text-white"
+        <div class="flex w-full gap-4 items-start justify-between">
+            <div class="flex items-start gap-4">
+                <div
+                    class="flex size-14 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-amber-500 to-orange-600 text-white shadow-[0_10px_30px_rgba(245,158,11,0.35)]"
                 >
-                    Transactions
-                </h1>
+                    <UIcon name="i-lucide-clipboard-list" class="size-7" />
+                </div>
 
-                <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">
-                    Review custodian requests, approve stock issues, or void
-                    them.
-                </p>
+                <div>
+                    <h1
+                        class="text-2xl font-bold tracking-tight text-slate-900 dark:text-white"
+                    >
+                        Transactions
+                    </h1>
+
+                    <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">
+                        Review custodian requests, approve stock issues, or void
+                        them.
+                    </p>
+                </div>
             </div>
 
-            <div class="ml-auto gap-2 flex">
+            <div class="flex items-center justify-end gap-3">
                 <UButton
                     color="success"
-                    icon="i-lucide-shopping-cart"
                     size="lg"
+                    icon="i-lucide-shopping-cart"
+                    class="rounded-2xl px-2.5! sm:px-3!"
                     @click="openIssue"
                 >
-                    Issue Stock
+                    <span class="hidden lg:inline">Issue Stock</span>
                 </UButton>
+
                 <UButton
                     icon="i-lucide-rotate-cw"
                     color="neutral"
                     variant="subtle"
+                    size="lg"
                     :loading="pending"
+                    class="rounded-2xl px-2.5 sm:px-3"
                     @click="
                         (e) => {
                             e.preventDefault()

@@ -1,23 +1,42 @@
 <template>
     <div class="space-y-6">
         <!-- Page header -->
-        <div class="flex items-start gap-4">
-            <div
-                class="flex size-14 shrink-0 items-center justify-center rounded-2xl bg-linear-to-br from-green-500 via-green-600 to-teal-600 text-white shadow-[0_10px_30px_rgba(16,185,129,0.35)]"
-            >
-                <UIcon name="i-lucide-layout-dashboard" class="size-7" />
+        <div class="flex w-full gap-4 items-start justify-between">
+            <div class="flex items-start gap-4">
+                <div
+                    class="flex size-14 shrink-0 items-center justify-center rounded-2xl bg-linear-to-br from-green-500 via-green-600 to-teal-600 text-white shadow-[0_10px_30px_rgba(16,185,129,0.35)]"
+                >
+                    <UIcon name="i-lucide-layout-dashboard" class="size-7" />
+                </div>
+
+                <div>
+                    <h1
+                        class="text-2xl font-bold tracking-tight text-slate-900 dark:text-white"
+                    >
+                        Dashboard
+                    </h1>
+
+                    <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">
+                        Overview of your transactions and inventory status.
+                    </p>
+                </div>
             </div>
 
-            <div>
-                <h1
-                    class="text-2xl font-bold tracking-tight text-slate-900 dark:text-white"
-                >
-                    Dashboard
-                </h1>
-
-                <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">
-                    Overview of your transactions and inventory status.
-                </p>
+            <div class="flex items-center justify-end gap-3">
+                <UButton
+                    icon="i-lucide-rotate-cw"
+                    color="neutral"
+                    variant="subtle"
+                    size="lg"
+                    :loading="refreshingDashboard"
+                    class="rounded-2xl px-2.5 sm:px-3"
+                    @click="
+                        (e) => {
+                            e.preventDefault()
+                            refreshDashboard()
+                        }
+                    "
+                />
             </div>
         </div>
 
@@ -295,15 +314,30 @@ interface InventoryItem {
 const strapi = useStrapi()
 const issueOpen = ref(false)
 
+const refreshingDashboard = ref(false)
+
+async function refreshDashboard() {
+    if (refreshingDashboard.value) return
+    refreshingDashboard.value = true
+    try {
+        await Promise.all([refreshStats(), refreshRecent(), refreshItems()])
+    } finally {
+        refreshingDashboard.value = false
+    }
+}
+
 /*
 |--------------------------------------------------------------------------
 | Stats
 |--------------------------------------------------------------------------
 */
 
-const { data: statsResponse } = await useAsyncData(
+const { data: statsResponse, refresh: refreshStats } = await useAsyncData(
     'custodian-dashboard-stats',
-    () => strapi.get<{ total: number; pending: number; completed: number }>('/transactions-stats')
+    () =>
+        strapi.get<{ total: number; pending: number; completed: number }>(
+            '/transactions-stats'
+        )
 )
 
 const stats = computed(() => [
@@ -339,7 +373,7 @@ const stats = computed(() => [
 |--------------------------------------------------------------------------
 */
 
-const { data: recentTransactions } = await useAsyncData(
+const { data: recentTransactions, refresh: refreshRecent } = await useAsyncData(
     'custodian-dashboard-recent',
     () =>
         strapi.get<{ data: StrapiRecentTransaction[] }>('/transactions', {
@@ -364,7 +398,7 @@ const recentOrders = computed<RecentOrder[]>(() =>
 |--------------------------------------------------------------------------
 */
 
-const { data: itemsResponse } = await useAsyncData(
+const { data: itemsResponse, refresh: refreshItems } = await useAsyncData(
     'custodian-dashboard-items',
     () =>
         strapi.get<{ data: InventoryItem[] }>('/items', {
@@ -403,7 +437,9 @@ const orderColor = (
 
 async function onIssueSubmitted() {
     const [stats, recent] = await Promise.all([
-        strapi.get<{ total: number; pending: number; completed: number }>('/transactions-stats'),
+        strapi.get<{ total: number; pending: number; completed: number }>(
+            '/transactions-stats'
+        ),
         strapi.get<{ data: StrapiRecentTransaction[] }>('/transactions', {
             populate: 'custodian',
             sort: 'createdAt:desc',
