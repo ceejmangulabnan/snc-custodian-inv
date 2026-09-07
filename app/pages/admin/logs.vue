@@ -263,7 +263,6 @@ import { sampleAuditLogs as sampleAuditLogsData } from '#shared/data/audit-logs'
 
 definePageMeta({
     layout: 'admin',
-    middleware: 'admin',
 })
 
 /*

@@ -774,7 +774,6 @@ import type { InventoryItem } from '#shared/types/inventory'
 
 definePageMeta({
     layout: 'admin',
-    middleware: 'admin',
 })
 
 /*

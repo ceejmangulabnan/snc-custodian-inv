@@ -79,6 +79,7 @@
                             placeholder="Enter email or username"
                             autocomplete="username"
                             class="w-full"
+                            autofocus
                             :disabled="isLoading"
                             @blur="validateIdentifier"
                             @input="clearFieldError('identifier')"

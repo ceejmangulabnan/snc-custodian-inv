@@ -276,7 +276,6 @@ import { sampleInventory as sampleInventoryData } from '#shared/data/inventory'
 
 definePageMeta({
     layout: 'admin',
-    middleware: 'admin',
 })
 
 const strapi = useStrapi()

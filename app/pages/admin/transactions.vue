@@ -620,7 +620,6 @@ import type { SortingState, ExpandedState } from '@tanstack/vue-table'
 
 definePageMeta({
     layout: 'admin',
-    middleware: 'admin',
 })
 
 /*

@@ -313,6 +313,9 @@ interface InventoryItem {
 
 const strapi = useStrapi()
 const issueOpen = ref(false)
+const session = useUserSession()
+
+console.log(session, "Session from '/' index.vue")
 
 const refreshingDashboard = ref(false)
 

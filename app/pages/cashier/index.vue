@@ -408,7 +408,6 @@
 <script setup lang="ts">
 definePageMeta({
     layout: 'cashier',
-    middleware: 'cashier',
 })
 
 interface SaleItem {

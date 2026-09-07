@@ -330,7 +330,6 @@ import type { TableColumn } from '@nuxt/ui'
 import type { DropdownMenuItem } from '@nuxt/ui/runtime/components/DropdownMenu.vue.js'
 
 definePageMeta({
-    middleware: 'admin',
     layout: 'admin',
 })
 
