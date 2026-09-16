@@ -7,7 +7,7 @@
             class="sticky top-0 z-30 border-b border-green-100 bg-white/85 backdrop-blur-2xl dark:border-slate-700 dark:bg-slate-900/85"
         >
             <div
-                class="mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-8"
+                class="mx-auto flex h-16 items-center justify-between gap-4 px-4 sm:px-6 lg:px-8"
             >
                 <!-- Brand -->
                 <div class="flex min-w-0 items-center gap-3">
@@ -60,7 +60,7 @@
 
         <!-- Main content -->
         <main>
-            <div class="mx-auto max-w-7xl px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
+            <div class="mx-auto px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
                 <slot />
             </div>
         </main>

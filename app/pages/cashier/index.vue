@@ -30,12 +30,12 @@
                     color="neutral"
                     variant="subtle"
                     size="lg"
-                    :loading="pending"
+                    :loading="pending || recentPending"
                     class="rounded-2xl px-2.5 sm:px-3"
                     @click="
                         (e) => {
                             e.preventDefault()
-                            refresh()
+                            refreshAll()
                         }
                     "
                 />
@@ -61,10 +61,7 @@
             ]"
         />
 
-        <div
-            class="flex flex-col gap-6 xl:flex-row xl:items-start"
-            v-else
-        >
+        <div class="flex flex-col gap-6 xl:flex-row xl:items-start" v-else>
             <!-- Catalog -->
             <div class="min-w-0 flex-1">
                 <div
@@ -159,7 +156,11 @@
                                 "
                             >
                                 {{ item.stockQty }} {{ item.unit }}
-                                {{ item.stockQty <= 0 ? '· Out of stock' : 'in stock' }}
+                                {{
+                                    item.stockQty <= 0
+                                        ? '· Out of stock'
+                                        : 'in stock'
+                                }}
                             </span>
                         </div>
 
@@ -187,7 +188,7 @@
             </div>
 
             <!-- Cart -->
-            <aside class="w-full shrink-0 xl:sticky xl:top-6 xl:w-96">
+            <aside class="w-full shrink-0 xl:sticky xl:top-6 xl:w-96 space-y-4">
                 <div
                     class="flex flex-col overflow-hidden rounded-3xl border border-green-100 bg-white shadow-sm dark:border-slate-700 dark:bg-slate-900"
                 >
@@ -280,8 +281,11 @@
                         </ul>
                     </div>
 
-                    <div class="border-t border-green-100 px-5 py-4 dark:border-slate-700">
+                    <div
+                        class="border-t border-green-100 px-5 py-4 dark:border-slate-700"
+                    >
                         <UInput
+                            class="w-full"
                             v-model="notes"
                             icon="i-lucide-sticky-note"
                             placeholder="Notes (optional)..."
@@ -317,6 +321,93 @@
                         >
                             Complete Sale
                         </UButton>
+                    </div>
+                </div>
+
+                <!-- Recent transactions -->
+                <div
+                    class="flex flex-col overflow-hidden rounded-3xl border border-green-100 bg-white shadow-sm dark:border-slate-700 dark:bg-slate-900"
+                >
+                    <div
+                        class="flex items-center gap-3 border-b border-green-100 bg-green-50/60 px-5 py-4 dark:border-slate-700 dark:bg-slate-800/60"
+                    >
+                        <div
+                            class="flex size-9 shrink-0 items-center justify-center rounded-xl bg-green-500/10 text-green-600 dark:text-green-400"
+                        >
+                            <UIcon name="i-lucide-clock" class="size-5" />
+                        </div>
+
+                        <div>
+                            <p
+                                class="text-sm font-semibold text-slate-800 dark:text-slate-200"
+                            >
+                                Recent Transactions
+                            </p>
+
+                            <p
+                                class="text-xs text-slate-500 dark:text-slate-400"
+                            >
+                                Most recent first
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="px-5 py-4">
+                        <p
+                            v-if="recentPending"
+                            class="py-6 text-center text-sm text-slate-400 dark:text-slate-500"
+                        >
+                            Loading transactions...
+                        </p>
+
+                        <p
+                            v-else-if="recentTransactions.length === 0"
+                            class="py-6 text-center text-sm text-slate-400 dark:text-slate-500"
+                        >
+                            No transactions yet.
+                        </p>
+
+                        <ul
+                            v-else
+                            class="max-h-96 divide-y divide-green-100 overflow-y-auto pr-1 dark:divide-slate-700"
+                        >
+                            <li
+                                v-for="transaction in recentTransactions"
+                                :key="transaction.id"
+                                class="flex items-center gap-3 py-3"
+                            >
+                                <div
+                                    class="flex size-9 shrink-0 items-center justify-center rounded-xl bg-green-500/10 text-green-600 dark:text-green-400"
+                                >
+                                    <UIcon
+                                        name="i-lucide-receipt-text"
+                                        class="size-4"
+                                    />
+                                </div>
+
+                                <div class="min-w-0 flex-1">
+                                    <p
+                                        class="truncate text-sm font-medium text-slate-800 dark:text-slate-200"
+                                    >
+                                        #{{ transaction.id }} ·
+                                        {{ transaction.custodian }}
+                                    </p>
+
+                                    <p
+                                        class="text-xs text-slate-500 dark:text-slate-400"
+                                    >
+                                        {{ transaction.date }}
+                                    </p>
+                                </div>
+
+                                <UBadge
+                                    :color="statusColor(transaction.status)"
+                                    variant="subtle"
+                                >
+                                    {{ transaction.status }}
+                                </UBadge>
+                            </li>
+                        </ul>
                     </div>
                 </div>
             </aside>
@@ -445,14 +536,35 @@ interface Receipt {
     lines: ReceiptLine[]
 }
 
+interface RecentTransaction {
+    id: number
+    createdAt: string
+    orderStatus: 'Pending' | 'Completed' | 'Voided'
+    custodian: {
+        id: number
+        username: string
+    } | null
+}
+
+interface RecentTransactionRow {
+    id: number
+    date: string
+    custodian: string
+    status: 'Pending' | 'Completed' | 'Voided'
+}
+
 const strapi = useStrapi()
 const toast = useToast()
 
 const search = ref('')
 
-const { data, error: fetchError, pending, refresh } = await useAsyncData(
-    'cashierSaleItems',
-    () => strapi.get<ItemListResponse>('/cashier/items')
+const {
+    data,
+    error: fetchError,
+    pending,
+    refresh,
+} = await useAsyncData('cashierSaleItems', () =>
+    strapi.get<ItemListResponse>('/cashier/items')
 )
 
 const saleItems = computed<SaleItem[]>(() => data.value?.data ?? [])
@@ -483,6 +595,15 @@ const formatPrice = (value: number | null | undefined): string => {
     }
 
     return '₱' + value.toFixed(2)
+}
+
+function formatDate(iso: string): string {
+    return new Intl.DateTimeFormat('en-US', {
+        month: 'short',
+        day: 'numeric',
+        hour: 'numeric',
+        minute: '2-digit',
+    }).format(new Date(iso))
 }
 
 /*
@@ -589,12 +710,52 @@ async function submitSale() {
 
         clearCart()
         receiptOpen.value = true
-        await refresh()
+        await Promise.all([refresh(), refreshRecentTransactions()])
     } catch (err) {
         checkoutError.value =
-            (err as Error).message ?? 'Failed to complete sale. Please try again.'
+            (err as Error).message ??
+            'Failed to complete sale. Please try again.'
     } finally {
         submitting.value = false
     }
+}
+
+/*
+|--------------------------------------------------------------------------
+| Recent transactions
+|--------------------------------------------------------------------------
+*/
+
+const {
+    data: recentTransactionsResponse,
+    pending: recentPending,
+    refresh: refreshRecentTransactions,
+} = await useAsyncData('cashierRecentTransactions', () =>
+    strapi.get<{ data: RecentTransaction[] }>('/transactions', {
+        populate: 'custodian',
+        sort: 'createdAt:desc',
+        pagination: { limit: 5 },
+    })
+)
+
+const recentTransactions = computed<RecentTransactionRow[]>(() =>
+    (recentTransactionsResponse.value?.data ?? []).map((transaction) => ({
+        id: transaction.id,
+        date: formatDate(transaction.createdAt),
+        custodian: transaction.custodian?.username ?? '—',
+        status: transaction.orderStatus,
+    }))
+)
+
+const statusColor = (
+    status: RecentTransactionRow['status']
+): 'neutral' | 'success' | 'error' => {
+    if (status === 'Completed') return 'success'
+    if (status === 'Voided') return 'error'
+    return 'neutral'
+}
+
+async function refreshAll() {
+    await Promise.all([refresh(), refreshRecentTransactions()])
 }
 </script>
