@@ -31,7 +31,7 @@
                         <div
                             class="flex size-12 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-green-500 via-green-600 to-teal-600 text-white shadow-[0_10px_30px_rgba(0,193,106,0.40)]"
                         >
-                            <UIcon name="i-lucide-id-card" class="size-6" />
+                            <UIcon name="i-lucide-boxes" class="size-6" />
                         </div>
 
                         <div v-if="!sidebarCollapsed" class="min-w-0">

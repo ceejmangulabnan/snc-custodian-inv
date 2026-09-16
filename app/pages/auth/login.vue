@@ -33,7 +33,7 @@
                 <div
                     class="mx-auto mb-6 flex size-20 items-center justify-center rounded-[28px] bg-gradient-to-br from-green-500 via-green-600 to-teal-600 text-white shadow-[0_15px_50px_rgba(0,193,106,0.35)]"
                 >
-                    <UIcon name="i-lucide-id-card" class="size-10" />
+                    <UIcon name="i-lucide-boxes" class="size-10" />
                 </div>
 
                 <h1

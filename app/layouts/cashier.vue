@@ -21,7 +21,7 @@
                         <p
                             class="truncate text-base font-bold tracking-tight text-slate-900 dark:text-white"
                         >
-                            SNC Cashier
+                            SNC Custodian - Cashier
                         </p>
 
                         <p
