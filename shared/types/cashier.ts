@@ -33,3 +33,7 @@ export interface CartExposed {
     cartQty: (itemId: number) => number
     addToCart: (item: SaleItem) => void
 }
+
+export interface ItemListResponse {
+    data: SaleItem[]
+}
