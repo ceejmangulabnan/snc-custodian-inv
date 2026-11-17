@@ -178,18 +178,17 @@
 </template>
 
 <script setup lang="ts">
-//@ts-nocheck
 const logoutOpen = ref(false)
 const isLoggingOut = ref(false)
 
 const { fetch: refreshSession, session } = useUserSession()
 
 const displayName = computed(() => {
-    return session.value.user?.username
+    return session.value?.user?.username
 })
 
 const displayRole = computed(() => {
-    return session.value.user?.role?.name
+    return session.value?.user?.role?.name
 })
 
 const openLogoutModal = () => {

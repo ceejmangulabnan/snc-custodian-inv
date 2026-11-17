@@ -1197,7 +1197,7 @@ async function saveItem() {
         minThreshold: itemForm.value.minThreshold || 0,
         category: itemForm.value.categoryId || null,
         isForSale: itemForm.value.isForSale,
-        price: itemForm.value.isForSale ? itemForm.value.price ?? null : null,
+        price: itemForm.value.isForSale ? (itemForm.value.price ?? null) : null,
     }
 
     savingItem.value = true

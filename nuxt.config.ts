@@ -1,6 +1,16 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-    modules: ['@nuxt/eslint', '@nuxt/ui', '@nuxt/fonts', 'nuxt-auth-utils'],
+    modules: [
+        '@nuxt/eslint',
+        '@nuxt/ui',
+        '@nuxt/fonts',
+        'nuxt-auth-utils',
+        'motion-v/nuxt',
+    ],
+
+    motionV: {
+        directives: true,
+    },
 
     colorMode: {
         preference: 'light',
@@ -13,6 +23,10 @@ export default defineNuxtConfig({
 
     devtools: {
         enabled: true,
+
+        timeline: {
+            enabled: true,
+        },
     },
 
     css: ['~/assets/css/main.css'],
