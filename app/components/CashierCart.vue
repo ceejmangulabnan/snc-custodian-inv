@@ -23,15 +23,6 @@
             </UButton>
         </div>
 
-        <UAlert
-            v-if="checkoutError"
-            color="error"
-            variant="soft"
-            icon="i-lucide-alert-circle"
-            :title="checkoutError"
-            class="mx-5 mt-4"
-        />
-
         <div class="px-5 py-4">
             <p
                 v-if="cartLines.length === 0"
@@ -67,7 +58,7 @@
                         :min="1"
                         :max="line.item.stockQty"
                         :step="1"
-                        class="w-20 shrink-0"
+                        class="w-28 shrink-0"
                     />
 
                     <span
@@ -87,15 +78,6 @@
             </ul>
         </div>
 
-        <div class="border-t border-green-100 px-5 py-4 dark:border-slate-700">
-            <UInput
-                v-model="notes"
-                class="w-full"
-                icon="i-lucide-sticky-note"
-                placeholder="Notes (optional)..."
-            />
-        </div>
-
         <div class="px-5 pb-5">
             <div
                 class="flex items-center justify-between rounded-2xl border border-green-100 bg-green-50/60 px-4 py-3 dark:border-slate-700 dark:bg-slate-800/60"
@@ -113,20 +95,13 @@
                 </p>
             </div>
 
-            <!-- <UButton
-                block
-                size="lg"
-                color="success"
-                icon="i-lucide-check"
-                class="mt-4 rounded-2xl"
-                :loading="submitting"
-                :disabled="!cartLines.length"
-                @click="submitSale"
-            >
-                Complete Sale
-            </UButton> -->
-
-            <CheckoutModal />
+            <CheckoutModal
+                v-model:open="checkoutOpen"
+                v-model:notes="notes"
+                :cart-lines="cartLines"
+                :cart-total="cartTotal"
+                @completed="onSaleCompleted"
+            />
         </div>
 
         <!-- Receipt modal -->
@@ -136,7 +111,7 @@
         >
             <template #content>
                 <div
-                    class="relative overflow-hidden rounded-[28px] border border-green-100 bg-white/90 p-6 shadow-xl backdrop-blur-xl dark:border-slate-700 dark:bg-slate-900/90"
+                    class="relative max-h-[calc(100dvh-2rem)] overflow-y-auto rounded-[28px] border border-green-100 bg-white/90 p-6 shadow-xl backdrop-blur-xl dark:border-slate-700 dark:bg-slate-900/90"
                 >
                     <div class="flex items-start gap-4">
                         <div
@@ -157,6 +132,64 @@
                             >
                                 Transaction #{{ receipt?.id }} · Total
                                 {{ formatPrice(receipt?.total ?? 0) }}
+                            </p>
+
+                            <p
+                                v-if="receipt?.receiptNumber"
+                                class="mt-1 inline-flex items-center gap-1 rounded-lg bg-green-500/10 px-2 py-0.5 text-xs font-semibold text-green-700 dark:text-green-400"
+                            >
+                                <UIcon
+                                    name="i-lucide-receipt-text"
+                                    class="size-3.5"
+                                />
+                                Receipt #{{ receipt.receiptNumber }}
+                            </p>
+                        </div>
+                    </div>
+
+                    <div
+                        v-if="receipt?.studentName || receipt?.studentIdNumber"
+                        class="mt-4 grid gap-3 rounded-2xl border border-green-100 bg-green-50/50 px-4 py-3 text-sm sm:grid-cols-2 dark:border-slate-700 dark:bg-slate-800/50"
+                    >
+                        <div v-if="receipt?.studentName">
+                            <p
+                                class="text-xs text-slate-500 dark:text-slate-400"
+                            >
+                                Student
+                            </p>
+
+                            <p
+                                class="font-semibold text-slate-800 dark:text-slate-200"
+                            >
+                                {{ receipt.studentName }}
+                            </p>
+                        </div>
+
+                        <div v-if="receipt?.studentIdNumber">
+                            <p
+                                class="text-xs text-slate-500 dark:text-slate-400"
+                            >
+                                Student ID
+                            </p>
+
+                            <p
+                                class="font-semibold text-slate-800 dark:text-slate-200"
+                            >
+                                {{ receipt.studentIdNumber }}
+                            </p>
+                        </div>
+
+                        <div v-if="receipt?.purchaseDate" class="sm:col-span-2">
+                            <p
+                                class="text-xs text-slate-500 dark:text-slate-400"
+                            >
+                                Purchase Date
+                            </p>
+
+                            <p
+                                class="font-semibold text-slate-800 dark:text-slate-200"
+                            >
+                                {{ formatDate(receipt.purchaseDate) }}
                             </p>
                         </div>
                     </div>
@@ -213,12 +246,7 @@
 </template>
 
 <script setup lang="ts">
-import type {
-    CartExposed,
-    Receipt,
-    SaleItem,
-    SaleTransaction,
-} from '#shared/types/cashier'
+import type { CartExposed, Receipt, SaleItem } from '#shared/types/cashier'
 
 const props = defineProps<{ saleItems: SaleItem[] }>()
 
@@ -226,7 +254,6 @@ const emit = defineEmits<{
     'sale-completed': []
 }>()
 
-const strapi = useStrapi()
 const toast = useToast()
 
 const formatPrice = (value: number | null | undefined): string => {
@@ -235,6 +262,14 @@ const formatPrice = (value: number | null | undefined): string => {
     }
 
     return '₱' + value.toFixed(2)
+}
+
+function formatDate(iso: string): string {
+    return new Intl.DateTimeFormat('en-US', {
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric',
+    }).format(new Date(iso))
 }
 
 /*
@@ -278,9 +313,7 @@ function addToCart(item: SaleItem) {
 }
 
 function removeFromCart(itemId: number) {
-    const next = { ...cart.value }
-    delete next[itemId]
-    cart.value = next
+    cart.value = { ...cart.value, [itemId]: 0 }
 }
 
 function clearCart() {
@@ -296,62 +329,25 @@ defineExpose<CartExposed>({ cartQty, addToCart })
 |--------------------------------------------------------------------------
 */
 
-const submitting = ref(false)
-const checkoutError = ref('')
+const checkoutOpen = ref(false)
 const receiptOpen = ref(false)
 const receipt = ref<Receipt | null>(null)
 
-async function submitSale() {
-    if (submitting.value || !cartLines.value.length) {
-        return
-    }
+async function onSaleCompleted(result: Receipt) {
+    checkoutOpen.value = false
+    receipt.value = result
+    clearCart()
 
-    checkoutError.value = ''
-    submitting.value = true
+    toast.add({
+        title: 'Sale completed',
+        description: `Transaction #${result.id} for ${formatPrice(result.total)}`,
+        color: 'success',
+    })
 
-    try {
-        const response = await strapi.post<{ data: SaleTransaction }>(
-            '/cashier/issue',
-            {
-                items: cartLines.value.map((line) => ({
-                    item: line.item.id,
-                    qtyPulled: line.qty,
-                })),
-                notes: notes.value.trim() || undefined,
-            }
-        )
+    emit('sale-completed')
 
-        const transactionId = response?.data?.id ?? 0
-        const total = cartTotal.value
-        const trimmedNotes = notes.value.trim() || undefined
-
-        receipt.value = {
-            id: transactionId,
-            total,
-            notes: trimmedNotes,
-            lines: cartLines.value.map((line) => ({
-                itemId: line.item.id,
-                name: line.item.name,
-                qty: line.qty,
-                lineTotal: lineTotal(line),
-            })),
-        }
-
-        toast.add({
-            title: 'Sale completed',
-            description: `Transaction #${transactionId} for ${formatPrice(total)}`,
-            color: 'success',
-        })
-
-        clearCart()
-        receiptOpen.value = true
-        emit('sale-completed')
-    } catch (err) {
-        checkoutError.value =
-            (err as Error).message ??
-            'Failed to complete sale. Please try again.'
-    } finally {
-        submitting.value = false
-    }
+    // Let the checkout modal finish closing before opening the receipt.
+    await nextTick()
+    receiptOpen.value = true
 }
 </script>

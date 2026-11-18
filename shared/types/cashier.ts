@@ -13,6 +13,10 @@ export interface SaleTransaction {
     documentId: string
     orderStatus: 'Pending' | 'Completed' | 'Voided'
     notes?: string | null
+    receiptNumber?: string | null
+    studentIdNumber?: string | null
+    studentName?: string | null
+    purchaseDate?: string | null
 }
 
 export interface ReceiptLine {
@@ -26,6 +30,10 @@ export interface Receipt {
     id: number
     total: number
     notes?: string
+    receiptNumber?: string
+    studentIdNumber?: string
+    studentName?: string
+    purchaseDate?: string
     lines: ReceiptLine[]
 }
 
