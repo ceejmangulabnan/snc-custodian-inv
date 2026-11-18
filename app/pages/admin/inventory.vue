@@ -4,7 +4,7 @@
         <div class="flex w-full gap-4 items-start justify-between">
             <div class="flex items-start gap-4">
                 <div
-                    class="flex size-14 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-green-500 via-green-600 to-teal-600 text-white shadow-[0_10px_30px_rgba(16,185,129,0.35)]"
+                    class="flex size-14 shrink-0 items-center justify-center rounded-2xl bg-linear-to-br from-green-500 via-green-600 to-teal-600 text-white shadow-[0_10px_30px_rgba(16,185,129,0.35)]"
                 >
                     <UIcon name="i-lucide-boxes" class="size-7" />
                 </div>
@@ -85,7 +85,7 @@
                     </div>
 
                     <div
-                        class="flex size-12 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br text-white shadow-lg"
+                        class="flex size-12 shrink-0 items-center justify-center rounded-2xl bg-linear-to-br text-white shadow-lg"
                         :class="stat.tint"
                     >
                         <UIcon :name="stat.icon" class="size-6" />
@@ -162,12 +162,12 @@
 
             <!-- Table -->
             <UTable
+                v-model:sorting="sorting"
+                v-model:pagination="pagination"
                 :data="inventoryItems"
                 :columns="columns"
                 :loading="pending"
                 :pagination-options="{ manualPagination: true }"
-                v-model:sorting="sorting"
-                v-model:pagination="pagination"
                 :empty="'No items match your filters.'"
                 class="flex-1"
             >
@@ -766,6 +766,7 @@
         />
     </div>
 </template>
+
 <script setup lang="ts">
 import type { TableColumn } from '@nuxt/ui'
 import type { DropdownMenuItem } from '#ui/types'

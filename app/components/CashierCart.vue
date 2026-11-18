@@ -89,8 +89,8 @@
 
         <div class="border-t border-green-100 px-5 py-4 dark:border-slate-700">
             <UInput
-                class="w-full"
                 v-model="notes"
+                class="w-full"
                 icon="i-lucide-sticky-note"
                 placeholder="Notes (optional)..."
             />
@@ -113,7 +113,7 @@
                 </p>
             </div>
 
-            <UButton
+            <!-- <UButton
                 block
                 size="lg"
                 color="success"
@@ -124,7 +124,9 @@
                 @click="submitSale"
             >
                 Complete Sale
-            </UButton>
+            </UButton> -->
+
+            <CheckoutModal />
         </div>
 
         <!-- Receipt modal -->

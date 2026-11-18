@@ -61,11 +61,11 @@
             ]"
         />
 
-        <div class="flex flex-col gap-6 xl:flex-row xl:items-start" v-else>
+        <div v-else class="flex flex-col gap-6 xl:flex-row xl:items-start">
             <!-- Catalog -->
             <div class="min-w-0 flex-1">
                 <div
-                    class="flex flex-col gap-4 rounded-3xl border border-green-100 bg-white p-5 shadow-sm sm:flex-row sm:items-center dark:border-slate-700 dark:bg-slate-900"
+                    class="flex flex-col gap-4 rounded-3xl border border-green-100 bg-white p-4 shadow-sm sm:flex-row sm:items-center dark:border-slate-700 dark:bg-slate-900"
                 >
                     <div class="flex items-center gap-3">
                         <div
@@ -98,6 +98,7 @@
                         placeholder="Search name or SKU..."
                         size="lg"
                         class="w-full sm:w-64 sm:ml-auto"
+                        :ui="{ base: 'rounded-lg' }"
                     />
                 </div>
 
@@ -165,10 +166,10 @@
                         </div>
 
                         <UButton
-                            block
                             v-motion
-                            :whileHover="{ scale: 1.01 }"
-                            :whilePress="{ scale: 0.99, y: 2 }"
+                            block
+                            :while-hover="{ scale: 1.01 }"
+                            :while-press="{ scale: 0.99, y: 2 }"
                             class="mt-auto rounded-2xl"
                             color="success"
                             icon="i-lucide-shopping-cart"
@@ -192,7 +193,7 @@
 
             <aside class="w-full shrink-0 xl:sticky xl:top-6 xl:w-96 space-y-4">
                 <!-- Cart -->
-                <Cart
+                <CashierCart
                     ref="cart"
                     :sale-items="saleItems"
                     @sale-completed="refreshAll"
@@ -200,8 +201,8 @@
 
                 <!-- Recent transactions -->
                 <RecentTransactions
-                    :recentPending="recentPending"
-                    :recentTransactions="recentTransactions"
+                    :recent-pending="recentPending"
+                    :recent-transactions="recentTransactions"
                 />
             </aside>
         </div>
