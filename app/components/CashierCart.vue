@@ -48,8 +48,8 @@
                         </p>
 
                         <p class="text-xs text-slate-500 dark:text-slate-400">
-                            {{ line.item.unit }} ·
-                            {{ formatPrice(line.item.price) }} each
+                            {{ formatPrice(line.item.price) }} ·
+                            {{ line.item.unit }}
                         </p>
                     </div>
 

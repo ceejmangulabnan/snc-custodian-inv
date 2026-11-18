@@ -26,9 +26,9 @@
                 <UButton
                     color="neutral"
                     size="lg"
-                    variant="soft"
+                    variant="subtle"
                     icon="i-lucide-tags"
-                    class="bg-linear-to-br from-amber-500 to-orange-600 rounded-2xl px-2.5! sm:px-3! text-white"
+                    class="rounded-2xl px-2.5! sm:px-3! text-black dark:text-white"
                     @click="categoriesOpen = true"
                 >
                     <span class="hidden lg:inline">Manage Categories</span>

@@ -3,7 +3,7 @@
         v-model:open="open"
         :ui="{
             content:
-                'rounded-[28px] max-w-3xl max-h-[calc(100dvh-2rem)] flex flex-col overflow-hidden',
+                'rounded-[28px] max-w-5xl max-h-[calc(100dvh-2rem)] flex flex-col overflow-hidden',
         }"
     >
         <UButton
@@ -156,7 +156,7 @@
                                     >
                                         <div class="min-w-0 flex-1">
                                             <p
-                                                class="truncate text-sm font-medium text-slate-800 dark:text-slate-200"
+                                                class="text-wrap text-sm font-medium text-slate-800 dark:text-slate-200"
                                             >
                                                 {{ line.item.name }}
                                             </p>
@@ -166,7 +166,9 @@
                                             >
                                                 {{ line.qty }}
                                                 {{ line.item.unit }} ×
-                                                {{ formatPrice(line.item.price) }}
+                                                {{
+                                                    formatPrice(line.item.price)
+                                                }}
                                             </p>
                                         </div>
 
@@ -205,7 +207,6 @@
                                     {{ formatPrice(cartTotal) }}
                                 </p>
                             </div>
-
                         </div>
                     </div>
                 </div>
@@ -324,12 +325,12 @@ watch(open, (isOpen) => {
 })
 
 function syncCheckoutError() {
-    checkoutError.value
-        = fieldErrors.receiptNumber
-            ?? fieldErrors.studentIdNumber
-            ?? fieldErrors.studentName
-            ?? fieldErrors.purchaseDate
-            ?? ''
+    checkoutError.value =
+        fieldErrors.receiptNumber ??
+        fieldErrors.studentIdNumber ??
+        fieldErrors.studentName ??
+        fieldErrors.purchaseDate ??
+        ''
 }
 
 watch(receiptNumber, () => {
@@ -405,10 +406,10 @@ async function submitSale() {
     }
 
     const firstError =
-        fieldErrors.receiptNumber
-        ?? fieldErrors.studentIdNumber
-        ?? fieldErrors.studentName
-        ?? fieldErrors.purchaseDate
+        fieldErrors.receiptNumber ??
+        fieldErrors.studentIdNumber ??
+        fieldErrors.studentName ??
+        fieldErrors.purchaseDate
 
     if (firstError) {
         checkoutError.value = firstError
