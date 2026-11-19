@@ -302,7 +302,7 @@ const {
     pending: recentPending,
     refresh: refreshRecentTransactions,
 } = await useAsyncData('cashierRecentTransactions', () =>
-    strapi.get<{ data: RecentTransaction[] }>('/transactions', {
+    strapi.get<{ data: RecentTransaction[] }>('/transactions/cashier', {
         populate: 'custodian',
         sort: 'createdAt:desc',
         pagination: { limit: 5 },

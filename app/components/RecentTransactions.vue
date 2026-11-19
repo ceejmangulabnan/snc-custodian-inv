@@ -86,6 +86,8 @@ const props = defineProps<{
     recentTransactions: RecentTransactionRow[]
 }>()
 
+console.log('Recent Transactions from cashier: ', props.recentTransactions)
+
 const statusColor = (
     status: RecentTransactionRow['status']
 ): 'neutral' | 'success' | 'error' => {
