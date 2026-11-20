@@ -24,7 +24,7 @@
             </div>
         </div>
 
-        <div class="pl-5 py-4">
+        <div>
             <p
                 v-if="recentPending"
                 class="py-6 text-center text-sm text-slate-400 dark:text-slate-500"
@@ -41,12 +41,19 @@
 
             <ul
                 v-else
-                class="max-h-96 divide-y divide-green-100 overflow-y-auto pr-4 dark:divide-slate-700"
+                class="max-h-96 divide-y divide-green-100 overflow-y-auto dark:divide-slate-700"
             >
+                <!-- <li
+                    v-for="transaction in recentTransactions"
+                    :key="transaction.id"
+                    class="flex items-center gap-3 py-3 hover:bg-gray-300 dark:hover:bg-slate-700"
+                    @click="openTransactionDetails = true"
+                > -->
                 <li
                     v-for="transaction in recentTransactions"
                     :key="transaction.id"
-                    class="flex items-center gap-3 py-3"
+                    class="flex items-center gap-3 py-3 hover:bg-gray-300 dark:hover:bg-slate-700 px-4"
+                    @click="selectTransaction(transaction)"
                 >
                     <div
                         class="flex size-9 shrink-0 items-center justify-center rounded-xl bg-green-500/10 text-green-600 dark:text-green-400"
@@ -59,7 +66,7 @@
                             class="truncate text-sm font-medium text-slate-800 dark:text-slate-200"
                         >
                             #{{ transaction.id }} ·
-                            {{ transaction.custodian }}
+                            {{ transaction.custodian?.username || '-' }}
                         </p>
 
                         <p class="text-xs text-slate-500 dark:text-slate-400">
@@ -68,14 +75,18 @@
                     </div>
 
                     <UBadge
-                        :color="statusColor(transaction.status)"
+                        :color="statusColor(transaction.orderStatus)"
                         variant="subtle"
                     >
-                        {{ transaction.status }}
+                        {{ transaction.orderStatus }}
                     </UBadge>
                 </li>
             </ul>
         </div>
+        <TransactionDetailsModal
+            v-model:open="openTransactionDetails"
+            :recent-transaction="selectedTransaction"
+        />
     </div>
 </template>
 
@@ -86,8 +97,15 @@ const props = defineProps<{
     recentPending: boolean
     recentTransactions: RecentTransactionRow[]
 }>()
+const openTransactionDetails = ref(false)
 
 console.log('Recent Transactions from cashier: ', props.recentTransactions)
+const selectedTransaction = ref(null)
+const selectTransaction = (transaction: RecentTransactionRow) => {
+    selectedTransaction.value = transaction
+    openTransactionDetails.value = true
+    console.log('Selected Transaction', transaction)
+}
 
 const statusColor = (
     status: RecentTransactionRow['status']

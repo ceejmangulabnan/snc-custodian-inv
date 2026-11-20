@@ -177,6 +177,7 @@
                                 item.stockQty <= 0 ||
                                 cartQty(item.id) >= item.stockQty
                             "
+                            variant="outline"
                             @click="addToCart(item)"
                         >
                             {{
@@ -308,12 +309,12 @@ const {
     })
 )
 
+// MAPPING TRANSACTIONS FOR DISPLAY
 const recentTransactions = computed<RecentTransactionRow[]>(() =>
     (recentTransactionsResponse.value?.data ?? []).map((transaction) => ({
         id: transaction.id,
         date: formatDate(transaction.createdAt),
-        custodian: transaction.custodian?.username ?? '—',
-        status: transaction.orderStatus,
+        ...transaction,
     }))
 )
 
