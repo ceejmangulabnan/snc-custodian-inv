@@ -118,7 +118,7 @@
 
                 <div
                     v-else
-                    class="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4"
+                    class="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3"
                 >
                     <div
                         v-for="item in filteredItems"
@@ -303,7 +303,6 @@ const {
     refresh: refreshRecentTransactions,
 } = await useAsyncData('cashierRecentTransactions', () =>
     strapi.get<{ data: RecentTransaction[] }>('/transactions/cashier', {
-        populate: 'custodian',
         sort: 'createdAt:desc',
         pagination: { limit: 5 },
     })

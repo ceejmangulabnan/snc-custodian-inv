@@ -78,6 +78,7 @@
         </div>
     </div>
 </template>
+
 <script setup lang="ts">
 import type { RecentTransactionRow } from '#shared/types/transaction'
 
