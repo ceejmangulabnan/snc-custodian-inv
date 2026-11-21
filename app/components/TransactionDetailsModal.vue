@@ -43,6 +43,35 @@
                             <p
                                 class="text-xs font-medium text-slate-500 dark:text-slate-400"
                             >
+                                Receipt Number
+                            </p>
+                            <p
+                                class="mt-0.5 font-mono text-sm font-semibold text-slate-800 dark:text-slate-200"
+                            >
+                                {{ recentTransaction.receiptNumber || '—' }}
+                            </p>
+                        </div>
+                        <div>
+                            <p
+                                class="text-xs font-medium text-slate-500 dark:text-slate-400"
+                            >
+                                Purchase Date
+                            </p>
+                            <p
+                                class="mt-0.5 text-sm font-medium text-slate-700 dark:text-slate-300"
+                            >
+                                {{
+                                    formatPurchaseDate(
+                                        recentTransaction.purchaseDate
+                                    )
+                                }}
+                            </p>
+                        </div>
+
+                        <div>
+                            <p
+                                class="text-xs font-medium text-slate-500 dark:text-slate-400"
+                            >
                                 Student Name
                             </p>
                             <p
@@ -69,19 +98,6 @@
                             <p
                                 class="text-xs font-medium text-slate-500 dark:text-slate-400"
                             >
-                                Receipt Number
-                            </p>
-                            <p
-                                class="mt-0.5 font-mono text-sm font-semibold text-slate-800 dark:text-slate-200"
-                            >
-                                {{ recentTransaction.receiptNumber || '—' }}
-                            </p>
-                        </div>
-
-                        <div>
-                            <p
-                                class="text-xs font-medium text-slate-500 dark:text-slate-400"
-                            >
                                 Processed By (Custodian)
                             </p>
                             <p
@@ -89,23 +105,6 @@
                             >
                                 {{
                                     recentTransaction.custodian?.username ?? '—'
-                                }}
-                            </p>
-                        </div>
-
-                        <div>
-                            <p
-                                class="text-xs font-medium text-slate-500 dark:text-slate-400"
-                            >
-                                Purchase Date
-                            </p>
-                            <p
-                                class="mt-0.5 text-sm font-medium text-slate-700 dark:text-slate-300"
-                            >
-                                {{
-                                    formatPurchaseDate(
-                                        recentTransaction.purchaseDate
-                                    )
                                 }}
                             </p>
                         </div>
@@ -152,7 +151,7 @@
                             <span
                                 class="text-xs text-slate-500 dark:text-slate-400"
                             >
-                                {{ totalItemsPulled }} total qty ({{
+                                {{ totalItemsPulled }} Total Quantity ({{
                                     recentTransaction.items?.length ?? 0
                                 }}
                                 line
@@ -173,6 +172,9 @@
                                 >
                                     <tr>
                                         <th class="px-4 py-2.5">Item #</th>
+                                        <th class="px-4 py-2.5 text-left">
+                                            Item Name
+                                        </th>
                                         <th class="px-4 py-2.5 text-right">
                                             Qty Pulled
                                         </th>
@@ -188,7 +190,7 @@
                                         "
                                     >
                                         <td
-                                            colspan="2"
+                                            colspan="3"
                                             class="px-4 py-6 text-center text-xs text-slate-400"
                                         >
                                             No items recorded.
@@ -202,7 +204,12 @@
                                         <td
                                             class="px-4 py-2.5 font-medium text-slate-800 dark:text-slate-200"
                                         >
-                                            Item #{{ item.id }}
+                                            {{ item.item.sku }}
+                                        </td>
+                                        <td
+                                            class="px-4 py-2.5 text-left font-medium text-slate-800 dark:text-slate-200"
+                                        >
+                                            {{ item.item.name }}
                                         </td>
                                         <td
                                             class="px-4 py-2.5 text-right font-semibold tabular-nums text-slate-700 dark:text-slate-300"
@@ -248,6 +255,9 @@ function formatPurchaseDate(iso?: string | null): string {
         month: 'short',
         day: 'numeric',
         year: 'numeric',
+        hour: 'numeric',
+        minute: '2-digit',
+        hour12: true,
     }).format(new Date(iso))
 }
 </script>

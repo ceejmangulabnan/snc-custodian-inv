@@ -52,7 +52,7 @@
                 <li
                     v-for="transaction in recentTransactions"
                     :key="transaction.id"
-                    class="flex items-center gap-3 py-3 hover:bg-gray-300 dark:hover:bg-slate-700 px-4"
+                    class="flex items-center gap-3 py-3 hover:bg-gray-300 dark:hover:bg-slate-800 px-4"
                     @click="selectTransaction(transaction)"
                 >
                     <div
