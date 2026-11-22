@@ -8,6 +8,7 @@
     >
         <template #content>
             <div
+                v-if="recentTransaction"
                 class="relative flex min-h-0 flex-1 flex-col rounded-[28px] border border-green-100 bg-white/90 p-6 shadow-xl backdrop-blur-xl dark:border-slate-700 dark:bg-slate-900/90"
             >
                 <div class="flex items-start gap-4">
@@ -243,11 +244,18 @@
 <script lang="ts" setup>
 import type { RecentTransactionRow } from '#shared/types/transaction'
 
-const open = defineModel<boolean>()
+const open = defineModel<boolean>('open', { default: false })
+
 const { recentTransaction } = defineProps<{
-    recentTransaction: RecentTransactionRow
+    recentTransaction: RecentTransactionRow | null
 }>()
-console.log('recent transaction', recentTransaction)
+
+const totalItemsPulled = computed(() =>
+    (recentTransaction?.items ?? []).reduce(
+        (sum, item) => sum + item.qtyPulled,
+        0
+    )
+)
 
 function formatPurchaseDate(iso?: string | null): string {
     if (!iso) return '—'

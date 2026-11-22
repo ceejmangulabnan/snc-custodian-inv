@@ -97,13 +97,13 @@
                             </UFormField>
 
                             <UFormField
-                                label="Purchase Date"
+                                label="Purchase Date & Time"
                                 required
                                 :error="fieldErrors.purchaseDate"
                             >
                                 <UInput
                                     v-model="purchaseDate"
-                                    type="date"
+                                    type="datetime-local"
                                     class="w-full"
                                 />
                             </UFormField>
@@ -267,7 +267,7 @@ const strapi = useStrapi()
 const receiptNumber = ref('')
 const studentIdNumber = ref('')
 const studentName = ref('')
-const purchaseDate = ref(todayIso())
+const purchaseDate = ref(nowLocalDateTime())
 
 const submitting = ref(false)
 const checkoutError = ref('')
@@ -300,17 +300,17 @@ const cartTotalQty = computed(() =>
     props.cartLines.reduce((sum, line) => sum + line.qty, 0)
 )
 
-function todayIso(): string {
+function nowLocalDateTime(): string {
     const now = new Date()
     const offset = now.getTimezoneOffset() * 60 * 1000
-    return new Date(now.getTime() - offset).toISOString().slice(0, 10)
+    return new Date(now.getTime() - offset).toISOString().slice(0, 16)
 }
 
 function resetForm() {
     receiptNumber.value = ''
     studentIdNumber.value = ''
     studentName.value = ''
-    purchaseDate.value = todayIso()
+    purchaseDate.value = nowLocalDateTime()
     clearFieldErrors()
 }
 
@@ -319,7 +319,7 @@ watch(open, (isOpen) => {
         checkoutError.value = ''
         clearFieldErrors()
         if (!purchaseDate.value) {
-            purchaseDate.value = todayIso()
+            purchaseDate.value = nowLocalDateTime()
         }
     }
 })
@@ -382,7 +382,7 @@ async function submitSale() {
     const receipt = receiptNumber.value.trim()
     const studentId = studentIdNumber.value.trim()
     const student = studentName.value.trim()
-    const purchaseDateIso = purchaseDate.value.trim()
+    const purchaseDateTime = purchaseDate.value.trim()
 
     clearFieldErrors()
 
@@ -398,11 +398,11 @@ async function submitSale() {
         fieldErrors.studentName = 'Student name is required.'
     }
 
-    // Parse as local midnight so the stored date matches the chosen calendar
-    // day when it is formatted back for the receipt.
-    const purchaseTimestamp = Date.parse(`${purchaseDateIso}T00:00:00`)
-    if (!purchaseDateIso || Number.isNaN(purchaseTimestamp)) {
-        fieldErrors.purchaseDate = 'A valid purchase date is required.'
+    // datetime-local values have no timezone, so Date.parse reads them in the
+    // user's local time before converting to the ISO string sent to Strapi.
+    const purchaseTimestamp = Date.parse(purchaseDateTime)
+    if (!purchaseDateTime || Number.isNaN(purchaseTimestamp)) {
+        fieldErrors.purchaseDate = 'A valid purchase date and time is required.'
     }
 
     const firstError =

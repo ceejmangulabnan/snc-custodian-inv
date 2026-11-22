@@ -43,16 +43,10 @@
                 v-else
                 class="max-h-96 divide-y divide-green-100 overflow-y-auto dark:divide-slate-700"
             >
-                <!-- <li
-                    v-for="transaction in recentTransactions"
-                    :key="transaction.id"
-                    class="flex items-center gap-3 py-3 hover:bg-gray-300 dark:hover:bg-slate-700"
-                    @click="openTransactionDetails = true"
-                > -->
                 <li
                     v-for="transaction in recentTransactions"
                     :key="transaction.id"
-                    class="flex items-center gap-3 py-3 hover:bg-gray-300 dark:hover:bg-slate-800 px-4"
+                    class="flex items-center gap-3 py-3 hover:cursor-pointer hover:bg-green-100/30 dark:hover:bg-slate-800 px-4"
                     @click="selectTransaction(transaction)"
                 >
                     <div
@@ -84,6 +78,7 @@
             </ul>
         </div>
         <TransactionDetailsModal
+            v-if="selectedTransaction"
             v-model:open="openTransactionDetails"
             :recent-transaction="selectedTransaction"
         />
@@ -93,22 +88,21 @@
 <script setup lang="ts">
 import type { RecentTransactionRow } from '#shared/types/transaction'
 
-const props = defineProps<{
+const { recentTransactions } = defineProps<{
     recentPending: boolean
     recentTransactions: RecentTransactionRow[]
 }>()
 const openTransactionDetails = ref(false)
 
-console.log('Recent Transactions from cashier: ', props.recentTransactions)
-const selectedTransaction = ref(null)
-const selectTransaction = (transaction: RecentTransactionRow) => {
+const selectedTransaction = ref<RecentTransactionRow | null>(null)
+
+function selectTransaction(transaction: RecentTransactionRow) {
     selectedTransaction.value = transaction
     openTransactionDetails.value = true
-    console.log('Selected Transaction', transaction)
 }
 
 const statusColor = (
-    status: RecentTransactionRow['status']
+    status: RecentTransactionRow['orderStatus']
 ): 'neutral' | 'success' | 'error' => {
     if (status === 'Completed') return 'success'
     if (status === 'Voided') return 'error'

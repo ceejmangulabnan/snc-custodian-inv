@@ -312,9 +312,8 @@ const {
 // MAPPING TRANSACTIONS FOR DISPLAY
 const recentTransactions = computed<RecentTransactionRow[]>(() =>
     (recentTransactionsResponse.value?.data ?? []).map((transaction) => ({
-        id: transaction.id,
-        date: formatDate(transaction.createdAt),
         ...transaction,
+        date: formatDate(transaction.createdAt),
     }))
 )
 
