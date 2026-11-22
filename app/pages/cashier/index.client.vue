@@ -84,8 +84,8 @@
                             <p
                                 class="text-xs text-slate-500 dark:text-slate-400"
                             >
-                                {{ saleItems.length }} item{{
-                                    saleItems.length === 1 ? '' : 's'
+                                {{ itemsTotal }} item{{
+                                    itemsTotal === 1 ? '' : 's'
                                 }}
                                 available
                             </p>
@@ -190,6 +190,27 @@
                         </UButton>
                     </div>
                 </div>
+
+                <div
+                    v-if="!pending && itemsTotal > 0"
+                    class="mt-4 flex flex-col items-center gap-2"
+                >
+                    <p class="text-xs text-slate-500 dark:text-slate-400">
+                        Showing {{ saleItems.length }} of {{ itemsTotal }}
+                    </p>
+
+                    <UButton
+                        v-if="hasMoreItems"
+                        color="neutral"
+                        variant="outline"
+                        icon="i-lucide-chevrons-down"
+                        :loading="loadingMore"
+                        :disabled="loadingMore"
+                        @click="loadMoreItems"
+                    >
+                        Load more items
+                    </UButton>
+                </div>
             </div>
 
             <aside class="w-full shrink-0 xl:sticky xl:top-6 xl:w-96 space-y-4">
@@ -226,18 +247,78 @@ definePageMeta({
 })
 
 const strapi = useStrapi()
+const toast = useToast()
 const search = ref('')
 
+const ITEMS_PER_PAGE = 10
+
 const {
-    data,
+    data: itemsResponse,
     error: fetchError,
     pending,
     refresh,
 } = await useAsyncData('cashierSaleItems', () =>
-    strapi.get<ItemListResponse>('/cashier/items')
+    strapi.get<ItemListResponse>('/cashier/items', {
+        'pagination[page]': 1,
+        'pagination[pageSize]': ITEMS_PER_PAGE,
+    })
 )
 
-const saleItems = computed<SaleItem[]>(() => data.value?.data ?? [])
+const saleItems = ref<SaleItem[]>([])
+const itemsPage = ref(1)
+const itemsPageCount = ref(1)
+const itemsTotal = ref(0)
+const loadingMore = ref(false)
+
+const hasMoreItems = computed(() => itemsPage.value < itemsPageCount.value)
+
+function syncItems(response: ItemListResponse | null | undefined) {
+    saleItems.value = response?.data ?? []
+
+    const pagination = response?.meta?.pagination
+    itemsPage.value = pagination?.page ?? 1
+    itemsPageCount.value = pagination?.pageCount ?? 1
+    itemsTotal.value = pagination?.total ?? saleItems.value.length
+}
+
+syncItems(itemsResponse.value)
+watch(itemsResponse, syncItems)
+
+async function loadMoreItems() {
+    if (loadingMore.value || !hasMoreItems.value) {
+        return
+    }
+
+    loadingMore.value = true
+
+    try {
+        const nextPage = itemsPage.value + 1
+        const response = await strapi.get<ItemListResponse>('/cashier/items', {
+            'pagination[page]': nextPage,
+            'pagination[pageSize]': ITEMS_PER_PAGE,
+        })
+
+        const loadedIds = new Set(saleItems.value.map((item) => item.id))
+        const newItems = (response.data ?? []).filter(
+            (item) => !loadedIds.has(item.id)
+        )
+
+        saleItems.value = [...saleItems.value, ...newItems]
+
+        const pagination = response.meta?.pagination
+        itemsPage.value = pagination?.page ?? nextPage
+        itemsPageCount.value = pagination?.pageCount ?? itemsPageCount.value
+        itemsTotal.value = pagination?.total ?? itemsTotal.value
+    } catch (error) {
+        toast.add({
+            title: 'Could not load more items',
+            description: (error as Error).message || 'Please try again.',
+            color: 'error',
+        })
+    } finally {
+        loadingMore.value = false
+    }
+}
 
 const errorMessage = computed(() => {
     const err = fetchError.value as {

@@ -42,6 +42,16 @@ export interface CartExposed {
     addToCart: (item: SaleItem) => void
 }
 
+export interface PaginationMeta {
+    page: number
+    pageSize: number
+    total: number
+    pageCount: number
+}
+
 export interface ItemListResponse {
     data: SaleItem[]
+    meta: {
+        pagination: PaginationMeta
+    }
 }
