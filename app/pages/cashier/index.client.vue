@@ -214,13 +214,6 @@
             </div>
 
             <aside class="w-full shrink-0 xl:sticky xl:top-6 xl:w-96 space-y-4">
-                <!-- Cart -->
-                <CashierCart
-                    ref="cart"
-                    :sale-items="saleItems"
-                    @sale-completed="refreshAll"
-                />
-
                 <!-- Recent transactions -->
                 <RecentTransactions
                     :recent-pending="recentPending"
@@ -228,6 +221,13 @@
                 />
             </aside>
         </div>
+
+        <!-- Cart drawer (renders its own floating trigger) -->
+        <CashierCart
+            ref="cart"
+            :sale-items="saleItems"
+            @sale-completed="refreshAll"
+        />
     </div>
 </template>
 

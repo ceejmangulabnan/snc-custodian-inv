@@ -1,16 +1,38 @@
 <template>
-    <div
-        class="flex flex-col overflow-hidden rounded-3xl border border-green-100 bg-white shadow-sm dark:border-slate-700 dark:bg-slate-900"
+    <USlideover
+        v-model:open="cartOpen"
+        side="right"
+        :title="cartTitle"
+        :overlay="!checkoutOpen && !receiptOpen"
+        :ui="{
+            content: 'rounded-l-3xl',
+            footer: 'flex-col items-stretch gap-3 p-4 sm:px-6'
+        }"
     >
-        <div
-            class="flex items-center justify-between border-b border-green-100 bg-green-50/60 px-5 py-4 dark:border-slate-700 dark:bg-slate-800/60"
-        >
-            <p class="text-sm font-semibold text-slate-800 dark:text-slate-200">
-                Cart · {{ cartLines.length }} item{{
-                    cartLines.length === 1 ? '' : 's'
-                }}
-            </p>
+        <!-- Floating trigger -->
+        <div class="fixed right-6 bottom-6 z-40">
+            <UButton
+                v-motion
+                :while-hover="{ scale: 1.05 }"
+                :while-press="{ scale: 0.95, y: 2 }"
+                icon="i-lucide-shopping-cart"
+                size="lg"
+                color="success"
+                class="relative size-14 rounded-full shadow-[0_10px_30px_rgba(16,185,129,0.45)]"
+                :aria-label="`Open cart (${cartLines.length} items)`"
+            >
+                <UBadge
+                    v-if="cartLines.length"
+                    color="error"
+                    size="sm"
+                    class="absolute -top-1 -right-1 min-w-5 justify-center rounded-full"
+                >
+                    {{ cartLines.length }}
+                </UBadge>
+            </UButton>
+        </div>
 
+        <template #actions>
             <UButton
                 color="neutral"
                 variant="ghost"
@@ -21,9 +43,9 @@
             >
                 Clear
             </UButton>
-        </div>
+        </template>
 
-        <div class="px-5 py-4">
+        <template #body>
             <p
                 v-if="cartLines.length === 0"
                 class="py-6 text-center text-sm text-slate-400 dark:text-slate-500"
@@ -31,10 +53,7 @@
                 No items in cart yet. Add items from the catalog.
             </p>
 
-            <ul
-                v-else
-                class="max-h-80 divide-y divide-green-100 overflow-y-auto dark:divide-slate-700"
-            >
+            <ul v-else class="divide-y divide-green-100 dark:divide-slate-700">
                 <li
                     v-for="line in cartLines"
                     :key="line.item.id"
@@ -76,9 +95,9 @@
                     />
                 </li>
             </ul>
-        </div>
+        </template>
 
-        <div class="px-5 pb-5">
+        <template #footer>
             <div
                 class="flex items-center justify-between rounded-2xl border border-green-100 bg-green-50/60 px-4 py-3 dark:border-slate-700 dark:bg-slate-800/60"
             >
@@ -102,10 +121,10 @@
                 :cart-total="cartTotal"
                 @completed="onSaleCompleted"
             />
-        </div>
 
-        <ReceiptModal v-model:open="receiptOpen" :receipt="receipt" />
-    </div>
+            <ReceiptModal v-model:open="receiptOpen" :receipt="receipt" />
+        </template>
+    </USlideover>
 </template>
 
 <script setup lang="ts">
@@ -133,6 +152,7 @@ const formatPrice = (value: number | null | undefined): string => {
 |--------------------------------------------------------------------------
 */
 
+const cartOpen = ref(false)
 const cart = ref<Record<number, number>>({})
 const notes = ref('')
 
@@ -146,6 +166,11 @@ const cartLines = computed(() =>
             qty: cartQty(item.id),
         }))
 )
+
+const cartTitle = computed(() => {
+    const count = cartLines.value.length
+    return `Cart · ${count} item${count === 1 ? '' : 's'}`
+})
 
 const lineTotal = (line: { item: SaleItem; qty: number }): number =>
     (line.item.price ?? 0) * line.qty
