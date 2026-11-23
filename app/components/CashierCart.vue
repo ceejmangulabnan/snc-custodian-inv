@@ -19,12 +19,12 @@
                 size="lg"
                 color="success"
                 class="size-14 justify-center rounded-full p-0 shadow-[0_10px_30px_rgba(16,185,129,0.45)]"
-                :aria-label="`Open cart (${cartLines.length} items)`"
+                :aria-label="`Open cart (${cartQtyTotal} items)`"
             />
 
             <UBadge
-                v-if="cartLines.length"
-                :key="cartLines.length"
+                v-if="cartQtyTotal"
+                :key="cartQtyTotal"
                 v-motion
                 :initial="{ scale: 0.5, opacity: 0 }"
                 :animate="{ scale: 1, opacity: 1 }"
@@ -32,7 +32,7 @@
                 size="sm"
                 class="pointer-events-none absolute -top-1 -right-1 min-w-5 justify-center rounded-full"
             >
-                {{ cartLines.length }}
+                {{ cartQtyTotal }}
             </UBadge>
         </div>
 
@@ -171,8 +171,12 @@ const cartLines = computed(() =>
         }))
 )
 
+const cartQtyTotal = computed(() =>
+    cartLines.value.reduce((sum, line) => sum + line.qty, 0)
+)
+
 const cartTitle = computed(() => {
-    const count = cartLines.value.length
+    const count = cartQtyTotal.value
     return `Cart · ${count} item${count === 1 ? '' : 's'}`
 })
 
