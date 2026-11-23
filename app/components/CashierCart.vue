@@ -6,7 +6,7 @@
         :overlay="!checkoutOpen && !receiptOpen"
         :ui="{
             content: 'rounded-l-3xl',
-            footer: 'flex-col items-stretch gap-3 p-4 sm:px-6'
+            footer: 'flex-col items-stretch gap-3 p-4 sm:px-6',
         }"
     >
         <!-- Floating trigger -->
@@ -18,18 +18,22 @@
                 icon="i-lucide-shopping-cart"
                 size="lg"
                 color="success"
-                class="relative size-14 rounded-full shadow-[0_10px_30px_rgba(16,185,129,0.45)]"
+                class="size-14 justify-center rounded-full p-0 shadow-[0_10px_30px_rgba(16,185,129,0.45)]"
                 :aria-label="`Open cart (${cartLines.length} items)`"
+            />
+
+            <UBadge
+                v-if="cartLines.length"
+                :key="cartLines.length"
+                v-motion
+                :initial="{ scale: 0.5, opacity: 0 }"
+                :animate="{ scale: 1, opacity: 1 }"
+                color="error"
+                size="sm"
+                class="pointer-events-none absolute -top-1 -right-1 min-w-5 justify-center rounded-full"
             >
-                <UBadge
-                    v-if="cartLines.length"
-                    color="error"
-                    size="sm"
-                    class="absolute -top-1 -right-1 min-w-5 justify-center rounded-full"
-                >
-                    {{ cartLines.length }}
-                </UBadge>
-            </UButton>
+                {{ cartLines.length }}
+            </UBadge>
         </div>
 
         <template #actions>
@@ -186,10 +190,6 @@ function addToCart(item: SaleItem) {
     }
 
     cart.value = { ...cart.value, [item.id]: current + 1 }
-    toast.add({
-        title: 'Added to cart',
-        description: `${item.name} (${formatPrice(item.price)})`,
-    })
 }
 
 function removeFromCart(itemId: number) {
