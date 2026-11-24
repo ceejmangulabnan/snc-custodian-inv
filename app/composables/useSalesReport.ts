@@ -7,6 +7,8 @@ import type {
 } from '#shared/types/report'
 
 export type ReportPeriodMode = 'monthly' | 'yearly' | 'manual'
+export type PdfOrientation = 'landscape' | 'portrait'
+
 const MILLISECONDS_PER_DAY = 86_400_000
 
 function toDateInput(date: Date): string {
@@ -157,7 +159,6 @@ export function useSalesReport() {
     const appliedRange = ref<ReportRange>(computeRange())
     const sorting = ref<SortingState>([])
     const pagination = ref({ pageIndex: 0, pageSize: 10 })
-    const expandedRows = ref({})
 
     const page = computed({
         get: () => pagination.value.pageIndex + 1,
@@ -242,7 +243,6 @@ export function useSalesReport() {
                     formatDateTime(row.effectiveDate),
                     row.studentName ?? '',
                     row.studentIdNumber ?? '',
-                    row.cashier,
                     lines,
                     row.lines.reduce((sum, line) => sum + line.qtyPulled, 0),
                     row.total ?? '',
@@ -257,7 +257,6 @@ export function useSalesReport() {
                     'Purchase Date',
                     'Student',
                     'Student ID',
-                    'Cashier',
                     'Items',
                     'Units',
                     'Total',
@@ -283,30 +282,134 @@ export function useSalesReport() {
         }
     }
 
-    const printRows = ref<SalesReportDetailRow[]>([])
-    const printPending = ref(false)
+    const pdfRows = ref<SalesReportDetailRow[]>([])
+    const pdfPending = ref(false)
+    const pdfOrientation = ref<PdfOrientation>('landscape')
 
-    async function preparePrint() {
-        printPending.value = true
+    async function exportPdf(element: HTMLElement | null) {
+        if (!element) {
+            toast.add({
+                title: 'Could not generate PDF',
+                description: 'The report layout is not ready yet.',
+                color: 'error',
+            })
+            return
+        }
+
+        pdfPending.value = true
         try {
-            // Printouts include every sale in the selected range, not just the
-            // current detail-table page.
+            // Like CSV, the PDF includes every sale in the selected range,
+            // not just the current detail-table page.
             const response = await strapi.get<SalesReportResponse>(
                 '/reports/sales',
                 { ...buildQuery(true) }
             )
-            printRows.value = response.detail.rows
+            pdfRows.value = response.detail.rows
             await nextTick()
-            window.print()
-        } catch (printError) {
+
+            const [{ default: html2canvas }, { jsPDF }] = await Promise.all([
+                import('html2canvas-pro'),
+                import('jspdf'),
+            ])
+
+            // Cap the capture scale so long reports never exceed canvas limits.
+            const scale = Math.min(
+                2,
+                30_000 / Math.max(element.scrollHeight, 1)
+            )
+            const canvas = await html2canvas(element, {
+                scale,
+                backgroundColor: '#ffffff',
+                useCORS: true,
+                logging: false,
+                windowWidth: Math.max(element.scrollWidth, 800),
+                windowHeight: element.scrollHeight,
+            })
+
+            const pdf = new jsPDF({
+                orientation: pdfOrientation.value,
+                unit: 'mm',
+                format: 'a4',
+                compress: true,
+            })
+
+            const margin = 8
+            const pageWidth = pdf.internal.pageSize.getWidth()
+            const pageHeight = pdf.internal.pageSize.getHeight()
+            const contentWidth = pageWidth - margin * 2
+            const contentHeight = pageHeight - margin * 2
+            const fullHeight = (canvas.height * contentWidth) / canvas.width
+
+            let offset = 0
+            let pages = 0
+
+            while (offset < fullHeight) {
+                const sliceHeight = Math.min(contentHeight, fullHeight - offset)
+                const sourceY = Math.round((offset / fullHeight) * canvas.height)
+                const sourceHeight = Math.min(
+                    canvas.height - sourceY,
+                    Math.ceil((sliceHeight / fullHeight) * canvas.height)
+                )
+
+                const pageCanvas = document.createElement('canvas')
+                pageCanvas.width = canvas.width
+                pageCanvas.height = sourceHeight
+                const context = pageCanvas.getContext('2d')
+                if (!context) {
+                    throw new Error('Canvas is not available')
+                }
+
+                context.fillStyle = '#ffffff'
+                context.fillRect(0, 0, pageCanvas.width, pageCanvas.height)
+                context.drawImage(
+                    canvas,
+                    0,
+                    sourceY,
+                    canvas.width,
+                    sourceHeight,
+                    0,
+                    0,
+                    canvas.width,
+                    sourceHeight
+                )
+
+                if (pages > 0) {
+                    pdf.addPage()
+                }
+
+                pdf.addImage(
+                    pageCanvas.toDataURL('image/jpeg', 0.92),
+                    'JPEG',
+                    margin,
+                    margin,
+                    contentWidth,
+                    sliceHeight,
+                    undefined,
+                    'FAST'
+                )
+
+                offset += sliceHeight
+                pages += 1
+            }
+
+            const filenameStart = toDateInput(new Date(appliedRange.value.start))
+            const filenameEnd = toDateInput(new Date(appliedRange.value.end))
+            pdf.save(`sales-report-${filenameStart}-to-${filenameEnd}.pdf`)
+
             toast.add({
-                title: 'Could not prepare printout',
+                title: 'PDF generated',
+                description: `${pages} page${pages === 1 ? '' : 's'} saved.`,
+                color: 'success',
+            })
+        } catch (pdfError) {
+            toast.add({
+                title: 'Could not generate PDF',
                 description:
-                    (printError as Error).message || 'Please try again.',
+                    (pdfError as Error).message || 'Please try again.',
                 color: 'error',
             })
         } finally {
-            printPending.value = false
+            pdfPending.value = false
         }
     }
 
@@ -323,16 +426,16 @@ export function useSalesReport() {
         pagination,
         page,
         pageSize,
-        expandedRows,
         report,
         fetchError,
         pending,
         exportPending,
-        printRows,
-        printPending,
+        pdfRows,
+        pdfPending,
+        pdfOrientation,
         applyPeriod,
         refresh,
         exportCsv,
-        preparePrint,
+        exportPdf,
     }
 }
