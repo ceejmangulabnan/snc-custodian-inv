@@ -16,3 +16,62 @@
     --color-green-900: #0a5331;
     --color-green-950: #052e16;
 }
+
+/*
+ |--------------------------------------------------------------------------
+ | Print styles
+ |--------------------------------------------------------------------------
+ | Admin printouts should read like a plain paper report: no chrome, no dark
+ | backgrounds, and no split rows. The report page marks its own print-only
+ | sections with `print:` utilities; these rules cover the shared shell.
+ */
+@media print {
+    @page {
+        size: A4 landscape;
+        margin: 12mm;
+    }
+
+    html,
+    body {
+        background: #fff !important;
+        color: #000 !important;
+        color-scheme: light;
+    }
+
+    thead {
+        display: table-header-group;
+    }
+
+    tr,
+    img,
+    table {
+        break-inside: avoid;
+    }
+
+    .dark\:bg-slate-900,
+    .dark\:bg-slate-800,
+    .dark\:bg-slate-950\/85,
+    .dark\:bg-slate-900\/75 {
+        background: transparent !important;
+    }
+
+    .dark\:text-white,
+    .dark\:text-slate-100,
+    .dark\:text-slate-200,
+    .dark\:text-slate-300,
+    .dark\:text-slate-400 {
+        color: inherit !important;
+    }
+
+    .dark\:border-slate-700,
+    .dark\:border-green-100,
+    .border-green-100 {
+        border-color: #cbd5e1 !important;
+    }
+
+    .shadow-sm,
+    .shadow-lg,
+    .shadow-xl {
+        box-shadow: none !important;
+    }
+}
