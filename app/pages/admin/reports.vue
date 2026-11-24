@@ -1,26 +1,5 @@
 <template>
-    <div class="space-y-6 print:space-y-4">
-        <!-- Print-only report heading -->
-        <div class="hidden print:mb-6 print:block">
-            <div
-                class="flex items-end justify-between border-b-2 border-slate-900 pb-3"
-            >
-                <div>
-                    <h1 class="text-2xl font-bold tracking-tight text-black">
-                        Sales Report
-                    </h1>
-                    <p class="mt-1 text-sm text-slate-600">
-                        School Property &amp; Inventory
-                    </p>
-                </div>
-
-                <div class="text-right text-sm text-slate-700">
-                    <p class="font-semibold">{{ appliedRange.label }}</p>
-                    <p>Generated {{ generatedAt }}</p>
-                </div>
-            </div>
-        </div>
-
+    <div class="space-y-6">
         <!-- Page header -->
         <div
             class="flex w-full flex-col gap-4 items-start justify-between sm:flex-row sm:items-center print:hidden"
@@ -43,23 +22,30 @@
                     </h1>
 
                     <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">
-                        Completed sales performance by period, item, and
-                        cashier.
+                        Completed sales performance by period and item.
                     </p>
                 </div>
             </div>
 
-            <div class="flex items-center gap-3">
+            <div class="flex flex-wrap items-center gap-3">
+                <USelect
+                    v-model="pdfOrientation"
+                    :items="pdfOrientations"
+                    size="lg"
+                    class="w-36"
+                    aria-label="PDF orientation"
+                />
+
                 <UButton
-                    icon="i-lucide-printer"
+                    icon="i-lucide-file-text"
                     color="neutral"
                     variant="subtle"
                     size="lg"
-                    :loading="printPending"
+                    :loading="pdfPending"
                     class="rounded-2xl"
-                    @click="preparePrint"
+                    @click="onExportPdf"
                 >
-                    Print
+                    Export PDF
                 </UButton>
 
                 <UButton
@@ -281,18 +267,21 @@
                     <div
                         class="flex size-10 shrink-0 items-center justify-center rounded-xl bg-green-500/10 text-green-600 dark:text-green-400"
                     >
-                        <UIcon name="i-lucide-chart-column" class="size-5" />
+                        <UIcon
+                            name="i-lucide-chart-no-axes-combined"
+                            class="size-5"
+                        />
                     </div>
 
                     <div>
                         <h2
                             class="text-base font-semibold text-slate-900 dark:text-white"
                         >
-                            Sales Trend
+                            Revenue Trend
                         </h2>
 
                         <p class="text-xs text-slate-500 dark:text-slate-400">
-                            Completed sales per
+                            Completed sales revenue per
                             {{
                                 appliedRange.granularity === 'month'
                                     ? 'month'
@@ -302,38 +291,22 @@
                     </div>
                 </div>
 
-                <div v-if="report.buckets.length" class="space-y-4">
-                    <div v-for="bucket in report.buckets" :key="bucket.key">
-                        <div
-                            class="mb-1.5 flex items-center justify-between gap-3 text-xs"
-                        >
-                            <span
-                                class="font-medium text-slate-700 dark:text-slate-200"
-                            >
-                                {{ bucket.label }}
-                            </span>
-
-                            <span class="text-slate-500 dark:text-slate-400">
-                                {{ bucket.sales }} sale{{
-                                    bucket.sales === 1 ? '' : 's'
-                                }}
-                                · {{ bucket.units }} units ·
-                                {{ formatMoney(bucket.revenue) }}
-                            </span>
-                        </div>
-
-                        <div
-                            class="h-2.5 overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800"
-                        >
-                            <div
-                                class="h-full rounded-full bg-gradient-to-r from-green-500 to-teal-500"
-                                :style="{
-                                    width: `${(bucket.sales / maxBucketSales) * 100}%`,
-                                }"
-                            />
-                        </div>
-                    </div>
-                </div>
+                <UChart
+                    v-if="chartData.length"
+                    type="line"
+                    curve="monotone"
+                    points
+                    :data="chartData"
+                    index="label"
+                    :categories="[
+                        { key: 'revenue', label: 'Revenue', color: '#059669' },
+                    ]"
+                    :format="formatCompactMoney"
+                    :height="280"
+                    y-label="Revenue (₱)"
+                    aria-label="Revenue trend for the selected period"
+                    class="w-full"
+                />
 
                 <p
                     v-else
@@ -414,7 +387,7 @@
                     <UInput
                         v-model="search"
                         icon="i-lucide-search"
-                        placeholder="Search receipt, student, cashier..."
+                        placeholder="Search receipt, student, notes..."
                         size="lg"
                         class="w-full lg:w-80"
                     />
@@ -423,7 +396,6 @@
                 <UTable
                     v-model:sorting="sorting"
                     v-model:pagination="pagination"
-                    v-model:expanded="expandedRows"
                     :data="report.detail.rows"
                     :columns="detailColumns"
                     :loading="pending"
@@ -432,71 +404,13 @@
                     :empty="'No sales match your search.'"
                     class="flex-1"
                 >
-                    <template #expand-cell="{ row }">
-                        <UButton
-                            :icon="
-                                row.getIsExpanded()
-                                    ? 'i-lucide-chevron-down'
-                                    : 'i-lucide-chevron-right'
-                            "
-                            color="neutral"
-                            variant="ghost"
-                            size="sm"
-                            aria-label="Toggle line items"
-                            @click="row.toggleExpanded()"
-                        />
-                    </template>
-
-                    <template #expanded="{ row }">
-                        <div class="px-4 py-3">
-                            <ul
-                                class="divide-y divide-green-100 overflow-hidden rounded-2xl border border-green-100 dark:divide-slate-700 dark:border-slate-700"
-                            >
-                                <li
-                                    v-for="line in row.original.lines"
-                                    :key="`${row.original.documentId}-${line.itemId}`"
-                                    class="flex items-center gap-3 px-4 py-2.5"
-                                >
-                                    <div
-                                        class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-green-500/10 text-green-600 dark:text-green-400"
-                                    >
-                                        <UIcon
-                                            name="i-lucide-package"
-                                            class="size-4"
-                                        />
-                                    </div>
-
-                                    <div class="min-w-0 flex-1">
-                                        <p
-                                            class="truncate text-sm font-medium text-slate-800 dark:text-slate-200"
-                                        >
-                                            {{ line.name }}
-                                        </p>
-
-                                        <p
-                                            class="text-xs text-slate-500 dark:text-slate-400"
-                                        >
-                                            {{ line.sku || 'No SKU' }} ·
-                                            {{ formatMoney(line.unitPrice) }}
-                                            each
-                                        </p>
-                                    </div>
-
-                                    <span
-                                        class="shrink-0 text-sm text-slate-600 dark:text-slate-300"
-                                    >
-                                        {{ line.qtyPulled }} ×
-                                        {{ formatMoney(line.unitPrice) }}
-                                    </span>
-
-                                    <span
-                                        class="w-24 shrink-0 text-right text-sm font-semibold text-slate-700 dark:text-slate-200"
-                                    >
-                                        {{ formatMoney(line.lineTotal) }}
-                                    </span>
-                                </li>
-                            </ul>
-                        </div>
+                    <template #items-cell="{ row }">
+                        <span
+                            class="block max-w-sm truncate text-sm text-slate-700 dark:text-slate-200"
+                            :title="itemSummary(row.original)"
+                        >
+                            {{ itemSummary(row.original) }}
+                        </span>
                     </template>
 
                     <template #receipt-cell="{ row }">
@@ -589,56 +503,201 @@
                 </div>
             </div>
 
-            <!-- Print-only detail table (full period) -->
-            <div class="hidden print:mt-6 print:block">
-                <h2 class="mb-2 text-base font-bold text-black">
-                    Sale Details
+            <!-- Off-screen, fixed-width layout captured by html2canvas-pro -->
+            <div
+                ref="pdfReport"
+                aria-hidden="true"
+                class="pointer-events-none"
+                :style="{
+                    position: 'fixed',
+                    left: '-10000px',
+                    top: '0',
+                    zIndex: -1,
+                    width: pdfOrientation === 'portrait' ? '794px' : '1123px',
+                    padding: '32px',
+                    background: '#ffffff',
+                    color: '#111827',
+                    fontFamily: 'Arial, Helvetica, sans-serif',
+                }"
+            >
+                <div
+                    style="display: flex; align-items: flex-end; justify-content: space-between; border-bottom: 2px solid #111827; padding-bottom: 12px"
+                >
+                    <div>
+                        <div style="font-size: 24px; font-weight: 700">
+                            Sales Report
+                        </div>
+                        <div
+                            style="font-size: 12px; color: #4b5563; margin-top: 4px"
+                        >
+                            School Property &amp; Inventory
+                        </div>
+                    </div>
+
+                    <div
+                        style="text-align: right; font-size: 12px; color: #374151"
+                    >
+                        <div style="font-size: 14px; font-weight: 700">
+                            {{ appliedRange.label }}
+                        </div>
+                        <div>Generated {{ generatedAt }}</div>
+                    </div>
+                </div>
+
+                <div
+                    style="display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px"
+                >
+                    <div
+                        v-for="stat in stats"
+                        :key="`pdf-stat-${stat.label}`"
+                        style="flex: 1 1 28%; min-width: 150px; border: 1px solid #d1d5db; border-radius: 6px; padding: 10px 12px"
+                    >
+                        <div
+                            style="font-size: 10px; color: #6b7280; text-transform: uppercase; letter-spacing: 0.05em"
+                        >
+                            {{ stat.label }}
+                        </div>
+                        <div
+                            style="font-size: 18px; font-weight: 700; margin-top: 4px"
+                        >
+                            {{ stat.value }}
+                        </div>
+                    </div>
+                </div>
+
+                <h2 style="font-size: 14px; font-weight: 700; margin: 22px 0 8px">
+                    Revenue Trend
                 </h2>
 
-                <table class="w-full border-collapse text-xs">
+                <table
+                    style="width: 100%; border-collapse: collapse; font-size: 10px"
+                >
+                    <tbody>
+                        <tr
+                            v-for="bucket in report.buckets"
+                            :key="`pdf-bucket-${bucket.key}`"
+                        >
+                            <td style="padding: 3px 8px 3px 0; white-space: nowrap">
+                                {{ bucket.label }}
+                            </td>
+                            <td style="padding: 3px 8px">
+                                <div
+                                    style="height: 8px; background: #e5e7eb; border-radius: 4px"
+                                >
+                                    <div
+                                        :style="{
+                                            height: '8px',
+                                            background: '#059669',
+                                            borderRadius: '4px',
+                                            width: `${bucketRevenuePercent(bucket.revenue)}%`,
+                                        }"
+                                    />
+                                </div>
+                            </td>
+                            <td
+                                style="padding: 3px 0; text-align: right; white-space: nowrap"
+                            >
+                                {{ formatMoney(bucket.revenue) }}
+                            </td>
+                        </tr>
+
+                        <tr v-if="!report.buckets.length">
+                            <td colspan="3" style="padding: 8px 0; color: #6b7280">
+                                No completed sales in this period.
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h2 style="font-size: 14px; font-weight: 700; margin: 22px 0 8px">
+                    Top Items
+                </h2>
+
+                <table
+                    style="width: 100%; border-collapse: collapse; font-size: 10px"
+                >
                     <thead>
-                        <tr class="border-b-2 border-slate-900 text-left">
-                            <th class="py-1.5 pr-2">Receipt</th>
-                            <th class="py-1.5 pr-2">Date</th>
-                            <th class="py-1.5 pr-2">Student</th>
-                            <th class="py-1.5 pr-2">Cashier</th>
-                            <th class="py-1.5 pr-2">Items</th>
-                            <th class="py-1.5 pr-2">Units</th>
-                            <th class="py-1.5 text-right">Total</th>
+                        <tr
+                            style="border-bottom: 2px solid #111827; text-align: left"
+                        >
+                            <th style="padding: 5px 8px 5px 0">Item</th>
+                            <th style="padding: 5px 8px; text-align: right">Units</th>
+                            <th style="padding: 5px 8px; text-align: right">Sales</th>
+                            <th style="padding: 5px 0; text-align: right">Revenue</th>
                         </tr>
                     </thead>
 
                     <tbody>
                         <tr
-                            v-for="row in printRows"
-                            :key="`print-${row.documentId}`"
-                            class="border-b border-slate-300"
+                            v-for="item in report.topItems"
+                            :key="`pdf-item-${item.itemId}`"
+                            style="border-bottom: 1px solid #d1d5db"
                         >
-                            <td class="py-1.5 pr-2">
+                            <td style="padding: 5px 8px 5px 0">
+                                {{ item.name }}
+                            </td>
+                            <td style="padding: 5px 8px; text-align: right">
+                                {{ item.units }}
+                            </td>
+                            <td style="padding: 5px 8px; text-align: right">
+                                {{ item.sales }}
+                            </td>
+                            <td style="padding: 5px 0; text-align: right">
+                                {{ formatMoney(item.revenue) }}
+                            </td>
+                        </tr>
+
+                        <tr v-if="!report.topItems.length">
+                            <td colspan="4" style="padding: 8px 0; color: #6b7280">
+                                No items sold in this period.
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h2 style="font-size: 14px; font-weight: 700; margin: 22px 0 8px">
+                    Sale Details
+                </h2>
+
+                <table
+                    style="width: 100%; border-collapse: collapse; font-size: 10px"
+                >
+                    <thead>
+                        <tr
+                            style="border-bottom: 2px solid #111827; text-align: left"
+                        >
+                            <th style="padding: 5px 8px 5px 0">Receipt</th>
+                            <th style="padding: 5px 8px">Date</th>
+                            <th style="padding: 5px 8px">Student</th>
+                            <th style="padding: 5px 8px">Items</th>
+                            <th style="padding: 5px 8px; text-align: right">Units</th>
+                            <th style="padding: 5px 0; text-align: right">Total</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        <tr
+                            v-for="row in pdfRows"
+                            :key="`pdf-row-${row.documentId}`"
+                            style="border-bottom: 1px solid #d1d5db"
+                        >
+                            <td style="padding: 5px 8px 5px 0">
                                 {{ row.receiptNumber || '—' }}
                             </td>
-                            <td class="py-1.5 pr-2">
+                            <td style="padding: 5px 8px; white-space: nowrap">
                                 {{ formatDateTime(row.effectiveDate) }}
                             </td>
-                            <td class="py-1.5 pr-2">
+                            <td style="padding: 5px 8px">
                                 {{
                                     row.studentName ||
                                     row.studentIdNumber ||
                                     '—'
                                 }}
                             </td>
-                            <td class="py-1.5 pr-2">{{ row.cashier }}</td>
-                            <td class="py-1.5 pr-2">
-                                {{
-                                    row.lines
-                                        .map(
-                                            (line) =>
-                                                `${line.qtyPulled} × ${line.name}`
-                                        )
-                                        .join(', ') || '—'
-                                }}
+                            <td style="padding: 5px 8px; word-break: break-word">
+                                {{ itemBreakdown(row) }}
                             </td>
-                            <td class="py-1.5 pr-2">
+                            <td style="padding: 5px 8px; text-align: right">
                                 {{
                                     row.lines.reduce(
                                         (sum, line) => sum + line.qtyPulled,
@@ -646,16 +705,15 @@
                                     )
                                 }}
                             </td>
-                            <td class="py-1.5 text-right">
+                            <td
+                                style="padding: 5px 0; text-align: right; white-space: nowrap"
+                            >
                                 {{ formatMoney(row.total) }}
                             </td>
                         </tr>
 
-                        <tr v-if="!printRows.length">
-                            <td
-                                colspan="7"
-                                class="py-3 text-center text-slate-500"
-                            >
+                        <tr v-if="!pdfRows.length">
+                            <td colspan="6" style="padding: 8px 0; color: #6b7280">
                                 No completed sales in this period.
                             </td>
                         </tr>
@@ -669,7 +727,7 @@
 <script setup lang="ts">
 import type { TableColumn } from '@nuxt/ui'
 import type {
-    SalesReportCashierRow,
+    SalesReportBucket,
     SalesReportDetailRow,
     SalesReportItemRow,
 } from '#shared/types/report'
@@ -691,17 +749,17 @@ const {
     pagination,
     page,
     pageSize,
-    expandedRows,
     report,
     fetchError,
     pending,
     exportPending,
-    printRows,
-    printPending,
+    pdfRows,
+    pdfPending,
+    pdfOrientation,
     applyPeriod,
     refresh,
     exportCsv,
-    preparePrint,
+    exportPdf,
 } = useSalesReport()
 
 const periodModes = [
@@ -711,10 +769,37 @@ const periodModes = [
 ] as const
 
 const pageSizeOptions = [10, 20, 50]
-const generatedAt = new Intl.DateTimeFormat('en-US', {
-    dateStyle: 'medium',
-    timeStyle: 'short',
-}).format(new Date())
+const pdfOrientations = [
+    { label: 'Landscape', value: 'landscape' },
+    { label: 'Portrait', value: 'portrait' },
+]
+
+const pdfReport = ref<HTMLElement | null>(null)
+const generatedAt = ref('')
+
+function formatGeneratedAt(): string {
+    return new Intl.DateTimeFormat('en-US', {
+        dateStyle: 'medium',
+        timeStyle: 'short',
+    }).format(new Date())
+}
+generatedAt.value = formatGeneratedAt()
+
+async function onExportPdf() {
+    generatedAt.value = formatGeneratedAt()
+    await exportPdf(pdfReport.value)
+}
+
+const compactMoney = new Intl.NumberFormat('en-PH', {
+    style: 'currency',
+    currency: 'PHP',
+    notation: 'compact',
+    maximumFractionDigits: 1,
+})
+
+function formatCompactMoney(value: number): string {
+    return compactMoney.format(value)
+}
 
 const invalidRange = computed(
     () => periodMode.value === 'manual' && manualStart.value > manualEnd.value
@@ -747,9 +832,57 @@ const stats = computed(() => {
     ]
 })
 
-const maxBucketSales = computed(() =>
-    Math.max(1, ...(report.value?.buckets.map((bucket) => bucket.sales) ?? []))
+function shortBucketLabel(bucket: SalesReportBucket): string {
+    const [year, month, day] = bucket.key.split('-').map(Number)
+    if (!year || !month) {
+        return bucket.label
+    }
+
+    const date = new Date(year, month - 1, day ?? 1)
+    return new Intl.DateTimeFormat(
+        'en-US',
+        appliedRange.value.granularity === 'month'
+            ? { month: 'short', year: '2-digit' }
+            : { month: 'short', day: 'numeric' }
+    ).format(date)
+}
+
+const chartData = computed(() =>
+    (report.value?.buckets ?? []).map((bucket) => ({
+        label: shortBucketLabel(bucket),
+        revenue: bucket.revenue ?? 0,
+    }))
 )
+
+const maxBucketRevenue = computed(() =>
+    Math.max(
+        1,
+        ...(report.value?.buckets.map((bucket) => bucket.revenue ?? 0) ?? [])
+    )
+)
+
+function bucketRevenuePercent(revenue: number | null): number {
+    return Math.max(2, ((revenue ?? 0) / maxBucketRevenue.value) * 100)
+}
+
+function itemSummary(row: SalesReportDetailRow): string {
+    return (
+        row.lines
+            .map((line) => `${line.qtyPulled} × ${line.name}`)
+            .join(', ') || '—'
+    )
+}
+
+function itemBreakdown(row: SalesReportDetailRow): string {
+    return (
+        row.lines
+            .map(
+                (line) =>
+                    `${line.qtyPulled} × ${line.name} @ ${formatMoney(line.unitPrice)} = ${formatMoney(line.lineTotal)}`
+            )
+            .join('; ') || '—'
+    )
+}
 
 const itemColumns: TableColumn<SalesReportItemRow>[] = [
     {
@@ -772,17 +905,6 @@ const itemColumns: TableColumn<SalesReportItemRow>[] = [
 
 const detailColumns: TableColumn<SalesReportDetailRow>[] = [
     {
-        id: 'expand',
-        header: '',
-        enableSorting: false,
-        meta: {
-            class: {
-                td: 'w-10',
-                th: 'w-10',
-            },
-        },
-    },
-    {
         accessorKey: 'receiptNumber',
         id: 'receipt',
         header: 'Receipt #',
@@ -798,8 +920,9 @@ const detailColumns: TableColumn<SalesReportDetailRow>[] = [
         header: 'Student',
     },
     {
-        accessorKey: 'cashier',
-        header: 'Cashier',
+        id: 'items',
+        header: 'Items',
+        enableSorting: false,
     },
     {
         id: 'units',
