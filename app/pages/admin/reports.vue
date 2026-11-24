@@ -238,7 +238,7 @@
         <template v-else-if="report">
             <!-- Summary cards -->
             <div
-                class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6"
+                class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5"
             >
                 <div
                     v-for="stat in stats"
@@ -290,7 +290,6 @@
                         </p>
                     </div>
                 </div>
-
                 <UChart
                     v-if="chartData.length"
                     type="line"
@@ -521,21 +520,35 @@
                 }"
             >
                 <div
-                    style="display: flex; align-items: flex-end; justify-content: space-between; border-bottom: 2px solid #111827; padding-bottom: 12px"
+                    style="
+                        display: flex;
+                        align-items: flex-end;
+                        justify-content: space-between;
+                        border-bottom: 2px solid #111827;
+                        padding-bottom: 12px;
+                    "
                 >
                     <div>
                         <div style="font-size: 24px; font-weight: 700">
                             Sales Report
                         </div>
                         <div
-                            style="font-size: 12px; color: #4b5563; margin-top: 4px"
+                            style="
+                                font-size: 12px;
+                                color: #4b5563;
+                                margin-top: 4px;
+                            "
                         >
                             School Property &amp; Inventory
                         </div>
                     </div>
 
                     <div
-                        style="text-align: right; font-size: 12px; color: #374151"
+                        style="
+                            text-align: right;
+                            font-size: 12px;
+                            color: #374151;
+                        "
                     >
                         <div style="font-size: 14px; font-weight: 700">
                             {{ appliedRange.label }}
@@ -545,44 +558,83 @@
                 </div>
 
                 <div
-                    style="display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px"
+                    style="
+                        display: flex;
+                        flex-wrap: wrap;
+                        gap: 10px;
+                        margin-top: 18px;
+                    "
                 >
                     <div
                         v-for="stat in stats"
                         :key="`pdf-stat-${stat.label}`"
-                        style="flex: 1 1 28%; min-width: 150px; border: 1px solid #d1d5db; border-radius: 6px; padding: 10px 12px"
+                        style="
+                            flex: 1 1 28%;
+                            min-width: 150px;
+                            border: 1px solid #d1d5db;
+                            border-radius: 6px;
+                            padding: 10px 12px;
+                        "
                     >
                         <div
-                            style="font-size: 10px; color: #6b7280; text-transform: uppercase; letter-spacing: 0.05em"
+                            style="
+                                font-size: 10px;
+                                color: #6b7280;
+                                text-transform: uppercase;
+                                letter-spacing: 0.05em;
+                            "
                         >
                             {{ stat.label }}
                         </div>
                         <div
-                            style="font-size: 18px; font-weight: 700; margin-top: 4px"
+                            style="
+                                font-size: 18px;
+                                font-weight: 700;
+                                margin-top: 4px;
+                            "
                         >
                             {{ stat.value }}
                         </div>
                     </div>
                 </div>
 
-                <h2 style="font-size: 14px; font-weight: 700; margin: 22px 0 8px">
+                <h2
+                    style="
+                        font-size: 14px;
+                        font-weight: 700;
+                        margin: 22px 0 8px;
+                    "
+                >
                     Revenue Trend
                 </h2>
 
                 <table
-                    style="width: 100%; border-collapse: collapse; font-size: 10px"
+                    style="
+                        width: 100%;
+                        border-collapse: collapse;
+                        font-size: 10px;
+                    "
                 >
                     <tbody>
                         <tr
                             v-for="bucket in report.buckets"
                             :key="`pdf-bucket-${bucket.key}`"
                         >
-                            <td style="padding: 3px 8px 3px 0; white-space: nowrap">
+                            <td
+                                style="
+                                    padding: 3px 8px 3px 0;
+                                    white-space: nowrap;
+                                "
+                            >
                                 {{ bucket.label }}
                             </td>
                             <td style="padding: 3px 8px">
                                 <div
-                                    style="height: 8px; background: #e5e7eb; border-radius: 4px"
+                                    style="
+                                        height: 8px;
+                                        background: #e5e7eb;
+                                        border-radius: 4px;
+                                    "
                                 >
                                     <div
                                         :style="{
@@ -595,35 +647,61 @@
                                 </div>
                             </td>
                             <td
-                                style="padding: 3px 0; text-align: right; white-space: nowrap"
+                                style="
+                                    padding: 3px 0;
+                                    text-align: right;
+                                    white-space: nowrap;
+                                "
                             >
                                 {{ formatMoney(bucket.revenue) }}
                             </td>
                         </tr>
 
                         <tr v-if="!report.buckets.length">
-                            <td colspan="3" style="padding: 8px 0; color: #6b7280">
+                            <td
+                                colspan="3"
+                                style="padding: 8px 0; color: #6b7280"
+                            >
                                 No completed sales in this period.
                             </td>
                         </tr>
                     </tbody>
                 </table>
 
-                <h2 style="font-size: 14px; font-weight: 700; margin: 22px 0 8px">
+                <h2
+                    style="
+                        font-size: 14px;
+                        font-weight: 700;
+                        margin: 22px 0 8px;
+                    "
+                >
                     Top Items
                 </h2>
 
                 <table
-                    style="width: 100%; border-collapse: collapse; font-size: 10px"
+                    style="
+                        width: 100%;
+                        border-collapse: collapse;
+                        font-size: 10px;
+                    "
                 >
                     <thead>
                         <tr
-                            style="border-bottom: 2px solid #111827; text-align: left"
+                            style="
+                                border-bottom: 2px solid #111827;
+                                text-align: left;
+                            "
                         >
                             <th style="padding: 5px 8px 5px 0">Item</th>
-                            <th style="padding: 5px 8px; text-align: right">Units</th>
-                            <th style="padding: 5px 8px; text-align: right">Sales</th>
-                            <th style="padding: 5px 0; text-align: right">Revenue</th>
+                            <th style="padding: 5px 8px; text-align: right">
+                                Units
+                            </th>
+                            <th style="padding: 5px 8px; text-align: right">
+                                Sales
+                            </th>
+                            <th style="padding: 5px 0; text-align: right">
+                                Revenue
+                            </th>
                         </tr>
                     </thead>
 
@@ -648,30 +726,50 @@
                         </tr>
 
                         <tr v-if="!report.topItems.length">
-                            <td colspan="4" style="padding: 8px 0; color: #6b7280">
+                            <td
+                                colspan="4"
+                                style="padding: 8px 0; color: #6b7280"
+                            >
                                 No items sold in this period.
                             </td>
                         </tr>
                     </tbody>
                 </table>
 
-                <h2 style="font-size: 14px; font-weight: 700; margin: 22px 0 8px">
+                <h2
+                    style="
+                        font-size: 14px;
+                        font-weight: 700;
+                        margin: 22px 0 8px;
+                    "
+                >
                     Sale Details
                 </h2>
 
                 <table
-                    style="width: 100%; border-collapse: collapse; font-size: 10px"
+                    style="
+                        width: 100%;
+                        border-collapse: collapse;
+                        font-size: 10px;
+                    "
                 >
                     <thead>
                         <tr
-                            style="border-bottom: 2px solid #111827; text-align: left"
+                            style="
+                                border-bottom: 2px solid #111827;
+                                text-align: left;
+                            "
                         >
                             <th style="padding: 5px 8px 5px 0">Receipt</th>
                             <th style="padding: 5px 8px">Date</th>
                             <th style="padding: 5px 8px">Student</th>
                             <th style="padding: 5px 8px">Items</th>
-                            <th style="padding: 5px 8px; text-align: right">Units</th>
-                            <th style="padding: 5px 0; text-align: right">Total</th>
+                            <th style="padding: 5px 8px; text-align: right">
+                                Units
+                            </th>
+                            <th style="padding: 5px 0; text-align: right">
+                                Total
+                            </th>
                         </tr>
                     </thead>
 
@@ -694,7 +792,9 @@
                                     '—'
                                 }}
                             </td>
-                            <td style="padding: 5px 8px; word-break: break-word">
+                            <td
+                                style="padding: 5px 8px; word-break: break-word"
+                            >
                                 {{ itemBreakdown(row) }}
                             </td>
                             <td style="padding: 5px 8px; text-align: right">
@@ -706,14 +806,21 @@
                                 }}
                             </td>
                             <td
-                                style="padding: 5px 0; text-align: right; white-space: nowrap"
+                                style="
+                                    padding: 5px 0;
+                                    text-align: right;
+                                    white-space: nowrap;
+                                "
                             >
                                 {{ formatMoney(row.total) }}
                             </td>
                         </tr>
 
                         <tr v-if="!pdfRows.length">
-                            <td colspan="6" style="padding: 8px 0; color: #6b7280">
+                            <td
+                                colspan="6"
+                                style="padding: 8px 0; color: #6b7280"
+                            >
                                 No completed sales in this period.
                             </td>
                         </tr>
