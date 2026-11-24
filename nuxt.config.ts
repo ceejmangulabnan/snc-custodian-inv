@@ -10,25 +10,6 @@ export default defineNuxtConfig({
         'motion-v/nuxt',
     ],
 
-    motionV: {
-        directives: true,
-    },
-
-    colorMode: {
-        preference: 'light',
-        fallback: 'light',
-    },
-
-    runtimeConfig: {
-        strapiUrl: 'http://localhost:1337',
-    },
-
-    nitro: {
-        externals: {
-            inline: ['tailwind-variants'],
-        },
-    },
-
     devtools: {
         enabled: true,
 
@@ -39,11 +20,13 @@ export default defineNuxtConfig({
 
     css: ['~/assets/css/main.css'],
 
-    icon: {
-        clientBundle: {
-            scan: true,
-            sizeLimitKb: 256,
-        },
+    colorMode: {
+        preference: 'light',
+        fallback: 'light',
+    },
+
+    runtimeConfig: {
+        strapiUrl: 'http://localhost:1337',
     },
 
     routeRules: {
@@ -52,6 +35,12 @@ export default defineNuxtConfig({
 
     compatibilityDate: '2026-06-30',
 
+    nitro: {
+        externals: {
+            inline: ['tailwind-variants'],
+        },
+    },
+
     eslint: {
         config: {
             stylistic: {
@@ -59,5 +48,16 @@ export default defineNuxtConfig({
                 braceStyle: '1tbs',
             },
         },
+    },
+
+    icon: {
+        clientBundle: {
+            scan: true,
+            sizeLimitKb: 256,
+        },
+    },
+
+    motionV: {
+        directives: true,
     },
 })
