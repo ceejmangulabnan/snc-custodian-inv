@@ -1,6 +1,6 @@
 <template>
     <div
-        class="min-h-screen bg-[#f4f8f6] text-slate-900 dark:bg-slate-950 dark:text-white"
+        class="min-h-screen bg-[#f4f8f6] text-slate-900 print:bg-white print:text-black dark:bg-slate-950 dark:text-white"
     >
         <!-- Mobile sidebar overlay -->
         <div
@@ -11,7 +11,7 @@
 
         <!-- Sidebar -->
         <aside
-            class="fixed inset-y-0 left-0 z-50 border-r border-white/10 bg-[#0f172a]/95 shadow-2xl backdrop-blur-2xl transition-all duration-300"
+            class="fixed inset-y-0 left-0 z-50 border-r border-white/10 bg-[#0f172a]/95 shadow-2xl backdrop-blur-2xl transition-all duration-300 print:hidden"
             :class="[
                 sidebarCollapsed ? 'w-20' : 'w-72',
                 mobileOpen
@@ -186,7 +186,7 @@
 
         <!-- Mobile header -->
         <header
-            class="sticky top-0 z-30 border-b border-green-100 bg-[#f4f8f6]/85 px-4 py-3 backdrop-blur-2xl lg:hidden dark:border-slate-700 dark:bg-slate-950/85"
+            class="sticky top-0 z-30 border-b border-green-100 bg-[#f4f8f6]/85 px-4 py-3 backdrop-blur-2xl print:hidden lg:hidden dark:border-slate-700 dark:bg-slate-950/85"
         >
             <div class="flex items-center justify-between">
                 <div class="flex min-w-0 items-center gap-3">
@@ -239,13 +239,13 @@
 
         <!-- Main content -->
         <main
-            class="min-h-screen transition-all duration-300"
+            class="min-h-screen transition-all duration-300 print:min-h-0 print:pl-0!"
             :class="isCollapsed ? 'lg:pl-20' : 'lg:pl-72'"
         >
             <!-- Desktop page header -->
             <div
                 v-if="!hideDesktopHeader"
-                class="sticky top-0 z-20 hidden border-b border-green-100 bg-white/75 px-8 py-5 backdrop-blur-2xl lg:block dark:border-slate-700 dark:bg-slate-900/75"
+                class="sticky top-0 z-20 hidden border-b border-green-100 bg-white/75 px-8 py-5 backdrop-blur-2xl print:hidden lg:block dark:border-slate-700 dark:bg-slate-900/75"
             >
                 <div class="flex items-center justify-between">
                     <div>
@@ -270,7 +270,7 @@
 
             <!-- Page content -->
             <div
-                class="mx-auto px-4 sm:px-6 lg:px-8"
+                class="mx-auto px-4 print:p-0! sm:px-6 lg:px-8"
                 :class="hideDesktopHeader ? 'py-2' : 'py-4 sm:py-6 lg:py-8'"
             >
                 <slot />
@@ -427,6 +427,11 @@ const links: NavigationLink[] = [
         label: 'Transactions',
         icon: 'i-lucide-clipboard-list',
         to: '/admin/transactions',
+    },
+    {
+        label: 'Reports',
+        icon: 'i-lucide-chart-no-axes-column',
+        to: '/admin/reports',
     },
     {
         label: 'User Management',
