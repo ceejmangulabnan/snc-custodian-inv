@@ -1,5 +1,5 @@
 interface StrapiRequestOptions {
-    method?: 'GET' | 'POST' | 'PUT' | 'DELETE'
+    method?: 'get' | 'post' | 'put' | 'delete'
     body?: unknown
     query?: Record<string, unknown>
 }
@@ -32,7 +32,9 @@ export function useStrapi() {
     ): Promise<T> {
         try {
             return (await fetchFn<T>(`/api/strapi${path}`, {
-                method: options.method,
+                // Typed $fetch narrows the method to 'get' for generic
+                // responses; all methods are valid on the proxy at runtime.
+                method: options.method as 'get',
                 query: options.query,
                 body: options.body as Record<string, unknown> | undefined,
             })) as T
@@ -52,16 +54,16 @@ export function useStrapi() {
 
     return {
         get<T = unknown>(path: string, query?: Record<string, unknown>) {
-            return request<T>(path, { method: 'GET', query })
+            return request<T>(path, { method: 'get', query })
         },
         post<T = unknown>(path: string, body?: unknown) {
-            return request<T>(path, { method: 'POST', body })
+            return request<T>(path, { method: 'post', body })
         },
         put<T = unknown>(path: string, body?: unknown) {
-            return request<T>(path, { method: 'PUT', body })
+            return request<T>(path, { method: 'put', body })
         },
         delete<T = unknown>(path: string) {
-            return request<T>(path, { method: 'DELETE' })
+            return request<T>(path, { method: 'delete' })
         },
     }
 }

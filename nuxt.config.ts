@@ -23,6 +23,12 @@ export default defineNuxtConfig({
         strapiUrl: 'http://localhost:1337',
     },
 
+    nitro: {
+        externals: {
+            inline: ['tailwind-variants'],
+        },
+    },
+
     devtools: {
         enabled: true,
 
