@@ -284,7 +284,7 @@ export function useSalesReport() {
 
     const pdfRows = ref<SalesReportDetailRow[]>([])
     const pdfPending = ref(false)
-    const pdfOrientation = ref<PdfOrientation>('landscape')
+    const pdfOrientation = ref<PdfOrientation>('portrait')
 
     async function exportPdf(element: HTMLElement | null) {
         if (!element) {

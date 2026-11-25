@@ -27,7 +27,7 @@
  */
 @media print {
     @page {
-        size: A4 landscape;
+        size: A4 portrait;
         margin: 12mm;
     }
 
@@ -73,5 +73,28 @@
     .shadow-lg,
     .shadow-xl {
         box-shadow: none !important;
+    }
+
+    /* Reports ledger: keep the paper sheet and its rules intact. */
+    .reports-canvas {
+        background: #fff !important;
+    }
+
+    .ledger-sheet {
+        max-width: none !important;
+        border-color: #94a3b8 !important;
+    }
+
+    .ledger-table thead {
+        display: table-header-group;
+    }
+
+    .ledger-table tr {
+        break-inside: avoid;
+    }
+
+    .font-mono.tabular-nums,
+    .tabular-nums {
+        font-variant-numeric: tabular-nums !important;
     }
 }
