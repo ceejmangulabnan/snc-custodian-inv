@@ -188,7 +188,9 @@
                 >
                     <span>
                         Showing
-                        <span class="font-semibold text-slate-700 dark:text-slate-200">
+                        <span
+                            class="font-semibold text-slate-700 dark:text-slate-200"
+                        >
                             {{ appliedRange.label }}
                         </span>
                     </span>
@@ -243,27 +245,22 @@
                     >
                         <div class="flex items-start gap-4">
                             <div
-                                class="flex size-12 shrink-0 items-center justify-center rounded-xl border border-slate-200 bg-white p-1.5 dark:border-slate-700"
+                                class="flex size-16 shrink-0 items-center justify-center rounded-xl border border-slate-200 p-1 dark:border-slate-700"
                             >
-                                <AppLogo :size="40" />
+                                <AppLogo :size="70" />
                             </div>
 
                             <div>
-                                <p
-                                    class="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500 dark:text-slate-400"
-                                >
-                                    SNC Custodian System
-                                </p>
-                                <p class="text-sm text-slate-500 dark:text-slate-400">
-                                    School Property &amp; Inventory
-                                </p>
                                 <h1
-                                    class="mt-2 text-2xl font-bold tracking-tight text-slate-900 dark:text-white"
+                                    class="text-2xl font-bold tracking-tight text-slate-900 dark:text-white"
                                 >
                                     Custodian Sales Report
                                 </h1>
-                                <p class="mt-1 text-xs text-slate-500 dark:text-slate-400">
-                                    Completed sales performance by period and item.
+                                <p
+                                    class="mt-1 text-xs text-slate-500 dark:text-slate-400"
+                                >
+                                    Completed sales performance by period and
+                                    item.
                                 </p>
                             </div>
                         </div>
@@ -301,7 +298,9 @@
                                 >
                                     Reporting Period
                                 </dt>
-                                <dd class="mt-0.5 font-semibold text-slate-800 dark:text-slate-100">
+                                <dd
+                                    class="mt-0.5 font-semibold text-slate-800 dark:text-slate-100"
+                                >
                                     {{ appliedRange.label }}
                                 </dd>
                             </div>
@@ -323,7 +322,9 @@
 
                 <!-- KPI row -->
                 <section>
-                    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                    <div
+                        class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4"
+                    >
                         <div
                             v-for="stat in stats"
                             :key="stat.label"
@@ -354,96 +355,60 @@
                     </div>
                 </section>
 
-                <!-- Two-column breakdown -->
-                <section class="grid grid-cols-1 gap-6 lg:grid-cols-12">
-                    <div
-                        class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm lg:col-span-8 dark:border-slate-700 dark:bg-slate-900"
+                <!-- Report notes -->
+                <section
+                    class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-900"
+                >
+                    <h2
+                        class="text-base font-semibold text-slate-900 dark:text-white"
                     >
-                        <div
-                            class="mb-4 flex flex-wrap items-baseline justify-between gap-2"
-                        >
-                            <h2
-                                class="text-base font-semibold text-slate-900 dark:text-white"
-                            >
-                                Top Items
-                            </h2>
-                            <p class="text-xs text-slate-500 dark:text-slate-400">
-                                Ranked by units sold · share of gross revenue
-                            </p>
-                        </div>
+                        Report Notes
+                    </h2>
+                    <p class="mt-1 text-xs text-slate-500 dark:text-slate-400">
+                        Basis of preparation
+                    </p>
 
-                        <UTable
-                            :data="report.topItems"
-                            :columns="itemColumns"
-                            :empty="'No items sold in this period.'"
-                            class="ledger-table text-sm"
-                        >
-                            <template #share-cell="{ row }">
-                                <span class="font-mono tabular-nums">
-                                    {{ sharePercent(row.original.revenue) }}
-                                </span>
-                            </template>
-
-                            <template #revenue-cell="{ row }">
-                                <span
-                                    class="font-mono font-semibold tabular-nums text-slate-800 dark:text-slate-100"
-                                >
-                                    {{ formatMoney(row.original.revenue) }}
-                                </span>
-                            </template>
-                        </UTable>
-                    </div>
+                    <ul
+                        class="mt-4 grid gap-3 text-xs leading-relaxed text-slate-600 sm:grid-cols-2 dark:text-slate-300"
+                    >
+                        <li class="flex gap-2">
+                            <span aria-hidden="true">•</span>
+                            <span>Completed sales only are included.</span>
+                        </li>
+                        <li class="flex gap-2">
+                            <span aria-hidden="true">•</span>
+                            <span>
+                                Revenue uses the item price saved with each
+                                sale.
+                            </span>
+                        </li>
+                        <li class="flex gap-2">
+                            <span aria-hidden="true">•</span>
+                            <span>
+                                Dates use purchase date when available,
+                                otherwise the transaction date.
+                            </span>
+                        </li>
+                        <li class="flex gap-2">
+                            <span aria-hidden="true">•</span>
+                            <span>
+                                The exported report includes certification and
+                                sign-off lines.
+                            </span>
+                        </li>
+                    </ul>
 
                     <div
-                        class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm lg:col-span-4 dark:border-slate-700 dark:bg-slate-900"
+                        class="mt-5 border-t border-slate-200 pt-4 dark:border-slate-700"
                     >
-                        <h2
-                            class="text-base font-semibold text-slate-900 dark:text-white"
+                        <p
+                            class="text-[10px] font-semibold uppercase tracking-[0.1em] text-slate-500 dark:text-slate-400"
                         >
-                            Report Notes
-                        </h2>
-                        <p class="mt-1 text-xs text-slate-500 dark:text-slate-400">
-                            Basis of preparation
+                            Prepared By
                         </p>
-
-                        <ul
-                            class="mt-4 space-y-3 text-xs leading-relaxed text-slate-600 dark:text-slate-300"
-                        >
-                            <li class="flex gap-2">
-                                <span aria-hidden="true">•</span>
-                                <span>Completed sales only are included.</span>
-                            </li>
-                            <li class="flex gap-2">
-                                <span aria-hidden="true">•</span>
-                                <span>
-                                    Revenue uses the item price saved with each
-                                    sale.
-                                </span>
-                            </li>
-                            <li class="flex gap-2">
-                                <span aria-hidden="true">•</span>
-                                <span>
-                                    Dates use purchase date when available,
-                                    otherwise the transaction date.
-                                </span>
-                            </li>
-                            <li class="flex gap-2">
-                                <span aria-hidden="true">•</span>
-                                <span>
-                                    The exported report includes certification
-                                    and sign-off lines.
-                                </span>
-                            </li>
-                        </ul>
-
-                        <div class="mt-5 border-t border-slate-200 pt-4 dark:border-slate-700">
-                            <p
-                                class="text-[10px] font-semibold uppercase tracking-[0.1em] text-slate-500 dark:text-slate-400"
-                            >
-                                Prepared By
-                            </p>
-                            <div class="mt-2 h-6 border-b border-slate-300 dark:border-slate-600" />
-                        </div>
+                        <div
+                            class="mt-2 h-6 border-b border-slate-300 dark:border-slate-600"
+                        />
                     </div>
                 </section>
 
@@ -460,7 +425,9 @@
                             >
                                 Sale Details
                             </h2>
-                            <p class="text-xs text-slate-500 dark:text-slate-400">
+                            <p
+                                class="text-xs text-slate-500 dark:text-slate-400"
+                            >
                                 {{ report.detail.meta.total }} completed sale{{
                                     report.detail.meta.total === 1 ? '' : 's'
                                 }}
@@ -637,7 +604,11 @@
                         <img
                             src="/logo.png"
                             alt=""
-                            style="width: 36px; height: 36px; object-fit: contain"
+                            style="
+                                width: 36px;
+                                height: 36px;
+                                object-fit: contain;
+                            "
                         />
                         <div>
                             <div
@@ -651,7 +622,11 @@
                                 SNC CUSTODIAN SYSTEM
                             </div>
                             <div
-                                style="font-size: 10px; color: #6b7280; margin-top: 2px"
+                                style="
+                                    font-size: 10px;
+                                    color: #6b7280;
+                                    margin-top: 2px;
+                                "
                             >
                                 School Property &amp; Inventory
                             </div>
@@ -695,7 +670,12 @@
                     <div style="color: #6b7280; text-transform: uppercase">
                         Prepared By
                     </div>
-                    <div style="border-bottom: 1px solid #6b7280; min-width: 90px">
+                    <div
+                        style="
+                            border-bottom: 1px solid #6b7280;
+                            min-width: 90px;
+                        "
+                    >
                         &nbsp;
                     </div>
                 </div>
@@ -750,85 +730,6 @@
                     margin: 20px 0 6px;
                 "
             >
-                Top Items
-            </h2>
-            <table
-                style="width: 100%; border-collapse: collapse; font-size: 9px"
-            >
-                <thead>
-                    <tr
-                        style="border-bottom: 2px solid #142b47; text-align: left"
-                    >
-                        <th style="padding: 5px 6px 5px 0">Item</th>
-                        <th style="padding: 5px 6px; text-align: right">Units</th>
-                        <th style="padding: 5px 6px; text-align: right">Sales</th>
-                        <th style="padding: 5px 6px; text-align: right">
-                            Share %
-                        </th>
-                        <th style="padding: 5px 0; text-align: right">Revenue</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr
-                        v-for="item in report.topItems"
-                        :key="`pdf-item-${item.itemId}`"
-                        style="border-bottom: 1px solid #d1d5db"
-                    >
-                        <td style="padding: 5px 6px 5px 0">{{ item.name }}</td>
-                        <td
-                            style="
-                                padding: 5px 6px;
-                                text-align: right;
-                                font-variant-numeric: tabular-nums;
-                            "
-                        >
-                            {{ item.units }}
-                        </td>
-                        <td
-                            style="
-                                padding: 5px 6px;
-                                text-align: right;
-                                font-variant-numeric: tabular-nums;
-                            "
-                        >
-                            {{ item.sales }}
-                        </td>
-                        <td
-                            style="
-                                padding: 5px 6px;
-                                text-align: right;
-                                font-variant-numeric: tabular-nums;
-                            "
-                        >
-                            {{ sharePercent(item.revenue) }}
-                        </td>
-                        <td
-                            style="
-                                padding: 5px 0;
-                                text-align: right;
-                                white-space: nowrap;
-                                font-variant-numeric: tabular-nums;
-                            "
-                        >
-                            {{ formatMoney(item.revenue) }}
-                        </td>
-                    </tr>
-                    <tr v-if="!report.topItems.length">
-                        <td colspan="5" style="padding: 8px 0; color: #6b7280">
-                            No items sold in this period.
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-
-            <h2
-                style="
-                    font-size: 12px;
-                    font-weight: 700;
-                    color: #142b47;
-                    margin: 20px 0 6px;
-                "
-            >
                 Sale Details
             </h2>
             <table
@@ -836,14 +737,21 @@
             >
                 <thead>
                     <tr
-                        style="border-bottom: 2px solid #142b47; text-align: left"
+                        style="
+                            border-bottom: 2px solid #142b47;
+                            text-align: left;
+                        "
                     >
                         <th style="padding: 5px 6px 5px 0">Receipt #</th>
                         <th style="padding: 5px 6px">Date</th>
                         <th style="padding: 5px 6px">Student</th>
                         <th style="padding: 5px 6px">Items</th>
-                        <th style="padding: 5px 6px; text-align: right">Units</th>
-                        <th style="padding: 5px 6px; text-align: right">Total</th>
+                        <th style="padding: 5px 6px; text-align: right">
+                            Units
+                        </th>
+                        <th style="padding: 5px 6px; text-align: right">
+                            Total
+                        </th>
                         <th style="padding: 5px 0">Notes</th>
                     </tr>
                 </thead>
@@ -866,11 +774,7 @@
                             {{ formatDateTime(row.effectiveDate) }}
                         </td>
                         <td style="padding: 5px 6px">
-                            {{
-                                row.studentName ||
-                                row.studentIdNumber ||
-                                '—'
-                            }}
+                            {{ row.studentName || row.studentIdNumber || '—' }}
                         </td>
                         <td style="padding: 5px 6px; word-break: break-word">
                             {{ itemBreakdown(row) }}
@@ -958,7 +862,9 @@
                 "
             >
                 <p style="font-size: 9px; line-height: 1.5; color: #374151">
-                    <strong style="color: #142b47">CUSTODIAN CERTIFICATION.</strong>
+                    <strong style="color: #142b47"
+                        >CUSTODIAN CERTIFICATION.</strong
+                    >
                     This is to certify that the entries in this Custodian Sales
                     Report were recorded from completed sales for the stated
                     reporting period and reflect the inventory items,
@@ -967,7 +873,10 @@
                 <div style="display: flex; gap: 24px; margin-top: 28px">
                     <div style="flex: 1">
                         <div
-                            style="height: 24px; border-bottom: 1px solid #6b7280"
+                            style="
+                                height: 24px;
+                                border-bottom: 1px solid #6b7280;
+                            "
                         />
                         <div style="font-size: 8px; margin-top: 4px">
                             Prepared by: Property Custodian
@@ -975,7 +884,10 @@
                     </div>
                     <div style="flex: 1">
                         <div
-                            style="height: 24px; border-bottom: 1px solid #6b7280"
+                            style="
+                                height: 24px;
+                                border-bottom: 1px solid #6b7280;
+                            "
                         />
                         <div style="font-size: 8px; margin-top: 4px">
                             Verified by: Finance / Administrator
@@ -989,10 +901,7 @@
 
 <script setup lang="ts">
 import type { TableColumn } from '@nuxt/ui'
-import type {
-    SalesReportDetailRow,
-    SalesReportItemRow,
-} from '#shared/types/report'
+import type { SalesReportDetailRow } from '#shared/types/report'
 
 definePageMeta({
     layout: 'admin',
@@ -1106,14 +1015,6 @@ const stats = computed(() => {
     ]
 })
 
-function sharePercent(revenue: number | null): string {
-    const gross = report.value?.summary.revenue
-    if (!gross || revenue == null) {
-        return '—'
-    }
-    return `${((revenue / gross) * 100).toFixed(1)}%`
-}
-
 const visibleRows = computed(() => report.value?.detail.rows ?? [])
 const visibleUnits = computed(() =>
     visibleRows.value.reduce(
@@ -1157,38 +1058,6 @@ function itemBreakdown(row: SalesReportDetailRow): string {
             .join('; ') || '—'
     )
 }
-
-const itemColumns: TableColumn<SalesReportItemRow>[] = [
-    {
-        accessorKey: 'name',
-        header: 'Item',
-    },
-    {
-        accessorKey: 'units',
-        header: 'Units',
-        meta: {
-            class: { th: 'text-right', td: 'text-right font-mono tabular-nums' },
-        },
-    },
-    {
-        accessorKey: 'sales',
-        header: 'Sales',
-        meta: {
-            class: { th: 'text-right', td: 'text-right font-mono tabular-nums' },
-        },
-    },
-    {
-        id: 'share',
-        header: 'Share %',
-        enableSorting: false,
-        meta: { class: { th: 'text-right', td: 'text-right' } },
-    },
-    {
-        accessorKey: 'revenue',
-        header: 'Revenue',
-        meta: { class: { th: 'text-right', td: 'text-right' } },
-    },
-]
 
 const detailColumns: TableColumn<SalesReportDetailRow>[] = [
     {

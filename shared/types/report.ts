@@ -25,15 +25,6 @@ export interface SalesReportSummary {
     cashiers: number
 }
 
-export interface SalesReportItemRow {
-    itemId: number
-    name: string
-    sku: string
-    units: number
-    sales: number
-    revenue: number | null
-}
-
 export interface SalesReportCashierRow {
     id: number | null
     username: string
@@ -75,7 +66,6 @@ export interface SalesReportPagination {
 
 export interface SalesReportResponse {
     summary: SalesReportSummary
-    topItems: SalesReportItemRow[]
     cashiers: SalesReportCashierRow[]
     detail: {
         rows: SalesReportDetailRow[]
