@@ -29,9 +29,9 @@
                         :class="sidebarCollapsed ? 'justify-center' : 'gap-3'"
                     >
                         <div
-                            class="flex size-12 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-green-500 via-green-600 to-teal-600 text-white shadow-[0_10px_30px_rgba(0,193,106,0.40)]"
+                            class="flex size-12 shrink-0 items-center justify-center rounded-2xl bg-white p-1.5"
                         >
-                            <UIcon name="i-lucide-boxes" class="size-6" />
+                            <AppLogo :size="36" />
                         </div>
 
                         <div v-if="!sidebarCollapsed" class="min-w-0">
@@ -191,9 +191,9 @@
             <div class="flex items-center justify-between">
                 <div class="flex min-w-0 items-center gap-3">
                     <div
-                        class="flex size-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-green-500 via-green-600 to-teal-600 text-white shadow-lg shadow-green-500/30"
+                        class="flex size-10 shrink-0 items-center justify-center rounded-xl bg-white p-1"
                     >
-                        <UIcon name="i-lucide-id-card" class="size-5" />
+                        <AppLogo :size="30" />
                     </div>
 
                     <div class="min-w-0">

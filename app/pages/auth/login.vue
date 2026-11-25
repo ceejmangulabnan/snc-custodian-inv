@@ -31,9 +31,9 @@
                 class="border-b border-green-100 bg-gradient-to-br from-white via-green-50/70 to-white px-8 py-10 text-center dark:border-slate-700 dark:from-slate-900 dark:via-green-950/60 dark:to-slate-900"
             >
                 <div
-                    class="mx-auto mb-6 flex size-20 items-center justify-center rounded-[28px] bg-gradient-to-br from-green-500 via-green-600 to-teal-600 text-white shadow-[0_15px_50px_rgba(0,193,106,0.35)]"
+                    class="mx-auto mb-6 flex size-20 items-center justify-center rounded-[28px] bg-white p-3 shadow-[0_15px_50px_rgba(0,193,106,0.20)]"
                 >
-                    <UIcon name="i-lucide-boxes" class="size-10" />
+                    <AppLogo :size="60" />
                 </div>
 
                 <h1

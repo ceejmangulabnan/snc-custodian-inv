@@ -12,9 +12,9 @@
                 <!-- Brand -->
                 <div class="flex min-w-0 items-center gap-3">
                     <div
-                        class="flex size-10 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-green-500 via-green-600 to-teal-600 text-white shadow-lg shadow-green-500/30"
+                        class="flex size-10 shrink-0 items-center justify-center rounded-2xl bg-white p-1 shadow-sm"
                     >
-                        <UIcon name="i-lucide-store" class="size-5" />
+                        <AppLogo :size="30" />
                     </div>
 
                     <div class="hidden min-w-0 sm:block">

@@ -307,6 +307,23 @@ export function useSalesReport() {
             pdfRows.value = response.detail.rows
             await nextTick()
 
+            // The report header includes the brand logo; wait for it so the
+            // capture never paints a placeholder box.
+            await Promise.all(
+                Array.from(element.querySelectorAll('img')).map((image) =>
+                    image.complete
+                        ? Promise.resolve()
+                        : new Promise<void>((resolve) => {
+                              image.addEventListener('load', () => resolve(), {
+                                  once: true,
+                              })
+                              image.addEventListener('error', () => resolve(), {
+                                  once: true,
+                              })
+                          })
+                )
+            )
+
             const [{ default: html2canvas }, { jsPDF }] = await Promise.all([
                 import('html2canvas-pro'),
                 import('jspdf'),

@@ -233,12 +233,9 @@
                 >
                     <div class="flex items-start gap-4">
                         <div
-                            class="flex size-11 shrink-0 items-center justify-center rounded-md bg-[#142b47] text-white"
+                            class="flex size-12 shrink-0 items-center justify-center rounded-md border border-slate-200 bg-white p-1"
                         >
-                            <UIcon
-                                name="i-lucide-landmark"
-                                class="size-5"
-                            />
+                            <AppLogo :size="40" />
                         </div>
 
                         <div>
@@ -687,18 +684,37 @@
                 "
             >
                 <div>
-                    <div
-                        style="
-                            font-size: 11px;
-                            font-weight: 700;
-                            letter-spacing: 0.12em;
-                            color: #142b47;
-                        "
-                    >
-                        SNC CUSTODIAN SYSTEM
-                    </div>
-                    <div style="font-size: 10px; color: #6b7280; margin-top: 2px">
-                        School Property &amp; Inventory
+                    <div style="display: flex; align-items: center; gap: 10px">
+                        <img
+                            src="/logo.png"
+                            alt=""
+                            style="
+                                width: 36px;
+                                height: 36px;
+                                object-fit: contain;
+                            "
+                        />
+                        <div>
+                            <div
+                                style="
+                                    font-size: 11px;
+                                    font-weight: 700;
+                                    letter-spacing: 0.12em;
+                                    color: #142b47;
+                                "
+                            >
+                                SNC CUSTODIAN SYSTEM
+                            </div>
+                            <div
+                                style="
+                                    font-size: 10px;
+                                    color: #6b7280;
+                                    margin-top: 2px;
+                                "
+                            >
+                                School Property &amp; Inventory
+                            </div>
+                        </div>
                     </div>
                     <div
                         style="
