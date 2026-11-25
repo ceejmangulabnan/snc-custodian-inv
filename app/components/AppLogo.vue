@@ -3,7 +3,7 @@
         src="/logo.png"
         alt=""
         aria-hidden="true"
-        class="object-contain"
+        class="object-cover"
         :style="imageStyle"
     />
 </template>
