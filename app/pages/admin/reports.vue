@@ -1,197 +1,208 @@
 <template>
-    <div class="reports-canvas min-h-screen bg-[#f4f4f1] text-[#1f2937]">
-        <!-- Sticky report toolbar -->
-        <div
-            class="report-toolbar sticky top-[64px] z-30 mb-6 border-b border-slate-200 bg-white/95 px-4 py-3 backdrop-blur print:hidden lg:top-[89px] lg:px-6"
-        >
+    <div>
+        <div class="mx-auto max-w-[1200px] space-y-6">
+            <!-- Sticky report toolbar -->
             <div
-                class="mx-auto flex max-w-[1200px] flex-col gap-3 xl:flex-row xl:items-end xl:justify-between"
+                class="sticky top-[64px] z-30 rounded-2xl border border-slate-200 bg-white/95 p-4 shadow-sm backdrop-blur print:hidden lg:top-[89px] dark:border-slate-700 dark:bg-slate-900/95"
             >
-                <div class="flex flex-wrap items-end gap-3">
-                    <div>
-                        <p
-                            class="mb-1.5 text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-500"
-                        >
-                            Period
-                        </p>
-
-                        <div
-                            class="inline-flex rounded-lg border border-slate-200 bg-slate-50 p-1"
-                        >
-                            <UButton
-                                v-for="mode in periodModes"
-                                :key="mode.value"
-                                size="sm"
-                                :color="
-                                    periodMode === mode.value
-                                        ? 'primary'
-                                        : 'neutral'
-                                "
-                                :variant="
-                                    periodMode === mode.value
-                                        ? 'solid'
-                                        : 'ghost'
-                                "
-                                class="rounded-md px-3"
-                                @click="periodMode = mode.value"
-                            >
-                                {{ mode.label }}
-                            </UButton>
-                        </div>
-                    </div>
-
-                    <div v-if="periodMode === 'monthly'">
-                        <label
-                            for="report-month"
-                            class="mb-1.5 block text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-500"
-                        >
-                            Month
-                        </label>
-
-                        <UInput
-                            id="report-month"
-                            v-model="month"
-                            type="month"
-                            size="sm"
-                            class="w-40"
-                        />
-                    </div>
-
-                    <div v-else-if="periodMode === 'yearly'">
-                        <label
-                            for="report-year"
-                            class="mb-1.5 block text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-500"
-                        >
-                            Year
-                        </label>
-
-                        <USelect
-                            id="report-year"
-                            v-model="year"
-                            :items="yearOptions"
-                            size="sm"
-                            class="w-32"
-                        />
-                    </div>
-
-                    <template v-else>
+                <div
+                    class="flex flex-col gap-3 xl:flex-row xl:items-end xl:justify-between"
+                >
+                    <div class="flex flex-wrap items-end gap-3">
                         <div>
-                            <label
-                                for="report-start"
-                                class="mb-1.5 block text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-500"
+                            <p
+                                class="mb-1.5 text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-500 dark:text-slate-400"
                             >
-                                From
+                                Period
+                            </p>
+
+                            <div
+                                class="inline-flex rounded-lg border border-slate-200 bg-slate-50 p-1 dark:border-slate-700 dark:bg-slate-800"
+                            >
+                                <UButton
+                                    v-for="mode in periodModes"
+                                    :key="mode.value"
+                                    size="sm"
+                                    :color="
+                                        periodMode === mode.value
+                                            ? 'primary'
+                                            : 'neutral'
+                                    "
+                                    :variant="
+                                        periodMode === mode.value
+                                            ? 'solid'
+                                            : 'ghost'
+                                    "
+                                    class="rounded-md px-3"
+                                    @click="periodMode = mode.value"
+                                >
+                                    {{ mode.label }}
+                                </UButton>
+                            </div>
+                        </div>
+
+                        <div v-if="periodMode === 'monthly'">
+                            <label
+                                for="report-month"
+                                class="mb-1.5 block text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-500 dark:text-slate-400"
+                            >
+                                Month
                             </label>
 
                             <UInput
-                                id="report-start"
-                                v-model="manualStart"
-                                type="date"
+                                id="report-month"
+                                v-model="month"
+                                type="month"
                                 size="sm"
                                 class="w-40"
                             />
                         </div>
 
-                        <div>
+                        <div v-else-if="periodMode === 'yearly'">
                             <label
-                                for="report-end"
-                                class="mb-1.5 block text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-500"
+                                for="report-year"
+                                class="mb-1.5 block text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-500 dark:text-slate-400"
                             >
-                                To
+                                Year
                             </label>
 
-                            <UInput
-                                id="report-end"
-                                v-model="manualEnd"
-                                type="date"
+                            <USelect
+                                id="report-year"
+                                v-model="year"
+                                :items="yearOptions"
                                 size="sm"
-                                class="w-40"
+                                class="w-32"
+                            />
+                        </div>
+
+                        <template v-else>
+                            <div>
+                                <label
+                                    for="report-start"
+                                    class="mb-1.5 block text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-500 dark:text-slate-400"
+                                >
+                                    From
+                                </label>
+
+                                <UInput
+                                    id="report-start"
+                                    v-model="manualStart"
+                                    type="date"
+                                    size="sm"
+                                    class="w-40"
+                                />
+                            </div>
+
+                            <div>
+                                <label
+                                    for="report-end"
+                                    class="mb-1.5 block text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-500 dark:text-slate-400"
+                                >
+                                    To
+                                </label>
+
+                                <UInput
+                                    id="report-end"
+                                    v-model="manualEnd"
+                                    type="date"
+                                    size="sm"
+                                    class="w-40"
+                                />
+                            </div>
+
+                            <UButton
+                                icon="i-lucide-check"
+                                color="primary"
+                                size="sm"
+                                :disabled="invalidRange"
+                                @click="applyPeriod"
+                            >
+                                Apply
+                            </UButton>
+                        </template>
+                    </div>
+
+                    <div class="flex flex-wrap items-end gap-2">
+                        <div>
+                            <p
+                                class="mb-1.5 text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-500 dark:text-slate-400"
+                            >
+                                Orientation
+                            </p>
+
+                            <USelect
+                                v-model="pdfOrientation"
+                                :items="pdfOrientations"
+                                size="sm"
+                                class="w-32"
+                                aria-label="PDF orientation"
                             />
                         </div>
 
                         <UButton
-                            icon="i-lucide-check"
+                            icon="i-lucide-rotate-cw"
+                            color="neutral"
+                            variant="outline"
+                            size="sm"
+                            :loading="pending"
+                            aria-label="Refresh report"
+                            @click="refresh()"
+                        />
+
+                        <UButton
+                            icon="i-lucide-download"
+                            color="neutral"
+                            variant="outline"
+                            size="sm"
+                            :loading="exportPending"
+                            @click="exportCsv"
+                        >
+                            Export CSV
+                        </UButton>
+
+                        <UButton
+                            icon="i-lucide-eye"
+                            color="neutral"
+                            variant="outline"
+                            size="sm"
+                            :loading="pdfPending"
+                            @click="onPreviewReport"
+                        >
+                            Preview Report
+                        </UButton>
+
+                        <UButton
+                            icon="i-lucide-file-text"
                             color="primary"
                             size="sm"
-                            :disabled="invalidRange"
-                            @click="applyPeriod"
+                            :loading="pdfPending"
+                            @click="onExportPdf"
                         >
-                            Apply
+                            Export PDF
                         </UButton>
-                    </template>
-                </div>
-
-                <div class="flex flex-wrap items-end gap-2">
-                    <div>
-                        <p
-                            class="mb-1.5 text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-500"
-                        >
-                            Orientation
-                        </p>
-
-                        <USelect
-                            v-model="pdfOrientation"
-                            :items="pdfOrientations"
-                            size="sm"
-                            class="w-32"
-                            aria-label="PDF orientation"
-                        />
                     </div>
+                </div>
 
-                    <UButton
-                        icon="i-lucide-rotate-cw"
-                        color="neutral"
-                        variant="outline"
-                        size="sm"
-                        :loading="pending"
-                        aria-label="Refresh report"
-                        @click="refresh()"
-                    />
-
-                    <UButton
-                        icon="i-lucide-download"
-                        color="neutral"
-                        variant="outline"
-                        size="sm"
-                        :loading="exportPending"
-                        @click="exportCsv"
-                    >
-                        Export CSV
-                    </UButton>
-
-                    <UButton
-                        icon="i-lucide-file-text"
-                        color="primary"
-                        size="sm"
-                        :loading="pdfPending"
-                        @click="onExportPdf"
-                    >
-                        Export PDF
-                    </UButton>
+                <div
+                    class="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-slate-500 dark:text-slate-400"
+                >
+                    <span>
+                        Showing
+                        <span class="font-semibold text-slate-700 dark:text-slate-200">
+                            {{ appliedRange.label }}
+                        </span>
+                    </span>
+                    <span aria-hidden="true">·</span>
+                    <span>
+                        Dates use purchase date when available, otherwise the
+                        transaction date.
+                    </span>
+                    <span v-if="invalidRange" class="font-medium text-red-600">
+                        The start date must be on or before the end date.
+                    </span>
                 </div>
             </div>
 
-            <div
-                class="mx-auto mt-2 flex max-w-[1200px] flex-wrap items-center gap-x-2 gap-y-1 text-xs text-slate-500"
-            >
-                <span>
-                    Showing
-                    <span class="font-semibold text-[#142b47]">
-                        {{ appliedRange.label }}
-                    </span>
-                </span>
-                <span aria-hidden="true">·</span>
-                <span>
-                    Dates use purchase date when available, otherwise the
-                    transaction date.
-                </span>
-                <span v-if="invalidRange" class="font-medium text-red-600">
-                    The start date must be on or before the end date.
-                </span>
-            </div>
-        </div>
-
-        <div class="mx-auto max-w-[1200px]">
             <!-- Fetch error -->
             <UAlert
                 v-if="fetchError"
@@ -213,7 +224,7 @@
 
             <div
                 v-else-if="pending && !report"
-                class="flex items-center justify-center border border-slate-300 bg-white py-16 text-sm text-slate-500"
+                class="flex items-center justify-center rounded-2xl border border-slate-200 bg-white py-16 text-sm text-slate-500 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-400"
             >
                 <UIcon
                     name="i-lucide-loader-circle"
@@ -222,438 +233,376 @@
                 Building report…
             </div>
 
-            <!-- Paper report sheet -->
-            <article
-                v-else-if="report"
-                class="ledger-sheet mx-auto w-full max-w-[1200px] border border-slate-300 bg-white"
-            >
-                <!-- Official header -->
-                <header
-                    class="flex flex-col gap-5 border-b-2 border-[#142b47] p-6 sm:p-8 lg:flex-row lg:items-start lg:justify-between"
+            <template v-else-if="report">
+                <!-- Report identity -->
+                <section
+                    class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-700 dark:bg-slate-900"
                 >
-                    <div class="flex items-start gap-4">
-                        <div
-                            class="flex size-12 shrink-0 items-center justify-center rounded-md border border-slate-200 bg-white p-1"
-                        >
-                            <AppLogo :size="40" />
+                    <div
+                        class="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between"
+                    >
+                        <div class="flex items-start gap-4">
+                            <div
+                                class="flex size-12 shrink-0 items-center justify-center rounded-xl border border-slate-200 bg-white p-1.5 dark:border-slate-700"
+                            >
+                                <AppLogo :size="40" />
+                            </div>
+
+                            <div>
+                                <p
+                                    class="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500 dark:text-slate-400"
+                                >
+                                    SNC Custodian System
+                                </p>
+                                <p class="text-sm text-slate-500 dark:text-slate-400">
+                                    School Property &amp; Inventory
+                                </p>
+                                <h1
+                                    class="mt-2 text-2xl font-bold tracking-tight text-slate-900 dark:text-white"
+                                >
+                                    Custodian Sales Report
+                                </h1>
+                                <p class="mt-1 text-xs text-slate-500 dark:text-slate-400">
+                                    Completed sales performance by period and item.
+                                </p>
+                            </div>
                         </div>
 
-                        <div>
+                        <dl
+                            class="grid w-full grid-cols-2 gap-x-6 gap-y-2 border-t border-slate-200 pt-4 text-xs lg:w-[340px] lg:border-l lg:border-t-0 lg:pl-6 lg:pt-0 dark:border-slate-700"
+                        >
+                            <div>
+                                <dt
+                                    class="text-[10px] font-semibold uppercase tracking-[0.1em] text-slate-500 dark:text-slate-400"
+                                >
+                                    Report ID
+                                </dt>
+                                <dd
+                                    class="mt-0.5 font-mono font-semibold tabular-nums text-slate-800 dark:text-slate-100"
+                                >
+                                    {{ reportId }}
+                                </dd>
+                            </div>
+                            <div>
+                                <dt
+                                    class="text-[10px] font-semibold uppercase tracking-[0.1em] text-slate-500 dark:text-slate-400"
+                                >
+                                    Generated Date
+                                </dt>
+                                <dd
+                                    class="mt-0.5 font-mono tabular-nums text-slate-700 dark:text-slate-200"
+                                >
+                                    {{ generatedAt }}
+                                </dd>
+                            </div>
+                            <div>
+                                <dt
+                                    class="text-[10px] font-semibold uppercase tracking-[0.1em] text-slate-500 dark:text-slate-400"
+                                >
+                                    Reporting Period
+                                </dt>
+                                <dd class="mt-0.5 font-semibold text-slate-800 dark:text-slate-100">
+                                    {{ appliedRange.label }}
+                                </dd>
+                            </div>
+                            <div>
+                                <dt
+                                    class="text-[10px] font-semibold uppercase tracking-[0.1em] text-slate-500 dark:text-slate-400"
+                                >
+                                    Prepared By
+                                </dt>
+                                <dd
+                                    class="mt-0.5 border-b border-slate-300 pb-0.5 text-slate-400 dark:border-slate-600"
+                                >
+                                    ________________
+                                </dd>
+                            </div>
+                        </dl>
+                    </div>
+                </section>
+
+                <!-- KPI row -->
+                <section>
+                    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                        <div
+                            v-for="stat in stats"
+                            :key="stat.label"
+                            class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-900"
+                        >
                             <p
-                                class="text-xs font-semibold uppercase tracking-[0.16em] text-[#142b47]"
+                                class="text-xs font-medium text-slate-500 dark:text-slate-400"
                             >
-                                SNC Custodian System
+                                {{ stat.label }}
                             </p>
-                            <p class="text-sm text-slate-500">
-                                School Property &amp; Inventory
-                            </p>
-                            <h1
-                                class="mt-3 text-2xl font-bold tracking-tight text-[#142b47]"
+
+                            <p
+                                class="mt-2 text-2xl font-bold tracking-tight text-slate-900 dark:text-white"
+                                :class="
+                                    stat.numeric ? 'font-mono tabular-nums' : ''
+                                "
                             >
-                                Custodian Sales Report
-                            </h1>
-                            <p class="mt-1 text-xs text-slate-500">
-                                Completed sales performance by period and item.
+                                {{ stat.value }}
+                            </p>
+
+                            <p
+                                v-if="stat.subtitle"
+                                class="mt-1 text-xs text-slate-500 dark:text-slate-400"
+                            >
+                                {{ stat.subtitle }}
                             </p>
                         </div>
                     </div>
+                </section>
 
-                    <dl
-                        class="grid w-full grid-cols-2 gap-x-6 gap-y-2 border-t border-slate-200 pt-4 text-xs lg:w-[340px] lg:border-l lg:border-t-0 lg:pl-6 lg:pt-0"
+                <!-- Two-column breakdown -->
+                <section class="grid grid-cols-1 gap-6 lg:grid-cols-12">
+                    <div
+                        class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm lg:col-span-8 dark:border-slate-700 dark:bg-slate-900"
                     >
-                        <div>
-                            <dt
-                                class="text-[10px] font-semibold uppercase tracking-[0.1em] text-slate-500"
-                            >
-                                Report ID
-                            </dt>
-                            <dd
-                                class="mt-0.5 font-mono font-semibold tabular-nums text-[#142b47]"
-                            >
-                                {{ reportId }}
-                            </dd>
-                        </div>
-                        <div>
-                            <dt
-                                class="text-[10px] font-semibold uppercase tracking-[0.1em] text-slate-500"
-                            >
-                                Generated Date
-                            </dt>
-                            <dd
-                                class="mt-0.5 font-mono tabular-nums text-[#1f2937]"
-                            >
-                                {{ generatedAt }}
-                            </dd>
-                        </div>
-                        <div>
-                            <dt
-                                class="text-[10px] font-semibold uppercase tracking-[0.1em] text-slate-500"
-                            >
-                                Reporting Period
-                            </dt>
-                            <dd class="mt-0.5 font-semibold text-[#1f2937]">
-                                {{ appliedRange.label }}
-                            </dd>
-                        </div>
-                        <div>
-                            <dt
-                                class="text-[10px] font-semibold uppercase tracking-[0.1em] text-slate-500"
-                            >
-                                Prepared By
-                            </dt>
-                            <dd
-                                class="mt-0.5 border-b border-slate-400 pb-0.5 text-slate-400"
-                            >
-                                ________________
-                            </dd>
-                        </div>
-                    </dl>
-                </header>
-
-                <div class="space-y-6 p-6 sm:p-8">
-                    <!-- KPI row -->
-                    <section aria-labelledby="summary-heading">
-                        <h2
-                            id="summary-heading"
-                            class="mb-3 text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-500"
-                        >
-                            Summary
-                        </h2>
-
                         <div
-                            class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4"
+                            class="mb-4 flex flex-wrap items-baseline justify-between gap-2"
                         >
-                            <div
-                                v-for="stat in stats"
-                                :key="stat.label"
-                                class="flex min-h-[104px] flex-col justify-between rounded-md border border-slate-200 bg-slate-50/60 px-4 py-3"
+                            <h2
+                                class="text-base font-semibold text-slate-900 dark:text-white"
                             >
-                                <p
-                                    class="text-[11px] font-semibold uppercase tracking-[0.08em] text-slate-500"
-                                >
-                                    {{ stat.label }}
-                                </p>
-
-                                <p
-                                    class="mt-2 text-2xl font-bold tracking-tight text-[#142b47]"
-                                    :class="
-                                        stat.numeric
-                                            ? 'font-mono tabular-nums'
-                                            : ''
-                                    "
-                                >
-                                    {{ stat.value }}
-                                </p>
-
-                                <p
-                                    v-if="stat.subtitle"
-                                    class="mt-1 text-xs text-slate-500"
-                                >
-                                    {{ stat.subtitle }}
-                                </p>
-                            </div>
-                        </div>
-                    </section>
-
-                    <!-- Two-column breakdown -->
-                    <section class="grid grid-cols-1 gap-6 lg:grid-cols-12">
-                        <div class="ledger-block lg:col-span-8">
-                            <div
-                                class="mb-3 flex flex-wrap items-baseline justify-between gap-2"
-                            >
-                                <h2
-                                    class="text-sm font-semibold text-[#142b47]"
-                                >
-                                    Top Items
-                                </h2>
-                                <p class="text-xs text-slate-500">
-                                    Ranked by units sold · share of gross
-                                    revenue
-                                </p>
-                            </div>
-
-                            <UTable
-                                :data="report.topItems"
-                                :columns="itemColumns"
-                                :empty="'No items sold in this period.'"
-                                class="ledger-table text-xs"
-                            >
-                                <template #share-cell="{ row }">
-                                    <span class="font-mono tabular-nums">
-                                        {{ sharePercent(row.original.revenue) }}
-                                    </span>
-                                </template>
-
-                                <template #revenue-cell="{ row }">
-                                    <span
-                                        class="font-mono font-semibold tabular-nums text-[#142b47]"
-                                    >
-                                        {{ formatMoney(row.original.revenue) }}
-                                    </span>
-                                </template>
-                            </UTable>
-                        </div>
-
-                        <div class="ledger-block lg:col-span-4">
-                            <div
-                                class="mb-3 flex flex-wrap items-baseline justify-between gap-2"
-                            >
-                                <h2
-                                    class="text-sm font-semibold text-[#142b47]"
-                                >
-                                    Revenue Trend
-                                </h2>
-                                <p class="text-xs text-slate-500">
-                                    Per
-                                    {{
-                                        appliedRange.granularity === 'month'
-                                            ? 'month'
-                                            : 'day'
-                                    }}
-                                </p>
-                            </div>
-
-                            <UChart
-                                v-if="chartData.length"
-                                type="line"
-                                curve="monotone"
-                                points
-                                :data="chartData"
-                                index="label"
-                                :categories="[
-                                    {
-                                        key: 'revenue',
-                                        label: 'Revenue',
-                                        color: '#142b47',
-                                    },
-                                ]"
-                                :format="formatCompactMoney"
-                                :height="180"
-                                y-label="Revenue (₱)"
-                                aria-label="Revenue trend for the selected period"
-                                class="w-full"
-                            />
-
-                            <p
-                                v-else
-                                class="py-8 text-center text-xs text-slate-500"
-                            >
-                                No completed sales in this period.
+                                Top Items
+                            </h2>
+                            <p class="text-xs text-slate-500 dark:text-slate-400">
+                                Ranked by units sold · share of gross revenue
                             </p>
-
-                            <dl
-                                class="mt-3 grid grid-cols-2 gap-2 border-t border-slate-200 pt-3 text-xs"
-                            >
-                                <div>
-                                    <dt class="text-slate-500">Buckets</dt>
-                                    <dd class="font-mono tabular-nums">
-                                        {{ chartData.length }}
-                                    </dd>
-                                </div>
-                                <div>
-                                    <dt class="text-slate-500">Peak revenue</dt>
-                                    <dd
-                                        class="font-mono font-semibold tabular-nums text-[#142b47]"
-                                    >
-                                        {{ formatMoney(peakBucket?.revenue) }}
-                                    </dd>
-                                </div>
-                                <div class="col-span-2">
-                                    <dt class="text-slate-500">Peak period</dt>
-                                    <dd class="font-medium">
-                                        {{ peakBucket?.label ?? '—' }}
-                                    </dd>
-                                </div>
-                            </dl>
-                        </div>
-                    </section>
-
-                    <!-- Itemized sale ledger -->
-                    <section class="ledger-block">
-                        <div
-                            class="mb-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"
-                        >
-                            <div>
-                                <h2
-                                    class="text-sm font-semibold text-[#142b47]"
-                                >
-                                    Sale Details
-                                </h2>
-                                <p class="text-xs text-slate-500">
-                                    {{ report.detail.meta.total }} completed
-                                    sale{{
-                                        report.detail.meta.total === 1 ? '' : 's'
-                                    }}
-                                    in this period
-                                </p>
-                            </div>
-
-                            <UInput
-                                v-model="search"
-                                icon="i-lucide-search"
-                                placeholder="Search receipt, student, notes..."
-                                size="sm"
-                                class="w-full sm:w-72"
-                            />
                         </div>
 
                         <UTable
-                            v-model:sorting="sorting"
-                            v-model:pagination="pagination"
-                            :data="report.detail.rows"
-                            :columns="detailColumns"
-                            :loading="pending"
-                            :pagination-options="{ manualPagination: true }"
-                            :sorting-options="{ manualSorting: true }"
-                            :empty="'No sales match your search.'"
-                            class="ledger-table text-xs"
+                            :data="report.topItems"
+                            :columns="itemColumns"
+                            :empty="'No items sold in this period.'"
+                            class="ledger-table text-sm"
                         >
-                            <template #receipt-cell="{ row }">
-                                <span
-                                    class="font-mono font-semibold tabular-nums text-[#142b47]"
-                                >
-                                    {{ row.original.receiptNumber || '—' }}
-                                </span>
-                            </template>
-
-                            <template #date-cell="{ row }">
-                                <span class="whitespace-nowrap">
-                                    {{ formatDateTime(row.original.effectiveDate) }}
-                                </span>
-                            </template>
-
-                            <template #student-cell="{ row }">
-                                <span>
-                                    {{
-                                        row.original.studentName ||
-                                        row.original.studentIdNumber ||
-                                        '—'
-                                    }}
-                                </span>
-                            </template>
-
-                            <template #items-cell="{ row }">
-                                <span
-                                    class="block max-w-sm truncate"
-                                    :title="itemSummary(row.original)"
-                                >
-                                    {{ itemSummary(row.original) }}
-                                </span>
-                            </template>
-
-                            <template #units-cell="{ row }">
+                            <template #share-cell="{ row }">
                                 <span class="font-mono tabular-nums">
-                                    {{
-                                        row.original.lines.reduce(
-                                            (sum, line) =>
-                                                sum + line.qtyPulled,
-                                            0
-                                        )
-                                    }}
+                                    {{ sharePercent(row.original.revenue) }}
                                 </span>
                             </template>
 
-                            <template #total-cell="{ row }">
+                            <template #revenue-cell="{ row }">
                                 <span
-                                    class="font-mono font-semibold tabular-nums text-[#142b47]"
+                                    class="font-mono font-semibold tabular-nums text-slate-800 dark:text-slate-100"
                                 >
-                                    {{ formatMoney(row.original.total) }}
-                                </span>
-                            </template>
-
-                            <template #notes-cell="{ row }">
-                                <span
-                                    :class="
-                                        row.original.notes
-                                            ? 'text-slate-600'
-                                            : 'text-slate-400'
-                                    "
-                                >
-                                    {{ row.original.notes || '—' }}
-                                </span>
-                            </template>
-
-                            <template #receipt-footer>
-                                <span
-                                    class="text-[10px] font-semibold uppercase tracking-[0.08em] text-[#142b47]"
-                                >
-                                    Page subtotal
-                                </span>
-                            </template>
-
-                            <template #units-footer>
-                                <span class="font-mono font-semibold tabular-nums">
-                                    {{ visibleUnits }}
-                                </span>
-                            </template>
-
-                            <template #total-footer>
-                                <span
-                                    class="font-mono font-semibold tabular-nums text-[#142b47]"
-                                >
-                                    {{ formatMoney(visibleTotal) }}
+                                    {{ formatMoney(row.original.revenue) }}
                                 </span>
                             </template>
                         </UTable>
+                    </div>
 
-                        <div
-                            class="mt-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"
+                    <div
+                        class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm lg:col-span-4 dark:border-slate-700 dark:bg-slate-900"
+                    >
+                        <h2
+                            class="text-base font-semibold text-slate-900 dark:text-white"
                         >
-                            <p class="text-xs text-slate-500">
-                                Page {{ report.detail.meta.page }} of
-                                {{ report.detail.meta.pageCount }}
-                            </p>
-
-                            <div class="flex items-center justify-between gap-4">
-                                <USelect
-                                    v-model="pageSize"
-                                    :items="pageSizeOptions"
-                                    size="sm"
-                                    class="w-32"
-                                />
-
-                                <UPagination
-                                    v-model:page="page"
-                                    :total="report.detail.meta.total"
-                                    :items-per-page="pagination.pageSize"
-                                    :show-edges="true"
-                                    :show-controls="true"
-                                    size="sm"
-                                />
-                            </div>
-                        </div>
-                    </section>
-
-                    <!-- Certification and sign-off -->
-                    <section class="border-t-2 border-[#142b47] pt-5">
-                        <p class="text-xs leading-relaxed text-slate-600">
-                            <span class="font-semibold text-[#142b47]">
-                                CUSTODIAN CERTIFICATION.
-                            </span>
-                            This is to certify that the entries in this
-                            Custodian Sales Report were recorded from completed
-                            sales for the stated reporting period and reflect
-                            the inventory items, quantities, and amounts on
-                            file with the Property Custodian.
+                            Report Notes
+                        </h2>
+                        <p class="mt-1 text-xs text-slate-500 dark:text-slate-400">
+                            Basis of preparation
                         </p>
 
-                        <div class="mt-10 grid grid-cols-1 gap-8 sm:grid-cols-2">
-                            <div>
-                                <div class="h-8 border-b border-slate-400" />
-                                <p class="mt-2 text-xs text-slate-600">
-                                    Prepared by: Property Custodian
-                                </p>
-                            </div>
-                            <div>
-                                <div class="h-8 border-b border-slate-400" />
-                                <p class="mt-2 text-xs text-slate-600">
-                                    Verified by: Finance / Administrator
-                                </p>
-                            </div>
+                        <ul
+                            class="mt-4 space-y-3 text-xs leading-relaxed text-slate-600 dark:text-slate-300"
+                        >
+                            <li class="flex gap-2">
+                                <span aria-hidden="true">•</span>
+                                <span>Completed sales only are included.</span>
+                            </li>
+                            <li class="flex gap-2">
+                                <span aria-hidden="true">•</span>
+                                <span>
+                                    Revenue uses the item price saved with each
+                                    sale.
+                                </span>
+                            </li>
+                            <li class="flex gap-2">
+                                <span aria-hidden="true">•</span>
+                                <span>
+                                    Dates use purchase date when available,
+                                    otherwise the transaction date.
+                                </span>
+                            </li>
+                            <li class="flex gap-2">
+                                <span aria-hidden="true">•</span>
+                                <span>
+                                    The exported report includes certification
+                                    and sign-off lines.
+                                </span>
+                            </li>
+                        </ul>
+
+                        <div class="mt-5 border-t border-slate-200 pt-4 dark:border-slate-700">
+                            <p
+                                class="text-[10px] font-semibold uppercase tracking-[0.1em] text-slate-500 dark:text-slate-400"
+                            >
+                                Prepared By
+                            </p>
+                            <div class="mt-2 h-6 border-b border-slate-300 dark:border-slate-600" />
                         </div>
-                    </section>
-                </div>
-            </article>
+                    </div>
+                </section>
+
+                <!-- Sale details -->
+                <section
+                    class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm dark:border-slate-700 dark:bg-slate-900"
+                >
+                    <div
+                        class="flex flex-col gap-4 border-b border-slate-200 p-5 sm:flex-row sm:items-center sm:justify-between dark:border-slate-700"
+                    >
+                        <div>
+                            <h2
+                                class="text-base font-semibold text-slate-900 dark:text-white"
+                            >
+                                Sale Details
+                            </h2>
+                            <p class="text-xs text-slate-500 dark:text-slate-400">
+                                {{ report.detail.meta.total }} completed sale{{
+                                    report.detail.meta.total === 1 ? '' : 's'
+                                }}
+                                in this period
+                            </p>
+                        </div>
+
+                        <UInput
+                            v-model="search"
+                            icon="i-lucide-search"
+                            placeholder="Search receipt, student, notes..."
+                            size="sm"
+                            class="w-full sm:w-72"
+                        />
+                    </div>
+
+                    <UTable
+                        v-model:sorting="sorting"
+                        v-model:pagination="pagination"
+                        :data="report.detail.rows"
+                        :columns="detailColumns"
+                        :loading="pending"
+                        :pagination-options="{ manualPagination: true }"
+                        :sorting-options="{ manualSorting: true }"
+                        :empty="'No sales match your search.'"
+                        class="ledger-table text-sm"
+                    >
+                        <template #receipt-cell="{ row }">
+                            <span
+                                class="font-mono font-semibold tabular-nums text-slate-800 dark:text-slate-100"
+                            >
+                                {{ row.original.receiptNumber || '—' }}
+                            </span>
+                        </template>
+
+                        <template #date-cell="{ row }">
+                            <span class="whitespace-nowrap">
+                                {{ formatDateTime(row.original.effectiveDate) }}
+                            </span>
+                        </template>
+
+                        <template #student-cell="{ row }">
+                            <span>
+                                {{
+                                    row.original.studentName ||
+                                    row.original.studentIdNumber ||
+                                    '—'
+                                }}
+                            </span>
+                        </template>
+
+                        <template #items-cell="{ row }">
+                            <span
+                                class="block max-w-sm truncate"
+                                :title="itemSummary(row.original)"
+                            >
+                                {{ itemSummary(row.original) }}
+                            </span>
+                        </template>
+
+                        <template #units-cell="{ row }">
+                            <span class="font-mono tabular-nums">
+                                {{
+                                    row.original.lines.reduce(
+                                        (sum, line) => sum + line.qtyPulled,
+                                        0
+                                    )
+                                }}
+                            </span>
+                        </template>
+
+                        <template #total-cell="{ row }">
+                            <span
+                                class="font-mono font-semibold tabular-nums text-slate-800 dark:text-slate-100"
+                            >
+                                {{ formatMoney(row.original.total) }}
+                            </span>
+                        </template>
+
+                        <template #notes-cell="{ row }">
+                            <span
+                                :class="
+                                    row.original.notes
+                                        ? 'text-slate-600 dark:text-slate-300'
+                                        : 'text-slate-400 dark:text-slate-500'
+                                "
+                            >
+                                {{ row.original.notes || '—' }}
+                            </span>
+                        </template>
+
+                        <template #receipt-footer>
+                            <span
+                                class="text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-600 dark:text-slate-300"
+                            >
+                                Page subtotal
+                            </span>
+                        </template>
+
+                        <template #units-footer>
+                            <span class="font-mono font-semibold tabular-nums">
+                                {{ visibleUnits }}
+                            </span>
+                        </template>
+
+                        <template #total-footer>
+                            <span
+                                class="font-mono font-semibold tabular-nums text-slate-800 dark:text-slate-100"
+                            >
+                                {{ formatMoney(visibleTotal) }}
+                            </span>
+                        </template>
+                    </UTable>
+
+                    <div
+                        class="flex flex-col gap-4 border-t border-slate-200 px-5 py-4 sm:flex-row sm:items-center sm:justify-between dark:border-slate-700"
+                    >
+                        <p class="text-xs text-slate-500 dark:text-slate-400">
+                            Page {{ report.detail.meta.page }} of
+                            {{ report.detail.meta.pageCount }}
+                        </p>
+
+                        <div class="flex items-center justify-between gap-4">
+                            <USelect
+                                v-model="pageSize"
+                                :items="pageSizeOptions"
+                                size="sm"
+                                class="w-32"
+                            />
+
+                            <UPagination
+                                v-model:page="page"
+                                :total="report.detail.meta.total"
+                                :items-per-page="pagination.pageSize"
+                                :show-edges="true"
+                                :show-controls="true"
+                                size="sm"
+                            />
+                        </div>
+                    </div>
+                </section>
+            </template>
         </div>
 
         <!-- Off-screen, fixed-width layout captured by html2canvas-pro -->
@@ -688,11 +637,7 @@
                         <img
                             src="/logo.png"
                             alt=""
-                            style="
-                                width: 36px;
-                                height: 36px;
-                                object-fit: contain;
-                            "
+                            style="width: 36px; height: 36px; object-fit: contain"
                         />
                         <div>
                             <div
@@ -706,11 +651,7 @@
                                 SNC CUSTODIAN SYSTEM
                             </div>
                             <div
-                                style="
-                                    font-size: 10px;
-                                    color: #6b7280;
-                                    margin-top: 2px;
-                                "
+                                style="font-size: 10px; color: #6b7280; margin-top: 2px"
                             >
                                 School Property &amp; Inventory
                             </div>
@@ -801,182 +742,84 @@
                 </div>
             </div>
 
-            <div style="display: flex; gap: 16px; margin-top: 18px">
-                <div style="width: 64%">
-                    <h2
-                        style="
-                            font-size: 12px;
-                            font-weight: 700;
-                            color: #142b47;
-                            margin: 0 0 6px;
-                        "
+            <h2
+                style="
+                    font-size: 12px;
+                    font-weight: 700;
+                    color: #142b47;
+                    margin: 20px 0 6px;
+                "
+            >
+                Top Items
+            </h2>
+            <table
+                style="width: 100%; border-collapse: collapse; font-size: 9px"
+            >
+                <thead>
+                    <tr
+                        style="border-bottom: 2px solid #142b47; text-align: left"
                     >
-                        Top Items
-                    </h2>
-                    <table
-                        style="
-                            width: 100%;
-                            border-collapse: collapse;
-                            font-size: 9px;
-                        "
+                        <th style="padding: 5px 6px 5px 0">Item</th>
+                        <th style="padding: 5px 6px; text-align: right">Units</th>
+                        <th style="padding: 5px 6px; text-align: right">Sales</th>
+                        <th style="padding: 5px 6px; text-align: right">
+                            Share %
+                        </th>
+                        <th style="padding: 5px 0; text-align: right">Revenue</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr
+                        v-for="item in report.topItems"
+                        :key="`pdf-item-${item.itemId}`"
+                        style="border-bottom: 1px solid #d1d5db"
                     >
-                        <thead>
-                            <tr
-                                style="
-                                    border-bottom: 2px solid #142b47;
-                                    text-align: left;
-                                "
-                            >
-                                <th style="padding: 5px 6px 5px 0">Item</th>
-                                <th style="padding: 5px 6px; text-align: right">
-                                    Units
-                                </th>
-                                <th style="padding: 5px 6px; text-align: right">
-                                    Sales
-                                </th>
-                                <th style="padding: 5px 6px; text-align: right">
-                                    Share %
-                                </th>
-                                <th style="padding: 5px 0; text-align: right">
-                                    Revenue
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr
-                                v-for="item in report.topItems"
-                                :key="`pdf-item-${item.itemId}`"
-                                style="border-bottom: 1px solid #d1d5db"
-                            >
-                                <td style="padding: 5px 6px 5px 0">
-                                    {{ item.name }}
-                                </td>
-                                <td
-                                    style="
-                                        padding: 5px 6px;
-                                        text-align: right;
-                                        font-variant-numeric: tabular-nums;
-                                    "
-                                >
-                                    {{ item.units }}
-                                </td>
-                                <td
-                                    style="
-                                        padding: 5px 6px;
-                                        text-align: right;
-                                        font-variant-numeric: tabular-nums;
-                                    "
-                                >
-                                    {{ item.sales }}
-                                </td>
-                                <td
-                                    style="
-                                        padding: 5px 6px;
-                                        text-align: right;
-                                        font-variant-numeric: tabular-nums;
-                                    "
-                                >
-                                    {{ sharePercent(item.revenue) }}
-                                </td>
-                                <td
-                                    style="
-                                        padding: 5px 0;
-                                        text-align: right;
-                                        white-space: nowrap;
-                                        font-variant-numeric: tabular-nums;
-                                    "
-                                >
-                                    {{ formatMoney(item.revenue) }}
-                                </td>
-                            </tr>
-                            <tr v-if="!report.topItems.length">
-                                <td
-                                    colspan="5"
-                                    style="padding: 8px 0; color: #6b7280"
-                                >
-                                    No items sold in this period.
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-
-                <div style="width: 36%">
-                    <h2
-                        style="
-                            font-size: 12px;
-                            font-weight: 700;
-                            color: #142b47;
-                            margin: 0 0 6px;
-                        "
-                    >
-                        Revenue Trend
-                    </h2>
-                    <table
-                        style="
-                            width: 100%;
-                            border-collapse: collapse;
-                            font-size: 9px;
-                        "
-                    >
-                        <tbody>
-                            <tr
-                                v-for="bucket in report.buckets"
-                                :key="`pdf-bucket-${bucket.key}`"
-                            >
-                                <td
-                                    style="
-                                        padding: 3px 6px 3px 0;
-                                        white-space: nowrap;
-                                    "
-                                >
-                                    {{ bucket.label }}
-                                </td>
-                                <td style="padding: 3px 6px">
-                                    <div
-                                        style="
-                                            height: 7px;
-                                            background: #e2e8f0;
-                                            border-radius: 4px;
-                                        "
-                                    >
-                                        <div
-                                            :style="{
-                                                height: '7px',
-                                                background: '#142b47',
-                                                borderRadius: '4px',
-                                                width: `${bucketRevenuePercent(bucket.revenue)}%`,
-                                            }"
-                                        />
-                                    </div>
-                                </td>
-                                <td
-                                    style="
-                                        padding: 3px 0;
-                                        text-align: right;
-                                        white-space: nowrap;
-                                        font-variant-numeric: tabular-nums;
-                                    "
-                                >
-                                    {{ formatMoney(bucket.revenue) }}
-                                </td>
-                            </tr>
-                            <tr v-if="!report.buckets.length">
-                                <td
-                                    colspan="3"
-                                    style="padding: 8px 0; color: #6b7280"
-                                >
-                                    No completed sales in this period.
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                    <div style="font-size: 8px; color: #6b7280; margin-top: 6px">
-                        Peak: {{ peakBucket?.label ?? '—' }} ·
-                        {{ formatMoney(peakBucket?.revenue) }}
-                    </div>
-                </div>
-            </div>
+                        <td style="padding: 5px 6px 5px 0">{{ item.name }}</td>
+                        <td
+                            style="
+                                padding: 5px 6px;
+                                text-align: right;
+                                font-variant-numeric: tabular-nums;
+                            "
+                        >
+                            {{ item.units }}
+                        </td>
+                        <td
+                            style="
+                                padding: 5px 6px;
+                                text-align: right;
+                                font-variant-numeric: tabular-nums;
+                            "
+                        >
+                            {{ item.sales }}
+                        </td>
+                        <td
+                            style="
+                                padding: 5px 6px;
+                                text-align: right;
+                                font-variant-numeric: tabular-nums;
+                            "
+                        >
+                            {{ sharePercent(item.revenue) }}
+                        </td>
+                        <td
+                            style="
+                                padding: 5px 0;
+                                text-align: right;
+                                white-space: nowrap;
+                                font-variant-numeric: tabular-nums;
+                            "
+                        >
+                            {{ formatMoney(item.revenue) }}
+                        </td>
+                    </tr>
+                    <tr v-if="!report.topItems.length">
+                        <td colspan="5" style="padding: 8px 0; color: #6b7280">
+                            No items sold in this period.
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
 
             <h2
                 style="
@@ -989,18 +832,11 @@
                 Sale Details
             </h2>
             <table
-                style="
-                    width: 100%;
-                    border-collapse: collapse;
-                    font-size: 9px;
-                "
+                style="width: 100%; border-collapse: collapse; font-size: 9px"
             >
                 <thead>
                     <tr
-                        style="
-                            border-bottom: 2px solid #142b47;
-                            text-align: left;
-                        "
+                        style="border-bottom: 2px solid #142b47; text-align: left"
                     >
                         <th style="padding: 5px 6px 5px 0">Receipt #</th>
                         <th style="padding: 5px 6px">Date</th>
@@ -1122,9 +958,7 @@
                 "
             >
                 <p style="font-size: 9px; line-height: 1.5; color: #374151">
-                    <strong style="color: #142b47">
-                        CUSTODIAN CERTIFICATION.
-                    </strong>
+                    <strong style="color: #142b47">CUSTODIAN CERTIFICATION.</strong>
                     This is to certify that the entries in this Custodian Sales
                     Report were recorded from completed sales for the stated
                     reporting period and reflect the inventory items,
@@ -1156,7 +990,6 @@
 <script setup lang="ts">
 import type { TableColumn } from '@nuxt/ui'
 import type {
-    SalesReportBucket,
     SalesReportDetailRow,
     SalesReportItemRow,
 } from '#shared/types/report'
@@ -1222,15 +1055,9 @@ async function onExportPdf() {
     await exportPdf(pdfReport.value)
 }
 
-const compactMoney = new Intl.NumberFormat('en-PH', {
-    style: 'currency',
-    currency: 'PHP',
-    notation: 'compact',
-    maximumFractionDigits: 1,
-})
-
-function formatCompactMoney(value: number): string {
-    return compactMoney.format(value)
+async function onPreviewReport() {
+    generatedAt.value = formatGeneratedAt()
+    await exportPdf(pdfReport.value, 'preview')
 }
 
 const invalidRange = computed(
@@ -1291,7 +1118,8 @@ const visibleRows = computed(() => report.value?.detail.rows ?? [])
 const visibleUnits = computed(() =>
     visibleRows.value.reduce(
         (sum, row) =>
-            sum + row.lines.reduce((lineSum, line) => lineSum + line.qtyPulled, 0),
+            sum +
+            row.lines.reduce((lineSum, line) => lineSum + line.qtyPulled, 0),
         0
     )
 )
@@ -1302,56 +1130,14 @@ const visibleTotal = computed(() =>
 const pdfUnits = computed(() =>
     pdfRows.value.reduce(
         (sum, row) =>
-            sum + row.lines.reduce((lineSum, line) => lineSum + line.qtyPulled, 0),
+            sum +
+            row.lines.reduce((lineSum, line) => lineSum + line.qtyPulled, 0),
         0
     )
 )
 const pdfTotal = computed(() =>
     pdfRows.value.reduce((sum, row) => sum + (row.total ?? 0), 0)
 )
-
-const peakBucket = computed<SalesReportBucket | null>(() =>
-    (report.value?.buckets ?? []).reduce<SalesReportBucket | null>(
-        (best, bucket) =>
-            !best || (bucket.revenue ?? 0) > (best.revenue ?? 0)
-                ? bucket
-                : best,
-        null
-    )
-)
-
-function shortBucketLabel(bucket: SalesReportBucket): string {
-    const [year, month, day] = bucket.key.split('-').map(Number)
-    if (!year || !month) {
-        return bucket.label
-    }
-
-    const date = new Date(year, month - 1, day ?? 1)
-    return new Intl.DateTimeFormat(
-        'en-US',
-        appliedRange.value.granularity === 'month'
-            ? { month: 'short', year: '2-digit' }
-            : { month: 'short', day: 'numeric' }
-    ).format(date)
-}
-
-const chartData = computed(() =>
-    (report.value?.buckets ?? []).map((bucket) => ({
-        label: shortBucketLabel(bucket),
-        revenue: bucket.revenue ?? 0,
-    }))
-)
-
-const maxBucketRevenue = computed(() =>
-    Math.max(
-        1,
-        ...(report.value?.buckets.map((bucket) => bucket.revenue ?? 0) ?? [])
-    )
-)
-
-function bucketRevenuePercent(revenue: number | null): number {
-    return Math.max(2, ((revenue ?? 0) / maxBucketRevenue.value) * 100)
-}
 
 function itemSummary(row: SalesReportDetailRow): string {
     return (
@@ -1380,12 +1166,16 @@ const itemColumns: TableColumn<SalesReportItemRow>[] = [
     {
         accessorKey: 'units',
         header: 'Units',
-        meta: { class: { th: 'text-right', td: 'text-right font-mono tabular-nums' } },
+        meta: {
+            class: { th: 'text-right', td: 'text-right font-mono tabular-nums' },
+        },
     },
     {
         accessorKey: 'sales',
         header: 'Sales',
-        meta: { class: { th: 'text-right', td: 'text-right font-mono tabular-nums' } },
+        meta: {
+            class: { th: 'text-right', td: 'text-right font-mono tabular-nums' },
+        },
     },
     {
         id: 'share',
@@ -1452,8 +1242,8 @@ const detailColumns: TableColumn<SalesReportDetailRow>[] = [
 <style scoped>
 .ledger-table :deep([data-slot='thead'] th) {
     background: #f8fafc;
-    border-bottom: 1px solid #94a3b8;
-    color: #142b47;
+    border-bottom: 1px solid #cbd5e1;
+    color: #334155;
     font-size: 10px;
     font-weight: 700;
     letter-spacing: 0.05em;
@@ -1462,7 +1252,7 @@ const detailColumns: TableColumn<SalesReportDetailRow>[] = [
 
 .ledger-table :deep([data-slot='tbody'] td) {
     border-bottom: 1px solid #e2e8f0;
-    color: #1f2937;
+    color: #334155;
 }
 
 .ledger-table :deep([data-slot='tr']:last-child td) {
@@ -1471,7 +1261,7 @@ const detailColumns: TableColumn<SalesReportDetailRow>[] = [
 
 .ledger-table :deep([data-slot='tfoot'] th) {
     background: #f8fafc;
-    border-top: 1px solid #94a3b8;
-    color: #142b47;
+    border-top: 1px solid #cbd5e1;
+    color: #334155;
 }
 </style>

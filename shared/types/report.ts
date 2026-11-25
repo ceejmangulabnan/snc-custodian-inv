@@ -1,18 +1,13 @@
-export type ReportGranularity = 'day' | 'month'
-
 export interface ReportRange {
     start: string
     end: string
     label: string
-    granularity: ReportGranularity
     tzOffsetMinutes: number
 }
 
 export interface SalesReportQuery {
     start: string
     end: string
-    tzOffsetMinutes: number
-    granularity: ReportGranularity
     page: number
     pageSize: number
     search: string
@@ -28,14 +23,6 @@ export interface SalesReportSummary {
     pricedSales: number
     students: number
     cashiers: number
-}
-
-export interface SalesReportBucket {
-    key: string
-    label: string
-    sales: number
-    units: number
-    revenue: number | null
 }
 
 export interface SalesReportItemRow {
@@ -88,7 +75,6 @@ export interface SalesReportPagination {
 
 export interface SalesReportResponse {
     summary: SalesReportSummary
-    buckets: SalesReportBucket[]
     topItems: SalesReportItemRow[]
     cashiers: SalesReportCashierRow[]
     detail: {

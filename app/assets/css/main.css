@@ -22,8 +22,8 @@
  | Print styles
  |--------------------------------------------------------------------------
  | Admin printouts should read like a plain paper report: no chrome, no dark
- | backgrounds, and no split rows. The report page marks its own print-only
- | sections with `print:` utilities; these rules cover the shared shell.
+ | backgrounds, and no split rows. Reports are exported as generated PDFs;
+ | these rules keep browser printing of shared pages readable too.
  */
 @media print {
     @page {
@@ -73,16 +73,6 @@
     .shadow-lg,
     .shadow-xl {
         box-shadow: none !important;
-    }
-
-    /* Reports ledger: keep the paper sheet and its rules intact. */
-    .reports-canvas {
-        background: #fff !important;
-    }
-
-    .ledger-sheet {
-        max-width: none !important;
-        border-color: #94a3b8 !important;
     }
 
     .ledger-table thead {

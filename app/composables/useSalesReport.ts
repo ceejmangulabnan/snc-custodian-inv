@@ -8,8 +8,7 @@ import type {
 
 export type ReportPeriodMode = 'monthly' | 'yearly' | 'manual'
 export type PdfOrientation = 'landscape' | 'portrait'
-
-const MILLISECONDS_PER_DAY = 86_400_000
+export type PdfExportMode = 'download' | 'preview'
 
 function toDateInput(date: Date): string {
     const month = String(date.getMonth() + 1).padStart(2, '0')
@@ -117,7 +116,6 @@ export function useSalesReport() {
                     999
                 ).toISOString(),
                 label: String(selectedYear),
-                granularity: 'month',
                 tzOffsetMinutes,
             }
         }
@@ -125,15 +123,11 @@ export function useSalesReport() {
         if (periodMode.value === 'manual') {
             const start = parseDateInput(manualStart.value, false)
             const end = parseDateInput(manualEnd.value, true)
-            const days = Math.round(
-                (end.getTime() - start.getTime()) / MILLISECONDS_PER_DAY
-            )
 
             return {
                 start: start.toISOString(),
                 end: end.toISOString(),
                 label: `${toDateInput(start)} – ${toDateInput(end)}`,
-                granularity: days > 62 ? 'month' : 'day',
                 tzOffsetMinutes,
             }
         }
@@ -151,7 +145,6 @@ export function useSalesReport() {
                 month: 'long',
                 year: 'numeric',
             }).format(start),
-            granularity: 'day',
             tzOffsetMinutes,
         }
     }
@@ -189,7 +182,8 @@ export function useSalesReport() {
         }
 
         return {
-            ...appliedRange.value,
+            start: appliedRange.value.start,
+            end: appliedRange.value.end,
             page: page.value,
             pageSize: pageSize.value,
             search: searchQuery.value,
@@ -286,11 +280,27 @@ export function useSalesReport() {
     const pdfPending = ref(false)
     const pdfOrientation = ref<PdfOrientation>('portrait')
 
-    async function exportPdf(element: HTMLElement | null) {
+    async function exportPdf(
+        element: HTMLElement | null,
+        mode: PdfExportMode = 'download'
+    ) {
         if (!element) {
             toast.add({
                 title: 'Could not generate PDF',
                 description: 'The report layout is not ready yet.',
+                color: 'error',
+            })
+            return
+        }
+
+        // Open the tab synchronously so the browser does not block the popup
+        // after the async fetch/capture work finishes.
+        const previewWindow =
+            mode === 'preview' ? window.open('', '_blank') : null
+        if (mode === 'preview' && !previewWindow) {
+            toast.add({
+                title: 'Could not open preview',
+                description: 'Allow pop-ups for this site and try again.',
                 color: 'error',
             })
             return
@@ -411,14 +421,24 @@ export function useSalesReport() {
 
             const filenameStart = toDateInput(new Date(appliedRange.value.start))
             const filenameEnd = toDateInput(new Date(appliedRange.value.end))
-            pdf.save(`sales-report-${filenameStart}-to-${filenameEnd}.pdf`)
+            const filename = `sales-report-${filenameStart}-to-${filenameEnd}.pdf`
+
+            if (previewWindow) {
+                const url = URL.createObjectURL(pdf.output('blob'))
+                previewWindow.location.href = url
+                previewWindow.focus()
+                window.setTimeout(() => URL.revokeObjectURL(url), 60_000)
+            } else {
+                pdf.save(filename)
+            }
 
             toast.add({
-                title: 'PDF generated',
-                description: `${pages} page${pages === 1 ? '' : 's'} saved.`,
+                title: previewWindow ? 'PDF preview opened' : 'PDF generated',
+                description: `${pages} page${pages === 1 ? '' : 's'} ${previewWindow ? 'ready' : 'saved'}.`,
                 color: 'success',
             })
         } catch (pdfError) {
+            previewWindow?.close()
             toast.add({
                 title: 'Could not generate PDF',
                 description:
