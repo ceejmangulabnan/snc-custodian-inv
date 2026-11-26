@@ -457,7 +457,7 @@
                     >
                         <template #receipt-cell="{ row }">
                             <span
-                                class="font-mono font-semibold tabular-nums text-slate-800 dark:text-slate-100"
+                                class="whitespace-nowrap font-mono font-semibold tabular-nums text-slate-800 dark:text-slate-100"
                             >
                                 {{ row.original.receiptNumber || '—' }}
                             </span>
@@ -470,7 +470,7 @@
                         </template>
 
                         <template #student-cell="{ row }">
-                            <span>
+                            <span class="whitespace-normal break-words">
                                 {{
                                     row.original.studentName ||
                                     row.original.studentIdNumber ||
@@ -480,16 +480,13 @@
                         </template>
 
                         <template #items-cell="{ row }">
-                            <span
-                                class="block max-w-sm truncate"
-                                :title="itemSummary(row.original)"
-                            >
+                            <span class="block max-w-sm whitespace-normal break-words">
                                 {{ itemSummary(row.original) }}
                             </span>
                         </template>
 
                         <template #units-cell="{ row }">
-                            <span class="font-mono tabular-nums">
+                            <span class="whitespace-nowrap font-mono tabular-nums">
                                 {{
                                     row.original.lines.reduce(
                                         (sum, line) => sum + line.qtyPulled,
@@ -501,7 +498,7 @@
 
                         <template #total-cell="{ row }">
                             <span
-                                class="font-mono font-semibold tabular-nums text-slate-800 dark:text-slate-100"
+                                class="whitespace-nowrap font-mono font-semibold tabular-nums text-slate-800 dark:text-slate-100"
                             >
                                 {{ formatMoney(row.original.total) }}
                             </span>
@@ -509,6 +506,8 @@
 
                         <template #notes-cell="{ row }">
                             <span
+                                class="block max-w-[10rem] truncate"
+                                :title="row.original.notes || ''"
                                 :class="
                                     row.original.notes
                                         ? 'text-slate-600 dark:text-slate-300'
@@ -752,7 +751,7 @@
                         <th style="padding: 5px 6px; text-align: right">
                             Total
                         </th>
-                        <th style="padding: 5px 0">Notes</th>
+                        <th style="padding: 5px 0; width: 90px">Notes</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -783,6 +782,7 @@
                             style="
                                 padding: 5px 6px;
                                 text-align: right;
+                                white-space: nowrap;
                                 font-variant-numeric: tabular-nums;
                             "
                         >
@@ -803,7 +803,15 @@
                         >
                             {{ formatMoney(row.total) }}
                         </td>
-                        <td style="padding: 5px 0; word-break: break-word">
+                        <td
+                            style="
+                                padding: 5px 0;
+                                max-width: 90px;
+                                overflow: hidden;
+                                text-overflow: ellipsis;
+                                white-space: nowrap;
+                            "
+                        >
                             {{ row.notes || '—' }}
                         </td>
                     </tr>
@@ -1065,11 +1073,23 @@ const detailColumns: TableColumn<SalesReportDetailRow>[] = [
         id: 'receipt',
         header: 'Receipt #',
         footer: '',
+        meta: {
+            class: {
+                th: 'whitespace-nowrap',
+                td: 'whitespace-nowrap',
+            },
+        },
     },
     {
         accessorKey: 'effectiveDate',
         id: 'date',
         header: 'Date',
+        meta: {
+            class: {
+                th: 'whitespace-nowrap',
+                td: 'whitespace-nowrap',
+            },
+        },
     },
     {
         accessorKey: 'studentName',
@@ -1086,13 +1106,23 @@ const detailColumns: TableColumn<SalesReportDetailRow>[] = [
         header: 'Units',
         enableSorting: false,
         footer: '',
-        meta: { class: { th: 'text-right', td: 'text-right' } },
+        meta: {
+            class: {
+                th: 'text-right whitespace-nowrap',
+                td: 'text-right whitespace-nowrap',
+            },
+        },
     },
     {
         accessorKey: 'total',
         header: 'Total',
         footer: '',
-        meta: { class: { th: 'text-right', td: 'text-right' } },
+        meta: {
+            class: {
+                th: 'text-right whitespace-nowrap',
+                td: 'text-right whitespace-nowrap',
+            },
+        },
     },
     {
         accessorKey: 'notes',
@@ -1100,8 +1130,8 @@ const detailColumns: TableColumn<SalesReportDetailRow>[] = [
         enableSorting: false,
         meta: {
             class: {
-                td: 'hidden xl:table-cell',
-                th: 'hidden xl:table-cell',
+                td: 'hidden xl:table-cell whitespace-nowrap',
+                th: 'hidden xl:table-cell whitespace-nowrap',
             },
         },
     },
