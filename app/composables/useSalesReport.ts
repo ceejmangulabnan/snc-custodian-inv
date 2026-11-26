@@ -149,7 +149,14 @@ export function useSalesReport() {
         }
     }
 
+    // Period selectors are draft state; only applyPeriod promotes them to the
+    // range used by the query, so editing them never triggers a fetch.
     const appliedRange = ref<ReportRange>(computeRange())
+    const periodDirty = computed(
+        () =>
+            JSON.stringify(computeRange()) !==
+            JSON.stringify(appliedRange.value)
+    )
     const sorting = ref<SortingState>([])
     const pagination = ref({ pageIndex: 0, pageSize: 10 })
 
@@ -458,6 +465,7 @@ export function useSalesReport() {
         manualStart,
         manualEnd,
         appliedRange,
+        periodDirty,
         search,
         sorting,
         pagination,

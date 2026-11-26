@@ -8,7 +8,10 @@
                 <div
                     class="flex flex-col gap-3 xl:flex-row xl:items-end xl:justify-between"
                 >
-                    <div class="flex flex-wrap items-end gap-3">
+                    <form
+                        class="flex flex-wrap items-end gap-3"
+                        @submit.prevent="applyPeriod"
+                    >
                         <div>
                             <p
                                 class="mb-1.5 text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-500 dark:text-slate-400"
@@ -22,6 +25,7 @@
                                 <UButton
                                     v-for="mode in periodModes"
                                     :key="mode.value"
+                                    type="button"
                                     size="sm"
                                     :color="
                                         periodMode === mode.value
@@ -110,17 +114,19 @@
                                 />
                             </div>
 
-                            <UButton
-                                icon="i-lucide-check"
-                                color="primary"
-                                size="sm"
-                                :disabled="invalidRange"
-                                @click="applyPeriod"
-                            >
-                                Apply
-                            </UButton>
                         </template>
-                    </div>
+
+                        <UButton
+                            type="submit"
+                            icon="i-lucide-check"
+                            color="primary"
+                            size="sm"
+                            :disabled="invalidRange"
+                            :loading="pending"
+                        >
+                            Apply period
+                        </UButton>
+                    </form>
 
                     <div class="flex flex-wrap items-end gap-2">
                         <div>
@@ -195,6 +201,12 @@
                         </span>
                     </span>
                     <span aria-hidden="true">·</span>
+                    <template v-if="periodDirty">
+                        <span class="font-medium text-amber-600">
+                            Unapplied changes — select Apply period to refresh.
+                        </span>
+                        <span aria-hidden="true">·</span>
+                    </template>
                     <span>
                         Dates use purchase date when available, otherwise the
                         transaction date.
@@ -923,6 +935,7 @@ const {
     manualStart,
     manualEnd,
     appliedRange,
+    periodDirty,
     search,
     sorting,
     pagination,
